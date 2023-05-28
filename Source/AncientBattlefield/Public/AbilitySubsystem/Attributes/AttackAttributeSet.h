@@ -21,10 +21,10 @@ public:
 	GAMEPLAYATTRIBUTE_VALUE_SETTER(AttackPower)
 	GAMEPLAYATTRIBUTE_VALUE_INITTER(AttackPower)
 
-	GAMEPLAYATTRIBUTE_PROPERTY_GETTER(UAttackAttributeSet, MeleeMoveFactor)
-	GAMEPLAYATTRIBUTE_VALUE_GETTER(MeleeMoveFactor)
-	GAMEPLAYATTRIBUTE_VALUE_SETTER(MeleeMoveFactor)
-	GAMEPLAYATTRIBUTE_VALUE_INITTER(MeleeMoveFactor)
+	GAMEPLAYATTRIBUTE_PROPERTY_GETTER(UAttackAttributeSet, CauseDamageFactor)
+	GAMEPLAYATTRIBUTE_VALUE_GETTER(CauseDamageFactor)
+	GAMEPLAYATTRIBUTE_VALUE_SETTER(CauseDamageFactor)
+	GAMEPLAYATTRIBUTE_VALUE_INITTER(CauseDamageFactor)
 
 	GAMEPLAYATTRIBUTE_PROPERTY_GETTER(UAttackAttributeSet, ShockLevel)
 	GAMEPLAYATTRIBUTE_VALUE_GETTER(ShockLevel)
@@ -34,15 +34,12 @@ public:
 private:
 	friend struct DamageStatics;
 
-	// ������
 	UPROPERTY(BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData AttackPower;
 
-	// �������蹥��֡�еĸ�����ʽ�˺�ϵ��
 	UPROPERTY(BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = true))
-	FGameplayAttributeData MeleeMoveFactor;
+	FGameplayAttributeData CauseDamageFactor;
 
-	// �������蹥��֡�еĸ��ӳ��ǿ��
 	UPROPERTY(BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData ShockLevel;
 };

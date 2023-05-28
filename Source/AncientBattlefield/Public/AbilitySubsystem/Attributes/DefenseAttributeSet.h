@@ -42,19 +42,15 @@ protected:
 private:
 	friend struct DamageStatics;
 
-	// ������
 	UPROPERTY(BlueprintReadOnly, Category = "Defense", meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData DefensePower;
 
-	// ͨ�ó���ϵ��
 	UPROPERTY(BlueprintReadOnly, Category = "Defense", meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData ApplyDamageFactor;
 
-	// ���ܳ��ʱ������ǿ��
 	UPROPERTY(BlueprintReadOnly, Category = "Defense", meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData StoicLevel;
 
-	// �ܵ�������˲ʱ�ȶ�״̬
 	UPROPERTY(BlueprintReadOnly, Category = "Defense", meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData StableState;
 };

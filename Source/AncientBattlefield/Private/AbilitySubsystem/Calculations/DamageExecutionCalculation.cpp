@@ -26,7 +26,7 @@
 struct DamageStatics
 {
 	DECLARE_SOURCE_ATTRIBUTE_CAPTUREDEF(AttackPower, Source);
-	DECLARE_SOURCE_ATTRIBUTE_CAPTUREDEF(MeleeMoveFactor, Source);
+	DECLARE_SOURCE_ATTRIBUTE_CAPTUREDEF(CauseDamageFactor, Source);
 	DECLARE_SOURCE_ATTRIBUTE_CAPTUREDEF(ShockLevel, Source);
 
 	DECLARE_SOURCE_ATTRIBUTE_CAPTUREDEF(DefensePower, Target);
@@ -40,7 +40,7 @@ struct DamageStatics
 	{
 		// 伤害来源的属性
 		DEFINE_SOURCE_ATTRIBUTE_CAPTUREDEF(UAttackAttributeSet, AttackPower, Source, true);
-		DEFINE_SOURCE_ATTRIBUTE_CAPTUREDEF(UAttackAttributeSet, MeleeMoveFactor, Source, true);
+		DEFINE_SOURCE_ATTRIBUTE_CAPTUREDEF(UAttackAttributeSet, CauseDamageFactor, Source, true);
 		DEFINE_SOURCE_ATTRIBUTE_CAPTUREDEF(UAttackAttributeSet, ShockLevel, Source, true);
 
 		// 伤害目标的属性
@@ -62,7 +62,7 @@ static const DamageStatics& DamageStaticsInst()
 UDamageExecutionCalculation::UDamageExecutionCalculation()
 {
 	RelevantAttributesToCapture.Add(DamageStaticsInst().SourceAttackPowerDef);
-	RelevantAttributesToCapture.Add(DamageStaticsInst().SourceMeleeMoveFactorDef);
+	RelevantAttributesToCapture.Add(DamageStaticsInst().SourceCauseDamageFactorDef);
 	RelevantAttributesToCapture.Add(DamageStaticsInst().SourceShockLevelDef);
 	RelevantAttributesToCapture.Add(DamageStaticsInst().TargetDefensePowerDef);
 	RelevantAttributesToCapture.Add(DamageStaticsInst().TargetApplyDamageFactorDef);
@@ -90,15 +90,15 @@ void UDamageExecutionCalculation::Execute_Implementation(const FGameplayEffectCu
 	EvaluationParameters.TargetTags = TargetTags;
 
 	// --------------------------------------
-	//	CauseDamage = MeleeMoveFactos * AttackPower
+	//	CauseDamage = CauseDamageFactor * AttackPower
 	//	ApplyDamage = CauseDamage * ApplyDamageFactor * (DefensePower / (DefensePower + 100))
 	// --------------------------------------
 
 	float SourceAttackPower = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().SourceAttackPowerDef, EvaluationParameters, SourceAttackPower);
 
-	float SourceMeleeMoveFactor = 0.f;
-	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().SourceMeleeMoveFactorDef, EvaluationParameters, SourceMeleeMoveFactor);
+	float SourceCauseDamageFactor = 0.f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().SourceCauseDamageFactorDef, EvaluationParameters, SourceCauseDamageFactor);
 
 	float TargetDefensePower = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().TargetDefensePowerDef, EvaluationParameters, TargetDefensePower);
@@ -106,8 +106,8 @@ void UDamageExecutionCalculation::Execute_Implementation(const FGameplayEffectCu
 	float TargetApplyDamageFactor = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().TargetApplyDamageFactorDef, EvaluationParameters, TargetApplyDamageFactor);
 
-	// Health = Health - (攻击力 * 招式系数 * 承伤系数 * (100 / (防御力 + 100)))
-	float ApplyDamage = SourceAttackPower * SourceMeleeMoveFactor * TargetApplyDamageFactor * (100.f / (TargetDefensePower + 100.f));
+	// Health = Health - (来源攻击力 * 来源造成伤害系数 * 目标承受伤害系数 * (100 / (目标防御力 + 100)))
+	float ApplyDamage = SourceAttackPower * SourceCauseDamageFactor * TargetApplyDamageFactor * (100.f / (TargetDefensePower + 100.f));
 	UE_LOG(LogTemp, Error, TEXT("Damage %f"), ApplyDamage);
 	if (ApplyDamage > 0.f)
 	{
