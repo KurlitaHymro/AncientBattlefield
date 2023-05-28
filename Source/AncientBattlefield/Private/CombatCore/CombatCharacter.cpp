@@ -1,11 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Combat/CombatCharacter.h"
+#include "CombatCore/CombatCharacter.h"
 #include "Components/CombatAbilitySystemComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "AbilitySubsystem/AbilitySubsystemComponent.h"
 
 ACombatCharacter::ACombatCharacter()
 {
@@ -29,6 +30,9 @@ ACombatCharacter::ACombatCharacter()
 	GetCharacterMovement()->MaxWalkSpeed = 420.f;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
+
+	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySubsystemComponent>(TEXT("AbilitySystemComponent"));
+	AbilitySystemComponent->SetIsReplicated(true);
 }
 
 void ACombatCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

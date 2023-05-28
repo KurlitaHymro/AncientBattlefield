@@ -21,6 +21,8 @@ public class AncientBattlefield : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new string[] {
 			"GameplayAbilities",
+			"GameplayTasks",
+			"GameplayTags",
 			"CombatFramework",
 			"PawnEnhancedInput",
 			"EnhancedInput",
