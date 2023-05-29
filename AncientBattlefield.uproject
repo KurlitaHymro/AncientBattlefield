@@ -7,7 +7,10 @@
 		{
 			"Name": "AncientBattlefield",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"CombatFramework"
+			]
 		}
 	],
 	"Plugins": [
@@ -25,6 +28,14 @@
 			"SupportedTargetPlatforms": [
 				"Win64"
 			]
+		},
+		{
+			"Name": "CombatCore",
+			"Enabled": true
+		},
+		{
+			"Name": "EmptyHandedPunch",
+			"Enabled": true
 		}
 	]
 }
