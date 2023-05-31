@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "AbilitySubsystem/AbilitySubsystemComponent.h"
+#include "AbilitySystem/CombatAbilitySystemComponent.h"
 #include "CombatCore/CombatCharacter.h"
 #include "AbilitySystemGlobals.h"
 
-void UAbilitySubsystemComponent::BeginPlay()
+void UCombatAbilitySystemComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -13,14 +13,14 @@ void UAbilitySubsystemComponent::BeginPlay()
 	OwnerCharacter->OnHitActor.AddDynamic(this, &ThisClass::HandleHitEvent);
 }
 
-void UAbilitySubsystemComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void UCombatAbilitySystemComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
 	OwnerCharacter->OnHitActor.RemoveAll(this);
 }
 
-void UAbilitySubsystemComponent::HandleHitEvent(AActor* Target)
+void UCombatAbilitySystemComponent::HandleHitEvent(AActor* Target)
 {
 	AActor* Instigator = GetOwner();
 	auto TargetASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(Target);

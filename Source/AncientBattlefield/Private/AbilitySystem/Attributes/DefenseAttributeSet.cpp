@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "AbilitySubsystem/Attributes/DefenseAttributeSet.h"
+#include "AbilitySystem/Attributes/DefenseAttributeSet.h"
 #include "AbilitySystemGlobals.h"
 
 void UDefenseAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue)

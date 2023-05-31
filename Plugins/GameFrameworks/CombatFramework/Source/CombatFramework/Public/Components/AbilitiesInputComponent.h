@@ -49,7 +49,7 @@ private:
 
 private:
 	UPROPERTY(transient)
-	class UCombatAbilitySystemComponent* ASC;
+	class URegisteredAbilitySystemComponent* ASC;
 
 	UPROPERTY(transient)
 	TMap<UInputAction*, FAbilityInputBinding> MappedAbilities;

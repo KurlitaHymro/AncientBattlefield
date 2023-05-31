@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "AbilitySubsystem/Attributes/HealthAttributeSet.h"
+#include "AbilitySystem/Attributes/HealthAttributeSet.h"
 #include "CombatCore/CombatCharacter.h"
 
 void UHealthAttributeSet::InitFromMetaDataTable(const UDataTable* DataTable)

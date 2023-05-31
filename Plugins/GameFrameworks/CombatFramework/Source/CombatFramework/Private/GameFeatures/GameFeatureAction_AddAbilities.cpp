@@ -3,7 +3,7 @@
 
 #include "GameFeatures/GameFeatureAction_AddAbilities.h"
 #include "Components/GameFrameworkComponentManager.h"
-#include "Components/CombatAbilitySystemComponent.h"
+#include "Components/RegisteredAbilitySystemComponent.h"
 #include "Components/AbilitiesInputComponent.h"
 #include "Engine/AssetManager.h"
 #include "GameFeaturesSubsystemSettings.h"
@@ -167,7 +167,7 @@ void UGameFeatureAction_AddAbilities::HandleActorExtension(AActor* Actor, FName 
 
 void UGameFeatureAction_AddAbilities::AddActorAbilities(AActor* Actor, const FCombatAbilitiesEntry& Entry)
 {
-	if (UCombatAbilitySystemComponent* AbilitySystemComponent = FindOrAddComponentForActor<UCombatAbilitySystemComponent>(Actor, Entry))
+	if (URegisteredAbilitySystemComponent* AbilitySystemComponent = FindOrAddComponentForActor<URegisteredAbilitySystemComponent>(Actor, Entry))
 	{
 		FActorExtensions AddedExtensions;
 		AddedExtensions.Abilities.Reserve(Entry.GrantedAbilities.Num());
@@ -177,7 +177,7 @@ void UGameFeatureAction_AddAbilities::AddActorAbilities(AActor* Actor, const FCo
 		{
 			if (!Ability.AbilityType.IsNull())
 			{
-				int32 AbilityID = AbilitySystemComponent->SynchronousLoadAbility(Ability.AbilityType);
+				int32 AbilityID = AbilitySystemComponent->LoadAbilityFromType(Ability.AbilityType);
 
 				if (!Ability.InputAction.IsNull())
 				{
@@ -231,7 +231,7 @@ void UGameFeatureAction_AddAbilities::RemoveActorAbilities(AActor* Actor)
 {
 	if (FActorExtensions* ActorExtensions = ActiveExtensions.Find(Actor))
 	{
-		if (UCombatAbilitySystemComponent* AbilitySystemComponent = Actor->FindComponentByClass<UCombatAbilitySystemComponent>())
+		if (URegisteredAbilitySystemComponent* AbilitySystemComponent = Actor->FindComponentByClass<URegisteredAbilitySystemComponent>())
 		{
 			for (UAttributeSet* AttribSetInstance : ActorExtensions->Attributes)
 			{

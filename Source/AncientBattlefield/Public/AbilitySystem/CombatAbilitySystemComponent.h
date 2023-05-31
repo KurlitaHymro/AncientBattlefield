@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/CombatAbilitySystemComponent.h"
-#include "AbilitySubsystemComponent.generated.h"
+#include "Components/RegisteredAbilitySystemComponent.h"
+#include "CombatAbilitySystemComponent.generated.h"
 
 /**
  * 
  */
 UCLASS(meta = (BlueprintSpawnableComponent))
-class ANCIENTBATTLEFIELD_API UAbilitySubsystemComponent : public UCombatAbilitySystemComponent
+class ANCIENTBATTLEFIELD_API UCombatAbilitySystemComponent : public URegisteredAbilitySystemComponent
 {
 	GENERATED_BODY()
 

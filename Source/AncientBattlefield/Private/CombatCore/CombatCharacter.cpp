@@ -2,11 +2,10 @@
 
 
 #include "CombatCore/CombatCharacter.h"
-#include "Components/CombatAbilitySystemComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "AbilitySubsystem/AbilitySubsystemComponent.h"
+#include "AbilitySystem/CombatAbilitySystemComponent.h"
 
 ACombatCharacter::ACombatCharacter()
 {
@@ -31,7 +30,7 @@ ACombatCharacter::ACombatCharacter()
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 
-	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySubsystemComponent>(TEXT("AbilitySystemComponent"));
+	AbilitySystemComponent = CreateDefaultSubobject<UCombatAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(true);
 }
 

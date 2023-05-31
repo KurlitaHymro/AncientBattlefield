@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Components/CombatAbilitySystemComponent.h"
+#include "Components/RegisteredAbilitySystemComponent.h"
 
-namespace CombatAbilitySystemComponent_Impl
+namespace RegisteredAbilitySystemComponent_Impl
 {
 	constexpr int32 InvalidID = 0;
 	int32 IncrementingID = InvalidID;
@@ -14,7 +14,7 @@ namespace CombatAbilitySystemComponent_Impl
 	}
 }
 
-void UCombatAbilitySystemComponent::RemoveAbility(int32 AbilityID)
+void URegisteredAbilitySystemComponent::RemoveAbility(int32 AbilityID)
 {
 	FBattleAbilityEntry* Ability = MappedAbilities.Find(AbilityID);
 	if (Ability)
@@ -24,7 +24,7 @@ void UCombatAbilitySystemComponent::RemoveAbility(int32 AbilityID)
 	}
 }
 
-void UCombatAbilitySystemComponent::EnableAbility(int32 AbilityID)
+void URegisteredAbilitySystemComponent::EnableAbility(int32 AbilityID)
 {
 	FBattleAbilityEntry* Ability = MappedAbilities.Find(AbilityID);
 	if (Ability)
@@ -33,19 +33,19 @@ void UCombatAbilitySystemComponent::EnableAbility(int32 AbilityID)
 	}
 }
 
-void UCombatAbilitySystemComponent::DisableAbility(int32 AbilityID)
+void URegisteredAbilitySystemComponent::DisableAbility(int32 AbilityID)
 {
 	FBattleAbilityEntry* Ability = MappedAbilities.Find(AbilityID);
 	if (Ability)
 	{
-		Ability->AbilitySpec.InputID = CombatAbilitySystemComponent_Impl::InvalidID;
+		Ability->AbilitySpec.InputID = RegisteredAbilitySystemComponent_Impl::InvalidID;
 	}
 }
 
-int32 UCombatAbilitySystemComponent::SynchronousLoadAbility(TSoftClassPtr<UGameplayAbility> AbilityType)
+int32 URegisteredAbilitySystemComponent::LoadAbilityFromType(TSoftClassPtr<UGameplayAbility> AbilityType)
 {
 	FGameplayAbilitySpec AbilitySpec(AbilityType.LoadSynchronous());
-	int32 newID = CombatAbilitySystemComponent_Impl::GetNextID();
+	int32 newID = RegisteredAbilitySystemComponent_Impl::GetNextID();
 	AbilitySpec.InputID = newID;
 	FGameplayAbilitySpecHandle AbilityHandle = GiveAbility(AbilitySpec);
 
@@ -57,7 +57,7 @@ int32 UCombatAbilitySystemComponent::SynchronousLoadAbility(TSoftClassPtr<UGamep
 	return newID;
 }
 
-int32 UCombatAbilitySystemComponent::FindAbilityByType(TSoftClassPtr<UGameplayAbility> AbilityType)
+int32 URegisteredAbilitySystemComponent::FindAbilityByType(TSoftClassPtr<UGameplayAbility> AbilityType)
 {
 	auto MappedIterator = MappedAbilities.CreateIterator();
 	while (MappedIterator)
@@ -68,5 +68,5 @@ int32 UCombatAbilitySystemComponent::FindAbilityByType(TSoftClassPtr<UGameplayAb
 		}
 		++MappedIterator;
 	}
-	return CombatAbilitySystemComponent_Impl::InvalidID;
+	return RegisteredAbilitySystemComponent_Impl::InvalidID;
 }

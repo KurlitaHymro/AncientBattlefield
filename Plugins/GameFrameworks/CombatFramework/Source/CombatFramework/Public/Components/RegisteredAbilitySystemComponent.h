@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
-#include "CombatAbilitySystemComponent.generated.h"
+#include "RegisteredAbilitySystemComponent.generated.h"
 
 USTRUCT(BlueprintType)
 struct FBattleAbilityEntry
@@ -26,23 +26,22 @@ struct FBattleAbilityEntry
  * 
  */
 UCLASS()
-class COMBATFRAMEWORK_API UCombatAbilitySystemComponent : public UAbilitySystemComponent
+class COMBATFRAMEWORK_API URegisteredAbilitySystemComponent : public UAbilitySystemComponent
 {
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable, Category = "Abilities")
-	void RemoveAbility(int32 AbilityID);
-
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
 	void EnableAbility(int32 AbilityID);
 
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
 	void DisableAbility(int32 AbilityID);
 
-public:
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
-	int32 SynchronousLoadAbility(TSoftClassPtr<UGameplayAbility> AbilityType);
+	void RemoveAbility(int32 AbilityID);
+
+	UFUNCTION(BlueprintCallable, Category = "Abilities")
+	int32 LoadAbilityFromType(TSoftClassPtr<UGameplayAbility> AbilityType);
 
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
 	int32 FindAbilityByType(TSoftClassPtr<UGameplayAbility> AbilityType);

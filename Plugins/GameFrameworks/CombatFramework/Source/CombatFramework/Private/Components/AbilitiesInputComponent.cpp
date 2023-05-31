@@ -2,7 +2,7 @@
 
 
 #include "Components/AbilitiesInputComponent.h"
-#include "Components/CombatAbilitySystemComponent.h"
+#include "Components/RegisteredAbilitySystemComponent.h"
 #include "InputAction.h"
 #include "EnhancedInputComponent.h"
 #include "AbilitySystemGlobals.h"
@@ -126,7 +126,7 @@ void UAbilitiesInputComponent::EnableBindings()
 	AActor* MyOwner = GetOwner();
 	check(MyOwner);
 
-	ASC = Cast<UCombatAbilitySystemComponent>(UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(MyOwner));
+	ASC = Cast<URegisteredAbilitySystemComponent>(UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(MyOwner));
 	if (ASC)
 	{
 		for (auto& InputBinding : MappedAbilities)
