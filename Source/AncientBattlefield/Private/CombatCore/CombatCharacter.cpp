@@ -6,6 +6,7 @@
 #include "Components/InputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "AbilitySystem/CombatAbilitySystemComponent.h"
+#include "InventoryComponent.h"
 
 ACombatCharacter::ACombatCharacter()
 {
@@ -32,6 +33,8 @@ ACombatCharacter::ACombatCharacter()
 
 	AbilitySystemComponent = CreateDefaultSubobject<UCombatAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(true);
+
+	//auto InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("CharacterPackage"));
 }
 
 void ACombatCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
