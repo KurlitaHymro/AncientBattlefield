@@ -9,18 +9,11 @@ namespace ItemSlotSet_Impl
 	constexpr int32 StartID = 0;
 }
 
-FItemSlot::FItemSlot(int32 _SlotID) : SlotID(_SlotID)
+void FItemSlotSet::Init(UInventoryComponent* OwnerInventoryComponent, int32 SlotsNumber)
 {
-
-}
-
-FItemSlotSet::FItemSlotSet(UInventoryComponent* _Owner, int32 _SlotsNumber) : Owner(_Owner)
-{
-	for (int32 SlotID = ItemSlotSet_Impl::StartID; SlotID < ItemSlotSet_Impl::StartID + _SlotsNumber; SlotID++)
-	{
-		FItemSlot Slot(SlotID);
-		ItemSlots.Emplace(Slot);
-	}
+	Owner = OwnerInventoryComponent;
+	Size = SlotsNumber;
+	ItemSlots.Init(FItemSlot(), Size);
 }
 
 FItemSlotHandle FItemSlotSet::AddItem(class UItemObject* Item)
@@ -28,12 +21,13 @@ FItemSlotHandle FItemSlotSet::AddItem(class UItemObject* Item)
 	FItemSlotHandle Handle;
 	Handle.Owner = Owner;
 	Handle.SlotID = ItemSlotSet_Impl::InvalidID;
-	for (auto Slot : ItemSlots)
+	for (int32 SlotID = ItemSlotSet_Impl::StartID; SlotID < Size; SlotID++)
 	{
-		if (Slot.Item == nullptr)
+		if (ItemSlots[SlotID].Item == nullptr)
 		{
-			Slot.Item = Item;
-			Handle.SlotID = Slot.SlotID;
+			ItemSlots[SlotID].Item = Item;
+			Handle.SlotID = SlotID;
+			break;
 		}
 	}
 	return Handle;

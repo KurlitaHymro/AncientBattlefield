@@ -10,25 +10,27 @@ UInventoryComponent::UInventoryComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 
-	SlotSet = FItemSlotSet(this, 10);
+	SlotSet.Init(this, 0);
 }
 
-
-// Called when the game starts
-void UInventoryComponent::BeginPlay()
+FItemSlotHandle UInventoryComponent::AddItem(UItemObject* Item)
 {
-	Super::BeginPlay();
+	if (Item != nullptr)
+	{
+		OnAddItem.Broadcast(Item);
+	}
 
-	// ...
-	
+	return SlotSet.AddItem(Item);
 }
 
-
-// Called every frame
-void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+bool UInventoryComponent::RemoveItem(FItemSlotHandle SlotHandle)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	UItemObject* Item = SlotSet.FindItem(SlotHandle);
 
-	// ...
+	if (Item != nullptr)
+	{
+		OnRemoveItem.Broadcast(Item);
+	}
+
+	return SlotSet.RemoveItem(SlotHandle);
 }
-

@@ -7,24 +7,35 @@
 #include "Slot/ItemSlot.h"
 #include "InventoryComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAddItemDelegate, UItemObject*, Item);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRemoveItemDelegate, UItemObject*, Item);
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class ITEMINVENTORYSYSTEM_API UInventoryComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
+	// Sets default values for78451 this component's properties
 	UInventoryComponent();
 
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
+public:
+	UFUNCTION(BlueprintCallable)
+	FItemSlotHandle AddItem(UItemObject* Item);
 
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	UFUNCTION(BlueprintCallable)
+	bool RemoveItem(FItemSlotHandle SlotHandle);
 
 private:
 	UPROPERTY()
 	FItemSlotSet SlotSet;
+
+public:
+	UPROPERTY(BlueprintAssignable)
+	FAddItemDelegate OnAddItem;
+
+	UPROPERTY(BlueprintAssignable)
+	FRemoveItemDelegate OnRemoveItem;
+
 };

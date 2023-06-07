@@ -31,10 +31,10 @@ ACombatCharacter::ACombatCharacter()
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 
-	AbilitySystemComponent = CreateDefaultSubobject<UCombatAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
-	AbilitySystemComponent->SetIsReplicated(true);
+	CombatAbilityComponent = CreateDefaultSubobject<UCombatAbilitySystemComponent>(TEXT("CombatAbilitySystemComponent"));
+	CombatAbilityComponent->SetIsReplicated(true);
 
-	//auto InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("CharacterPackage"));
+	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("CharacterPackage"));
 }
 
 void ACombatCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -54,5 +54,10 @@ void ACombatCharacter::BeginPlay()
 
 UAbilitySystemComponent* ACombatCharacter::GetAbilitySystemComponent() const
 {
-	return AbilitySystemComponent;
+	return CombatAbilityComponent;
+}
+
+UInventoryComponent* ACombatCharacter::GetInventorySystemComponent() const
+{
+	return InventoryComponent;
 }
