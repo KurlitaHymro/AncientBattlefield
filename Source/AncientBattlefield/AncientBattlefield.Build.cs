@@ -26,6 +26,7 @@ public class AncientBattlefield : ModuleRules
 			"CombatFramework",
 			"PawnEnhancedInput",
 			"EnhancedInput",
+			"ItemInventorySystem",
 		});
 
 		// Uncomment if you are using Slate UI

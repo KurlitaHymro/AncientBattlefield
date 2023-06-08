@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "CRCharacter.h"
 #include "AbilitySystemInterface.h"
+#include "InventorySystemInterface.h"
 #include "CombatCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHitActorDelegate, AActor*, Target);
@@ -14,7 +15,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHitActorDelegate, AActor*, Target);
  * 负责各项战斗相关模块（诸如技能系统、装备系统、伤害系统等）之间的功能配合。
  */
 UCLASS()
-class ANCIENTBATTLEFIELD_API ACombatCharacter : public ACRCharacter, public IAbilitySystemInterface
+class ANCIENTBATTLEFIELD_API ACombatCharacter : public ACRCharacter, public IAbilitySystemInterface, public IInventorySystemInterface
 {
 	GENERATED_BODY()
 
@@ -35,8 +36,14 @@ protected:
 public:
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
+	virtual class UInventoryComponent* GetInventorySystemComponent() const override;
+
 protected:
-	class UAbilitySystemComponent* AbilitySystemComponent;
+	UPROPERTY(BlueprintReadOnly)
+	class UAbilitySystemComponent* CombatAbilityComponent;
+
+	UPROPERTY(BlueprintReadOnly)
+	class UInventoryComponent* InventoryComponent;
 
 public:
 	UPROPERTY(BlueprintAssignable)
