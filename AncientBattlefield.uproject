@@ -36,6 +36,10 @@
 		{
 			"Name": "EmptyHandedPunch",
 			"Enabled": true
+		},
+		{
+			"Name": "SwordAndShield",
+			"Enabled": true
 		}
 	]
 }
