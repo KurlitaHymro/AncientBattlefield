@@ -27,6 +27,9 @@ public class ItemInventorySystem : ModuleRules
 			{
 				"Core",
 				"GameplayTags",
+				"ModularGameplay",
+				"GameFeatures",
+				"GameFeaturesExpansions",
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

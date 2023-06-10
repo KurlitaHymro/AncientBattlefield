@@ -2,6 +2,8 @@
 
 
 #include "PropSystem/EntityItem.h"
+#include "Item/ItemObject.h"
+#include "PropertyFragment/PropertyFragment_PropBaseInfo.h"
 
 // Sets default values
 AEntityItem::AEntityItem()
@@ -9,20 +11,14 @@ AEntityItem::AEntityItem()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
-	ItemObject = 
+	ItemObject = NewObject<UItemObject>();
+
+	ItemObject->AddPropertyFragment(UPropertyFragment_PropBaseInfo::StaticClass());
 }
 
 // Called when the game starts or when spawned
 void AEntityItem::BeginPlay()
 {
 	Super::BeginPlay();
-	
-}
-
-// Called every frame
-void AEntityItem::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 
 }
-

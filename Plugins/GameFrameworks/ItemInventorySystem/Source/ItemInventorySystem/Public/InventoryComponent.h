@@ -17,7 +17,7 @@ class ITEMINVENTORYSYSTEM_API UInventoryComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for78451 this component's properties
+	// Sets default values for this component's properties
 	UInventoryComponent();
 
 public:

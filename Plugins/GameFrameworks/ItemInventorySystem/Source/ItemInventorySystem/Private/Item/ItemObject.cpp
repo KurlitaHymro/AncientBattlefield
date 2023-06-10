@@ -9,7 +9,12 @@ void UItemObject::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) cons
 	TagContainer.AppendTags(ItemTagContainer);
 }
 
-UItemPropertyFragment* UItemObject::FindPropertyFragment(UClass* PropertyFragmentType)
+void UItemObject::AddPropertyFragment(TSubclassOf<class UItemPropertyFragment> PropertyFragmentClass)
+{
+	PropertyFragments.Add(PropertyFragmentClass.GetDefaultObject());
+}
+
+UItemPropertyFragment* UItemObject::FindPropertyFragment(TSubclassOf<class UItemPropertyFragment> PropertyFragmentType)
 {
 	if (PropertyFragmentType)
 	{
