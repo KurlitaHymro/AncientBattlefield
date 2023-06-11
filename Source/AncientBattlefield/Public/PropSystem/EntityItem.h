@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "EntityItem.generated.h"
 
+
 UCLASS()
 class ANCIENTBATTLEFIELD_API AEntityItem : public AActor
 {
@@ -19,7 +20,10 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-private:
-	class UItemObject* ItemObject;
+public:
+	UPROPERTY(BlueprintReadWrite)
+	TArray<struct FPropertyFragmentInit> GrantPropertyFragments;
 
+	UPROPERTY(BlueprintReadWrite)
+	class UItemObject* ItemObject;
 };

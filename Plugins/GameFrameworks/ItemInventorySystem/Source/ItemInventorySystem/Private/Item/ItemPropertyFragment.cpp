@@ -6,3 +6,7 @@
 void UItemPropertyFragment::OnItemInstantiate() const
 {
 }
+
+void UItemPropertyFragment::InitFromMetaDataTable(const UDataTable* DataTable, FString PrefabName)
+{
+}

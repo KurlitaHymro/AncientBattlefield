@@ -9,10 +9,6 @@ void UItemObject::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) cons
 	TagContainer.AppendTags(ItemTagContainer);
 }
 
-void UItemObject::AddPropertyFragment(TSubclassOf<class UItemPropertyFragment> PropertyFragmentClass)
-{
-	PropertyFragments.Add(PropertyFragmentClass.GetDefaultObject());
-}
 
 UItemPropertyFragment* UItemObject::FindPropertyFragment(TSubclassOf<class UItemPropertyFragment> PropertyFragmentType)
 {
@@ -27,4 +23,14 @@ UItemPropertyFragment* UItemObject::FindPropertyFragment(TSubclassOf<class UItem
 		}
 	}
 	return nullptr;
+}
+
+void UItemObject::AddPropertyFragment(TSubclassOf<UItemPropertyFragment> PropertyFragmentType, UDataTable* DataTable, FString PropertyFragmentPrefabName)
+{
+	auto PropertyFragment = PropertyFragmentType.GetDefaultObject();
+	if (DataTable != nullptr && !PropertyFragmentPrefabName.IsEmpty())
+	{
+		PropertyFragment->InitFromMetaDataTable(DataTable, PropertyFragmentPrefabName);
+	}
+	PropertyFragments.Add(PropertyFragment);
 }

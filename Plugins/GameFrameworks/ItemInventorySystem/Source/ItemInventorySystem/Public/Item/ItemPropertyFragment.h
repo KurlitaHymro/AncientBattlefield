@@ -6,6 +6,21 @@
 #include "UObject/NoExportTypes.h"
 #include "ItemPropertyFragment.generated.h"
 
+USTRUCT(BlueprintType)
+struct FPropertyFragmentInit
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSubclassOf<class UItemPropertyFragment> PropertyFragmentType;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	class UDataTable* DataTable;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FString PropertyFragmentPrefabName;
+};
+
 /**
  * 
  */
@@ -16,4 +31,6 @@ class ITEMINVENTORYSYSTEM_API UItemPropertyFragment : public UObject
 
 public:
 	virtual void OnItemInstantiate() const;
+
+	virtual void InitFromMetaDataTable(const class UDataTable* DataTable, FString PrefabName);
 };

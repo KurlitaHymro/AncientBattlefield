@@ -12,8 +12,6 @@ AEntityItem::AEntityItem()
 	PrimaryActorTick.bCanEverTick = false;
 
 	ItemObject = NewObject<UItemObject>();
-
-	ItemObject->AddPropertyFragment(UPropertyFragment_PropBaseInfo::StaticClass());
 }
 
 // Called when the game starts or when spawned
@@ -21,4 +19,8 @@ void AEntityItem::BeginPlay()
 {
 	Super::BeginPlay();
 
+	for (auto PropertyFragment : GrantPropertyFragments)
+	{
+		ItemObject->AddPropertyFragment(PropertyFragment.PropertyFragmentType, PropertyFragment.DataTable, PropertyFragment.PropertyFragmentPrefabName);
+	}
 }
