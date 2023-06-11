@@ -21,9 +21,12 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Inventory Item")
 	TArray<struct FPropertyFragmentInit> GrantPropertyFragments;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadOnly, Category = "Inventory Item")
 	class UItemObject* ItemObject;
+
+private:
+
 };

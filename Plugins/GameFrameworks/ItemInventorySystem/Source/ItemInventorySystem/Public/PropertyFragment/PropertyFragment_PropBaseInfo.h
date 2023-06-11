@@ -6,15 +6,15 @@
 #include "Item/ItemPropertyFragment.h"
 #include "PropertyFragment_PropBaseInfo.generated.h"
 
-USTRUCT(BlueprintType)
-struct FPropertyFragmentPropBaseInfo
+USTRUCT(BlueprintType, meta = (DisplayName = "PropertyFragment_PropBaseInfo"))
+struct ITEMINVENTORYSYSTEM_API FPropertyFragmentPropBaseInfo : public FTableRowBase
 {
 	GENERATED_BODY()
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FName Name;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	UTexture* Icon;
 };
 
@@ -27,10 +27,14 @@ class ITEMINVENTORYSYSTEM_API UPropertyFragment_PropBaseInfo : public UItemPrope
 	GENERATED_BODY()
 
 protected:
-	virtual void OnItemInstantiate() const override;
+	virtual void OnItemInstantiate(class UItemObject* Owner) const override;
 
 	virtual void InitFromMetaDataTable(const class UDataTable* DataTable, FString PrefabName) override;
 
+	virtual void OnRefresh() const override;
+
 public:
+	UPROPERTY(BlueprintReadOnly)
 	FPropertyFragmentPropBaseInfo PropertyFragment;
+
 };

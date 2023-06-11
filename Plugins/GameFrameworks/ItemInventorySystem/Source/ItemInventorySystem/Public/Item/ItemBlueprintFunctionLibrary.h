@@ -17,4 +17,5 @@ class ITEMINVENTORYSYSTEM_API UItemBlueprintFunctionLibrary : public UBlueprintF
 public:
 	UFUNCTION(BlueprintCallable)
 	static class UItemObject* CreateItemObject();
+
 };

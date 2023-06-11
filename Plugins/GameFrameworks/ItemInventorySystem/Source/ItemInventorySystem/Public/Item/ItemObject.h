@@ -19,13 +19,13 @@ public:
 	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;
 
 	template<class PropertyFragmentType>
-	const PropertyFragmentType* FindPropertyFragment() const
+	PropertyFragmentType* FindPropertyFragment()
 	{
 		return Cast<PropertyFragmentType>(FindPropertyFragment(PropertyFragmentType::StaticClass()));
 	};
 
 	UFUNCTION(BlueprintCallable)
-	class UItemPropertyFragment* FindPropertyFragment(TSubclassOf<class UItemPropertyFragment> PropertyFragmentType);
+	class UItemPropertyFragment* FindPropertyFragment(UClass* PropertyFragmentType);
 
 	UFUNCTION(BlueprintCallable)
 	virtual void AddPropertyFragment(TSubclassOf<UItemPropertyFragment> PropertyFragmentType, UDataTable* DataTable = nullptr, FString PropertyFragmentPrefabName = "");
@@ -36,4 +36,5 @@ protected:
 
 	UPROPERTY()
 	TArray<class UItemPropertyFragment*> PropertyFragments;
+
 };

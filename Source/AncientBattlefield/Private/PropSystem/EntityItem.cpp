@@ -11,7 +11,6 @@ AEntityItem::AEntityItem()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
-	ItemObject = NewObject<UItemObject>();
 }
 
 // Called when the game starts or when spawned
@@ -19,6 +18,7 @@ void AEntityItem::BeginPlay()
 {
 	Super::BeginPlay();
 
+	ItemObject = NewObject<UItemObject>();
 	for (auto PropertyFragment : GrantPropertyFragments)
 	{
 		ItemObject->AddPropertyFragment(PropertyFragment.PropertyFragmentType, PropertyFragment.DataTable, PropertyFragment.PropertyFragmentPrefabName);

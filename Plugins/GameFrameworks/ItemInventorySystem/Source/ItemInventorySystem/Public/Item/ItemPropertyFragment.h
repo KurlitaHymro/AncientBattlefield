@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "Engine/DataTable.h"
 #include "ItemPropertyFragment.generated.h"
 
 USTRUCT(BlueprintType)
-struct FPropertyFragmentInit
+struct ITEMINVENTORYSYSTEM_API FPropertyFragmentInit
 {
 	GENERATED_BODY()
 
@@ -15,7 +16,7 @@ struct FPropertyFragmentInit
 	TSubclassOf<class UItemPropertyFragment> PropertyFragmentType;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	class UDataTable* DataTable;
+	UDataTable* DataTable;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FString PropertyFragmentPrefabName;
@@ -30,7 +31,9 @@ class ITEMINVENTORYSYSTEM_API UItemPropertyFragment : public UObject
 	GENERATED_BODY()
 
 public:
-	virtual void OnItemInstantiate() const;
+	virtual void OnItemInstantiate(class UItemObject* Owner) const;
 
 	virtual void InitFromMetaDataTable(const class UDataTable* DataTable, FString PrefabName);
+
+	virtual void OnRefresh() const;
 };
