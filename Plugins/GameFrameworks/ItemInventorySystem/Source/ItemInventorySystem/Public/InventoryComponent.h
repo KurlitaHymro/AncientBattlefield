@@ -7,9 +7,11 @@
 #include "Slot/ItemSlot.h"
 #include "InventoryComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAddItemDelegate, UItemObject*, Item);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInitSlotsDelegate, int32, SlotsNumber);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRemoveItemDelegate, UItemObject*, Item);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FAddItemDelegate, UItemObject*, Item, int32, LocalID);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRemoveItemDelegate, UItemObject*, Item, int32, LocalID);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class ITEMINVENTORYSYSTEM_API UInventoryComponent : public UActorComponent
@@ -22,6 +24,9 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable)
+	void InitSlots(int32 SlotsNumber);
+
+	UFUNCTION(BlueprintCallable)
 	FItemSlotHandle AddItem(UItemObject* Item);
 
 	UFUNCTION(BlueprintCallable)
@@ -32,6 +37,9 @@ private:
 	FItemSlotSet SlotSet;
 
 public:
+	UPROPERTY(BlueprintAssignable)
+	FInitSlotsDelegate OnInitSlot;
+
 	UPROPERTY(BlueprintAssignable)
 	FAddItemDelegate OnAddItem;
 

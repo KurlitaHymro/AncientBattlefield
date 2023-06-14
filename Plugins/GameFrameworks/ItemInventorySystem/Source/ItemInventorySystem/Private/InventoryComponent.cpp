@@ -10,7 +10,16 @@ UInventoryComponent::UInventoryComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 
-	SlotSet.Init(this, 10);
+}
+
+void UInventoryComponent::InitSlots(int32 SlotsNumber)
+{
+	SlotSet.Init(this, SlotsNumber);
+
+	if (SlotsNumber > 0)
+	{
+		OnInitSlot.Broadcast(SlotsNumber);
+	}
 }
 
 FItemSlotHandle UInventoryComponent::AddItem(UItemObject* Item)
@@ -20,7 +29,7 @@ FItemSlotHandle UInventoryComponent::AddItem(UItemObject* Item)
 		auto Handle = SlotSet.AddItem(Item);
 		if (Handle.IsValid())
 		{
-			OnAddItem.Broadcast(Item);
+			OnAddItem.Broadcast(Item, Handle.SlotID);
 		}
 		return Handle;
 	}
@@ -33,7 +42,7 @@ bool UInventoryComponent::RemoveItem(FItemSlotHandle SlotHandle)
 
 	if (Item != nullptr)
 	{
-		OnRemoveItem.Broadcast(Item);
+		OnRemoveItem.Broadcast(Item, SlotHandle.SlotID);
 	}
 
 	return SlotSet.RemoveItem(SlotHandle);
