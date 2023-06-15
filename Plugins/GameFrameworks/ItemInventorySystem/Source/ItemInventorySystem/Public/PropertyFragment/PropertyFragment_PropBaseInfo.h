@@ -27,11 +27,7 @@ class ITEMINVENTORYSYSTEM_API UPropertyFragment_PropBaseInfo : public UItemPrope
 	GENERATED_BODY()
 
 protected:
-	virtual void OnItemInstantiate(class UItemObject* Owner) const override;
-
 	virtual void InitFromMetaDataTable(const class UDataTable* DataTable, FString PrefabName) override;
-
-	virtual void OnRefresh() const override;
 
 public:
 	UPROPERTY(BlueprintReadOnly)

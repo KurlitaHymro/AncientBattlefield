@@ -3,11 +3,6 @@
 
 #include "PropertyFragment/PropertyFragment_PropBaseInfo.h"
 
-void UPropertyFragment_PropBaseInfo::OnItemInstantiate(UItemObject* Owner) const
-{
-
-}
-
 void UPropertyFragment_PropBaseInfo::InitFromMetaDataTable(const UDataTable* DataTable, FString PrefabName)
 {
 	FPropertyFragmentPropBaseInfo* MetaData = DataTable->FindRow<FPropertyFragmentPropBaseInfo>(FName(*PrefabName), DataTable->GetName(), true);
@@ -17,9 +12,4 @@ void UPropertyFragment_PropBaseInfo::InitFromMetaDataTable(const UDataTable* Dat
 	}
 	
 	Super::InitFromMetaDataTable(DataTable, PrefabName);
-}
-
-void UPropertyFragment_PropBaseInfo::OnRefresh() const
-{
-
 }

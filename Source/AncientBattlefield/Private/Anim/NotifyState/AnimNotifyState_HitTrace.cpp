@@ -9,6 +9,8 @@ void UAnimNotifyState_HitTrace::NotifyBegin(USkeletalMeshComponent* MeshComp, UA
 {
 	Super::NotifyBegin(MeshComp, Animation, TotalDuration, EventReference);
 	OwnerCharacter = Cast<ACombatCharacter>(MeshComp->GetOwner());
+
+
 	LastHitPointLocation = MeshComp->GetSocketLocation(FName("Weapon_R"));
 
 	HitActors.Empty();

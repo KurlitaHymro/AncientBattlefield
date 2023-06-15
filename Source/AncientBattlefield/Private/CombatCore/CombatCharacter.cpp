@@ -34,7 +34,7 @@ ACombatCharacter::ACombatCharacter()
 	CombatAbilityComponent = CreateDefaultSubobject<UCombatAbilitySystemComponent>(TEXT("CombatAbilitySystemComponent"));
 	CombatAbilityComponent->SetIsReplicated(true);
 
-	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("CharacterPackage"));
+	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory"));
 }
 
 void ACombatCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

@@ -14,6 +14,16 @@ class ANCIENTBATTLEFIELD_API UAnimNotifyState_HitTrace : public UAnimNotifyState
 {
 	GENERATED_BODY()
 
+public:
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	FName EquipmentSlot;
+
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	FName HitPoint;
+
+	UPROPERTY(EditAnywhere, Category = "Ability")
+	FName AbilityAnim;
+
 protected:
 	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference) override;
 
