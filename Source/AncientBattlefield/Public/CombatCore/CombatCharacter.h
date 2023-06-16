@@ -38,12 +38,17 @@ public:
 
 	virtual class UInventoryComponent* GetInventorySystemComponent() const override;
 
+	virtual class UEquipmentComponent* GetEquipmentSystemComponent() const;
+
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	class UAbilitySystemComponent* CombatAbilityComponent;
 
 	UPROPERTY(BlueprintReadOnly)
 	class UInventoryComponent* InventoryComponent;
+
+	UPROPERTY(BlueprintReadOnly)
+	class UEquipmentComponent* EquipmentComponent;
 
 public:
 	UPROPERTY(BlueprintAssignable)

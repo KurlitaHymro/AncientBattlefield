@@ -7,6 +7,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "AbilitySystem/CombatAbilitySystemComponent.h"
 #include "InventoryComponent.h"
+#include "EquipmentSystem/EquipmentComponent.h"
 
 ACombatCharacter::ACombatCharacter()
 {
@@ -35,6 +36,8 @@ ACombatCharacter::ACombatCharacter()
 	CombatAbilityComponent->SetIsReplicated(true);
 
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory"));
+
+	EquipmentComponent = CreateDefaultSubobject<UEquipmentComponent>(TEXT("Equipment"));
 }
 
 void ACombatCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -60,4 +63,9 @@ UAbilitySystemComponent* ACombatCharacter::GetAbilitySystemComponent() const
 UInventoryComponent* ACombatCharacter::GetInventorySystemComponent() const
 {
 	return InventoryComponent;
+}
+
+UEquipmentComponent* ACombatCharacter::GetEquipmentSystemComponent() const
+{
+	return EquipmentComponent;
 }

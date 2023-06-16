@@ -43,6 +43,14 @@ bool FItemSlotSet::RemoveItem(FItemSlotHandle Handle)
 	return false;
 }
 
+void FItemSlotSet::SetItem(FItemSlotHandle Handle, UItemObject* Item)
+{
+	if (Handle.IsValid() && Handle.Owner == Owner)
+	{
+		ItemSlots[Handle.SlotID].Item = Item;
+	}
+}
+
 UItemObject* FItemSlotSet::FindItem(FItemSlotHandle Handle)
 {
 	if (Handle.IsValid() && Handle.Owner == Owner)

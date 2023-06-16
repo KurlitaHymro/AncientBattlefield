@@ -22,18 +22,27 @@ void UInventoryComponent::InitSlots(int32 SlotsNumber)
 	}
 }
 
-FItemSlotHandle UInventoryComponent::AddItem(UItemObject* Item)
+FItemSlotHandle UInventoryComponent::AddItem(UItemObject* Item, FItemSlotHandle SlotHandle)
 {
-	if (Item != nullptr)
+	FItemSlotHandle Handle;
+	if (SlotHandle.IsValid())
 	{
-		auto Handle = SlotSet.AddItem(Item);
-		if (Handle.IsValid())
+		Handle = SlotHandle;
+		if (SlotSet.FindItem(Handle) != nullptr)
 		{
-			OnAddItem.Broadcast(Item, Handle.SlotID);
+			RemoveItem(Handle);
 		}
-		return Handle;
+		SlotSet.SetItem(Handle, Item);
 	}
-	return FItemSlotHandle();
+	else
+	{
+		Handle = SlotSet.AddItem(Item);
+	}
+	if (Handle.IsValid())
+	{
+		OnAddItem.Broadcast(Item, Handle.SlotID);
+	}
+	return Handle;
 }
 
 bool UInventoryComponent::RemoveItem(FItemSlotHandle SlotHandle)
@@ -46,4 +55,9 @@ bool UInventoryComponent::RemoveItem(FItemSlotHandle SlotHandle)
 	}
 
 	return SlotSet.RemoveItem(SlotHandle);
+}
+
+UItemObject* UInventoryComponent::GetItem(FItemSlotHandle SlotHandle)
+{
+	return SlotSet.FindItem(SlotHandle);
 }

@@ -27,9 +27,16 @@ protected:
 	virtual void InitFromMetaDataTable(const class UDataTable* DataTable, FString PrefabName) override;
 
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UMeshComponent* SelfMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UMeshComponent* ParentMesh;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FPropertyFragmentEquipment PropertyFragment;
+
+public:
+	UFUNCTION()
+	OnPutOn();
 };

@@ -42,6 +42,8 @@ public:
 
 	bool RemoveItem(FItemSlotHandle Handle);
 
+	void SetItem(FItemSlotHandle Handle, class UItemObject* Item);
+
 	UItemObject* FindItem(FItemSlotHandle Handle);
 };
 

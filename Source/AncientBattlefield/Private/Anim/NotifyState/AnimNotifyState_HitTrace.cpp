@@ -2,16 +2,29 @@
 
 
 #include "Anim/NotifyState/AnimNotifyState_HitTrace.h"
-#include "CombatCore/CombatCharacter.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "CombatCore/CombatCharacter.h"
+#include "Item/ItemObject.h"
+#include "EquipmentSystem/PropertyFragment/PropertyFragment_Equipment.h"
+#include "EquipmentSystem/PropertyFragment/PropertyFragment_MeleeWeapon.h"
 
 void UAnimNotifyState_HitTrace::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference)
 {
 	Super::NotifyBegin(MeshComp, Animation, TotalDuration, EventReference);
 	OwnerCharacter = Cast<ACombatCharacter>(MeshComp->GetOwner());
 
-
-	LastHitPointLocation = MeshComp->GetSocketLocation(FName("Weapon_R"));
+	UItemObject* HitWeapon = OwnerCharacter->GetEquipmentSystemComponent()->GetEquipment(EquipmentSlot);
+	if (HitWeapon != nullptr)
+	{
+		UPropertyFragment_Equipment* HitWeaponInfo = HitWeapon->FindPropertyFragment<UPropertyFragment_Equipment>();
+		UPropertyFragment_MeleeWeapon* HitPointInfo = HitWeapon->FindPropertyFragment<UPropertyFragment_MeleeWeapon>();
+		if (HitWeaponInfo != nullptr && HitPointInfo != nullptr)
+		{
+			WeaponMesh = HitWeaponInfo->SelfMesh;
+			HitPointLocation = WeaponMesh->GetSocketLocation(HitPoint);
+			HitPointHalfSize = *HitPointInfo->HitPoints.Find(HitPoint);
+		}
+	}
 
 	HitActors.Empty();
 }
@@ -20,28 +33,33 @@ void UAnimNotifyState_HitTrace::NotifyTick(USkeletalMeshComponent* MeshComp, UAn
 {
 	Super::NotifyTick(MeshComp, Animation, FrameDeltaTime, EventReference);
 
-	FVector CurrentHitPointLocation = MeshComp->GetSocketLocation(FName("Weapon_R"));
-	if (CurrentHitPointLocation.IsNearlyZero() || CurrentHitPointLocation.Equals(LastHitPointLocation))
+	FVector CurrentLocation;
+	if (WeaponMesh != nullptr)
+	{
+		CurrentLocation = WeaponMesh->GetSocketLocation(HitPoint);
+	}
+	if (CurrentLocation.IsNearlyZero() || CurrentLocation.Equals(HitPointLocation))
 	{
 		return;
 	}
 
-	/* µ¶¹â¼ì²â */
 	TArray<FHitResult> TickAllHitResult;
 	TArray<AActor*> HitTargetIgnore;
 	HitTargetIgnore.Add(MeshComp->GetOwner());
+
+	/* µ¶¹â¼ì²â */
 	UKismetSystemLibrary::BoxTraceMulti(MeshComp->GetOwner()->GetWorld(),
-		LastHitPointLocation,
-		CurrentHitPointLocation,
-		FVector(4.f, 6.f, 12.f), // ÃÜ¶È£¬ÈÐ¿í£¬ÈÐ³¤
-		MeshComp->GetComponentRotation(), //Weapon->GetMesh()->GetComponentRotation(),
+		HitPointLocation,
+		CurrentLocation,
+		HitPointHalfSize,
+		WeaponMesh->GetComponentRotation(),
 		ETraceTypeQuery::TraceTypeQuery4,
 		false,
 		HitTargetIgnore,
 		EDrawDebugTrace::ForDuration,
 		TickAllHitResult,
 		true);
-	LastHitPointLocation = CurrentHitPointLocation;
+	HitPointLocation = CurrentLocation;
 
 	for (auto HitResult : TickAllHitResult)
 	{

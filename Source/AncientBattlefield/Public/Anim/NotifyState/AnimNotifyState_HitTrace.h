@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Animations/AnimNotifyState_SelfEffectBase.h"
+#include "EquipmentSystem/EquipmentComponent.h"
 #include "AnimNotifyState_HitTrace.generated.h"
 
 /**
@@ -16,13 +17,10 @@ class ANCIENTBATTLEFIELD_API UAnimNotifyState_HitTrace : public UAnimNotifyState
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Weapon")
-	FName EquipmentSlot;
+	EEquipmentSlots EquipmentSlot;
 
 	UPROPERTY(EditAnywhere, Category = "Weapon")
 	FName HitPoint;
-
-	UPROPERTY(EditAnywhere, Category = "Ability")
-	FName AbilityAnim;
 
 protected:
 	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference) override;
@@ -32,7 +30,10 @@ protected:
 private:
 	class ACombatCharacter* OwnerCharacter;
 
-	FVector LastHitPointLocation;
+	UMeshComponent* WeaponMesh;
+
+	FVector HitPointLocation;
+	FVector HitPointHalfSize;
 
 	TArray<AActor*> HitActors;
 };
