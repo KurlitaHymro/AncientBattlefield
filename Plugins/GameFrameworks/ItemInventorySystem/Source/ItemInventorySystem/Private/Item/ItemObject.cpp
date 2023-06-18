@@ -10,7 +10,7 @@ void UItemObject::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) cons
 }
 
 
-UItemPropertyFragment* UItemObject::FindPropertyFragment(UClass* PropertyFragmentType)
+UItemPropertyFragment* UItemObject::FindPropertyFragment(TSubclassOf<UItemPropertyFragment> PropertyFragmentType)
 {
 	if (PropertyFragmentType)
 	{
@@ -25,13 +25,11 @@ UItemPropertyFragment* UItemObject::FindPropertyFragment(UClass* PropertyFragmen
 	return nullptr;
 }
 
-void UItemObject::AddPropertyFragment(TSubclassOf<UItemPropertyFragment> PropertyFragmentType, UDataTable* DataTable, FString PropertyFragmentPrefabName)
+UItemPropertyFragment* UItemObject::ConstructPropertyFragment(TSubclassOf<UItemPropertyFragment> PropertyFragmentType)
 {
 	auto PropertyFragment = PropertyFragmentType.GetDefaultObject();
-	if (DataTable != nullptr && !PropertyFragmentPrefabName.IsEmpty())
-	{
-		PropertyFragment->OnItemInstantiate(this);
-		PropertyFragment->InitFromMetaDataTable(DataTable, PropertyFragmentPrefabName);
-	}
+	PropertyFragment->Instantiate(this);
 	PropertyFragments.Add(PropertyFragment);
+
+	return PropertyFragment;
 }

@@ -6,15 +6,6 @@
 #include "Item/ItemPropertyFragment.h"
 #include "PropertyFragment_Equipment.generated.h"
 
-USTRUCT(BlueprintType, meta = (DisplayName = "PropertyFragment_Equipment"))
-struct ANCIENTBATTLEFIELD_API FPropertyFragmentEquipment : public FTableRowBase
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	FName AttachSlot;
-};
-
 /**
  * 
  */
@@ -22,21 +13,35 @@ UCLASS()
 class ANCIENTBATTLEFIELD_API UPropertyFragment_Equipment : public UItemPropertyFragment
 {
 	GENERATED_BODY()
-	
-protected:
-	virtual void InitFromMetaDataTable(const class UDataTable* DataTable, FString PrefabName) override;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UMeshComponent* SelfMesh;
+	TSubclassOf<AActor> EntityType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UMeshComponent* ParentMesh;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FPropertyFragmentEquipment PropertyFragment;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName AttachSocket;
 
 public:
-	UFUNCTION()
-	OnPutOn();
+	UFUNCTION(BlueprintCallable)
+	void SpawnEntity();
+
+	UFUNCTION(BlueprintCallable)
+	void DestroyEntity();
+
+	UFUNCTION(BlueprintCallable)
+	void PutOn();
+
+	UFUNCTION(BlueprintCallable)
+	void TakeOff();
+
+	UFUNCTION(BlueprintCallable)
+	UMeshComponent* GetMesh();
+
+private:
+	AActor* Entity;
+
+	UMeshComponent* EquipmentMesh;
 };

@@ -20,7 +20,7 @@ void UAnimNotifyState_HitTrace::NotifyBegin(USkeletalMeshComponent* MeshComp, UA
 		UPropertyFragment_MeleeWeapon* HitPointInfo = HitWeapon->FindPropertyFragment<UPropertyFragment_MeleeWeapon>();
 		if (HitWeaponInfo != nullptr && HitPointInfo != nullptr)
 		{
-			WeaponMesh = HitWeaponInfo->SelfMesh;
+			WeaponMesh = HitWeaponInfo->GetMesh();
 			HitPointLocation = WeaponMesh->GetSocketLocation(HitPoint);
 			HitPointHalfSize = *HitPointInfo->HitPoints.Find(HitPoint);
 		}

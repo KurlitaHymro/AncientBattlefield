@@ -21,6 +21,11 @@ void AEntityItem::BeginPlay()
 	ItemObject = NewObject<UItemObject>();
 	for (auto PropertyFragment : GrantPropertyFragments)
 	{
-		ItemObject->AddPropertyFragment(PropertyFragment.PropertyFragmentType, PropertyFragment.DataTable, PropertyFragment.PropertyFragmentPrefabName);
+		ItemObject->ConstructPropertyFragment(PropertyFragment);
 	}
+	InitPropertyFragment();
+}
+
+void AEntityItem::InitPropertyFragment_Implementation()
+{
 }

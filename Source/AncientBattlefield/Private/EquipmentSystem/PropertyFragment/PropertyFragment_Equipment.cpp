@@ -3,13 +3,46 @@
 
 #include "EquipmentSystem/PropertyFragment/PropertyFragment_Equipment.h"
 
-void UPropertyFragment_Equipment::InitFromMetaDataTable(const UDataTable* DataTable, FString PrefabName)
+void UPropertyFragment_Equipment::SpawnEntity()
 {
-	FPropertyFragmentEquipment* MetaData = DataTable->FindRow<FPropertyFragmentEquipment>(FName(*PrefabName), DataTable->GetName(), true);
-	if (MetaData)
+	if (EntityType)
 	{
-		PropertyFragment = *MetaData;
+		Entity = GetWorld()->SpawnActor(EntityType);
+		EquipmentMesh = Entity->GetComponentByClass<UMeshComponent>();
+		if (EquipmentMesh == nullptr)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Equipment Entity Actor No Mesh"));
+		}
 	}
+}
 
-	Super::InitFromMetaDataTable(DataTable, PrefabName);
+void UPropertyFragment_Equipment::DestroyEntity()
+{
+	if (Entity)
+	{
+		Entity->Destroy();
+		Entity = nullptr;
+	}
+}
+
+void UPropertyFragment_Equipment::PutOn()
+{
+	if (ParentMesh != nullptr && EntityType != nullptr && AttachSocket.IsValid())
+	{
+		FAttachmentTransformRules Rules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true);
+		if (Entity == nullptr)
+		{
+			SpawnEntity();
+		}
+		Entity->AttachToComponent(ParentMesh, Rules, AttachSocket);
+	}
+}
+
+void UPropertyFragment_Equipment::TakeOff()
+{
+}
+
+UMeshComponent* UPropertyFragment_Equipment::GetMesh()
+{
+	return EquipmentMesh;
 }

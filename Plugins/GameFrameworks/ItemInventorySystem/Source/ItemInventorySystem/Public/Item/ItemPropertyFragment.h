@@ -7,33 +7,25 @@
 #include "Engine/DataTable.h"
 #include "ItemPropertyFragment.generated.h"
 
-USTRUCT(BlueprintType)
-struct ITEMINVENTORYSYSTEM_API FPropertyFragmentInit
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TSubclassOf<class UItemPropertyFragment> PropertyFragmentType;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	UDataTable* DataTable;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	FString PropertyFragmentPrefabName;
-};
-
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType, Blueprintable)
 class ITEMINVENTORYSYSTEM_API UItemPropertyFragment : public UObject
 {
 	GENERATED_BODY()
 
-public:
-	virtual void OnItemInstantiate(class UItemObject* Owner) const;
 
+public:
+	UFUNCTION()
+	UItemObject* GetOwner() const;
+
+public:
+	virtual void Instantiate(class UItemObject* Owner);
+
+	UFUNCTION(BlueprintCallable)
 	virtual void InitFromMetaDataTable(const class UDataTable* DataTable, FString PrefabName);
 
-	virtual void OnRefresh() const;
+private:
+	UItemObject* OwnerItemObject;
 };

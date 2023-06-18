@@ -3,6 +3,8 @@
 
 #include "EquipmentSystem/EquipmentComponent.h"
 #include "Components/PawnComponent.h"
+#include "Item/ItemObject.h"
+#include "EquipmentSystem/PropertyFragment/PropertyFragment_Equipment.h"
 
 void UEquipmentComponent::InitEquipmentSlots()
 {
@@ -15,14 +17,15 @@ void UEquipmentComponent::InitEquipmentSlots()
 
 bool UEquipmentComponent::PutOnEquipment(UItemObject* Equipment, EEquipmentSlots Slot)
 {
-	if (Equipment != nullptr)
+	if (Equipment != nullptr && Equipment->FindPropertyFragment<UPropertyFragment_Equipment>() != nullptr)
 	{
 		auto Handle = SlotHandles[(int32)Slot];
 		if (Handle.IsValid())
 		{
 			AddItem(Equipment, Handle);
+			Equipment->FindPropertyFragment<UPropertyFragment_Equipment>()->PutOn();
+			return true;
 		}
-		return true;
 	}
 	return false;
 }

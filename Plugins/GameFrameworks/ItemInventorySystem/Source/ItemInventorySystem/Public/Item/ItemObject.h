@@ -10,7 +10,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType, Blueprintable)
 class ITEMINVENTORYSYSTEM_API UItemObject : public UObject, public IGameplayTagAssetInterface
 {
 	GENERATED_BODY()
@@ -18,17 +18,23 @@ class ITEMINVENTORYSYSTEM_API UItemObject : public UObject, public IGameplayTagA
 public:
 	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;
 
+	UFUNCTION(BlueprintCallable)
+	class UItemPropertyFragment* FindPropertyFragment(TSubclassOf<UItemPropertyFragment> PropertyFragmentType);
+
+	UFUNCTION(BlueprintCallable)
+	virtual UItemPropertyFragment* ConstructPropertyFragment(TSubclassOf<UItemPropertyFragment> PropertyFragmentType);
+
 	template<class PropertyFragmentType>
 	PropertyFragmentType* FindPropertyFragment()
 	{
 		return Cast<PropertyFragmentType>(FindPropertyFragment(PropertyFragmentType::StaticClass()));
 	};
 
-	UFUNCTION(BlueprintCallable)
-	class UItemPropertyFragment* FindPropertyFragment(UClass* PropertyFragmentType);
-
-	UFUNCTION(BlueprintCallable)
-	virtual void AddPropertyFragment(TSubclassOf<UItemPropertyFragment> PropertyFragmentType, UDataTable* DataTable = nullptr, FString PropertyFragmentPrefabName = "");
+	template<class PropertyFragmentType>
+	PropertyFragmentType* ConstructPropertyFragment()
+	{
+		return Cast<PropertyFragmentType>(ConstructPropertyFragment(PropertyFragmentType::StaticClass()));
+	}
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = Tags)
