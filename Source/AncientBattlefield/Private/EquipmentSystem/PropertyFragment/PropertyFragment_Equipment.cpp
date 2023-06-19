@@ -7,7 +7,10 @@ void UPropertyFragment_Equipment::SpawnEntity()
 {
 	if (EntityType)
 	{
-		Entity = GetWorld()->SpawnActor(EntityType);
+		FActorSpawnParameters SpawnConfig;
+		SpawnConfig.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+		auto World = GetWorld();
+		Entity = World->SpawnActor(EntityType);
 		EquipmentMesh = Entity->GetComponentByClass<UMeshComponent>();
 		if (EquipmentMesh == nullptr)
 		{

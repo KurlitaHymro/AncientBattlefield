@@ -5,6 +5,8 @@
 
 UItemObject* UItemPropertyFragment::GetOwner() const
 {
+	GetOuter();
+
 	return OwnerItemObject;
 }
 

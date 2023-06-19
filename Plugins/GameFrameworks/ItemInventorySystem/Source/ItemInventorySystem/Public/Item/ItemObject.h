@@ -19,22 +19,15 @@ public:
 	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;
 
 	UFUNCTION(BlueprintCallable)
-	class UItemPropertyFragment* FindPropertyFragment(TSubclassOf<UItemPropertyFragment> PropertyFragmentType);
+	virtual void AddPropertyFragment(UItemPropertyFragment* PropertyFragmentObject);
 
 	UFUNCTION(BlueprintCallable)
-	virtual UItemPropertyFragment* ConstructPropertyFragment(TSubclassOf<UItemPropertyFragment> PropertyFragmentType);
-
+	class UItemPropertyFragment* FindPropertyFragment(TSubclassOf<UItemPropertyFragment> PropertyFragmentType);
 	template<class PropertyFragmentType>
 	PropertyFragmentType* FindPropertyFragment()
 	{
 		return Cast<PropertyFragmentType>(FindPropertyFragment(PropertyFragmentType::StaticClass()));
 	};
-
-	template<class PropertyFragmentType>
-	PropertyFragmentType* ConstructPropertyFragment()
-	{
-		return Cast<PropertyFragmentType>(ConstructPropertyFragment(PropertyFragmentType::StaticClass()));
-	}
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = Tags)
