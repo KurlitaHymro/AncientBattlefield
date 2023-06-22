@@ -60,20 +60,11 @@ void UGameplayAbility_Anim::OnCompleted_Implementation(FGameplayTag EventTag, FG
 
 void UGameplayAbility_Anim::OnReceiveEvent_Implementation(FGameplayTag EventTag, FGameplayEventData EventData)
 {
-	auto Iterator = HitEffectMap.CreateIterator();
-	while (Iterator)
-	{
-		if (Iterator.Key() == EventTag)
-		{
-			break;
-		}
-		++Iterator;
-	}
-
+	auto Effect = HitEffectMap.Find(EventTag);
 	auto ASC = GetAbilitySystemComponentFromActorInfo_Ensured();
-	if (Iterator && ASC)
+	if (Effect && ASC)
 	{
-		auto DamageEffectSpecHandle = MakeOutgoingGameplayEffectSpec(Iterator.Value(), GetAbilityLevel());
+		auto DamageEffectSpecHandle = MakeOutgoingGameplayEffectSpec(*Effect, GetAbilityLevel());
 		auto DataHandle = AssembleTargetData(EventData);
 		ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, DamageEffectSpecHandle, DataHandle);
 	}
