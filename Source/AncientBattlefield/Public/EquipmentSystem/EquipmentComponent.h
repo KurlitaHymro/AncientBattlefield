@@ -38,8 +38,10 @@ protected:
 	UEquipmentComponent();
 
 public:
+	UPROPERTY(BlueprintAssignable)
 	FPutOnDelegate OnPutOnEquipment;
 
+	UPROPERTY(BlueprintAssignable)
 	FTakeOffDelegate OnTakeOffEquipment;
 
 public:

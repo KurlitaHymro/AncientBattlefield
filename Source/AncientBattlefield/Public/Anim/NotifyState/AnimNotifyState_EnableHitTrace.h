@@ -17,8 +17,6 @@ class ANCIENTBATTLEFIELD_API UAnimNotifyState_EnableHitTrace : public UAnimNotif
 protected:
 	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference) override;
 
-	virtual void NotifyTick(class USkeletalMeshComponent* MeshComp, class UAnimSequenceBase* Animation, float FrameDeltaTime, const FAnimNotifyEventReference& EventReference) override;
-
 	virtual void NotifyEnd(class USkeletalMeshComponent* MeshComp, class UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;
 
 private:
@@ -26,5 +24,5 @@ private:
 
 	class UHitTraceComponent* HitTraceComponent;
 
-	TArray<AActor> HitActors;
+	TArray<AActor*> HitActors;
 };

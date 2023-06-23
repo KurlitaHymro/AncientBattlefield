@@ -13,7 +13,6 @@ void UAnimNotifyState_SelfEffectBase::NotifyBegin(USkeletalMeshComponent* MeshCo
 	auto EffectSpec = MakeSelfEffectSpec();
 	if (EffectSpec.IsValid())
 	{
-		UE_LOG(LogTemp, Error, TEXT("Apply"));
 		Handle = AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*EffectSpec.Data.Get(), AbilitySystemComponent->GetPredictionKeyForNewAction());
 	}
 }
@@ -24,11 +23,8 @@ void UAnimNotifyState_SelfEffectBase::NotifyEnd(USkeletalMeshComponent* MeshComp
 
 	if (AbilitySystemComponent != nullptr && Handle.IsValid())
 	{
-		UE_LOG(LogTemp, Error, TEXT("Remove"));
 		AbilitySystemComponent->RemoveActiveGameplayEffect(Handle);
 	}
-
-	UE_LOG(LogTemp, Error, TEXT("End"));
 }
 
 FGameplayEffectSpecHandle UAnimNotifyState_SelfEffectBase::MakeSelfEffectSpec()

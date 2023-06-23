@@ -14,7 +14,7 @@ UHitTraceComponent::UHitTraceComponent()
 	bTrace = false;
 	SocketsLastLocations.Empty();
 
-	TraceChannel = UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Visibility);
+	TraceChannel = UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Pawn);
 	bTraceComplex = false;
 	ActorsToIgnore.Empty();
 	DrawDebugType = EDrawDebugTrace::None;
@@ -57,9 +57,13 @@ void UHitTraceComponent::Setup(UPrimitiveComponent* Reference)
 
 void UHitTraceComponent::EnableTrace()
 {
+	if (ReferenceMesh == nullptr)
+	{
+		return;
+	}
 	bTrace = true;
-	SocketsLastLocations.Empty();
 	HitResult.Empty();
+	SocketsLastLocations.Empty();
 }
 
 void UHitTraceComponent::DisableTrace()
@@ -93,6 +97,16 @@ void UHitTraceComponent::TickTrace()
 			TraceColor,
 			HitColor,
 			DrawTime);
+
+		for (const auto& Hit : OutHits)
+		{
+			if (!HitResult.ContainsByPredicate([&](const FHitResult& Inner) {  return Inner.GetActor() == Hit.GetActor(); }))
+			{
+				HitResult.Add(Hit);
+
+				OnUniqueHit.Broadcast(Hit);
+			}
+		}
 	}
 }
 

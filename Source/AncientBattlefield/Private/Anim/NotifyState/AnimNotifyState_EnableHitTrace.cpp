@@ -34,28 +34,7 @@ void UAnimNotifyState_EnableHitTrace::NotifyBegin(USkeletalMeshComponent* MeshCo
 	if (HitTraceComponent)
 	{
 		HitTraceComponent->EnableTrace();
-	}
-}
-
-void UAnimNotifyState_EnableHitTrace::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime, const FAnimNotifyEventReference& EventReference)
-{
-	Super::NotifyTick(MeshComp, Animation, FrameDeltaTime, EventReference);
-	
-	if (OwnerCharacter && HitTraceComponent)
-	{
-		for (auto HitResult : HitTraceComponent->HitResult)
-		{
-			AActor* HitActor = HitResult.GetActor();
-			if (HitActors.Contains(HitActor))
-			{
-				continue;
-			}
-			else
-			{
-				HitActors.Emplace(HitActor);
-				OwnerCharacter->OnHitActor.Broadcast(HitActor);
-			}
-		}
+		HitActors.Empty();
 	}
 }
 

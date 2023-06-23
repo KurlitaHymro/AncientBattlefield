@@ -7,6 +7,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "HitTraceComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUniqueHitDelegate, FHitResult, HitResult);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class ANCIENTBATTLEFIELD_API UHitTraceComponent : public UActorComponent
@@ -22,6 +23,10 @@ public:
 
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+public:
+	UPROPERTY(BlueprintAssignable)
+	FUniqueHitDelegate OnUniqueHit;
 
 public:
 	UPROPERTY()

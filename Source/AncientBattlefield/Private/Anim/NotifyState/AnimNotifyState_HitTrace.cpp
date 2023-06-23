@@ -70,7 +70,7 @@ void UAnimNotifyState_HitTrace::NotifyTick(USkeletalMeshComponent* MeshComp, UAn
 		}
 		else
 		{
-			HitActors.Emplace(HitActor);
+			HitActors.Add(HitActor);
 			OwnerCharacter->OnHitActor.Broadcast(HitActor);
 		}
 	}

@@ -51,6 +51,6 @@ protected:
 	class UEquipmentComponent* EquipmentComponent;
 
 public:
-	UPROPERTY(BlueprintAssignable)
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
 	FHitActorDelegate OnHitActor;
 };
