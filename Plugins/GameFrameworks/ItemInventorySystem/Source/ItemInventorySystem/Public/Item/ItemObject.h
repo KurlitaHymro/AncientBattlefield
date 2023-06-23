@@ -7,6 +7,10 @@
 #include "GameplayTagAssetInterface.h"
 #include "ItemObject.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAddToInventoryDelegate, UInventoryComponent*, InventoryComponent);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRemoveFromInventoryDelegate, UInventoryComponent*, InventoryComponent);
+
 /**
  * 
  */
@@ -14,6 +18,13 @@ UCLASS(BlueprintType, Blueprintable)
 class ITEMINVENTORYSYSTEM_API UItemObject : public UObject, public IGameplayTagAssetInterface
 {
 	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintAssignable)
+	FAddToInventoryDelegate OnAddToInventory;
+
+	UPROPERTY(BlueprintAssignable)
+	FRemoveFromInventoryDelegate OnRemoveFromInventory;
 
 public:
 	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;

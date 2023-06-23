@@ -21,8 +21,8 @@ void UAnimNotifyState_HitTrace::NotifyBegin(USkeletalMeshComponent* MeshComp, UA
 		if (HitWeaponInfo != nullptr && HitPointInfo != nullptr)
 		{
 			WeaponMesh = HitWeaponInfo->GetMesh();
-			HitPointLocation = WeaponMesh->GetSocketLocation(HitPoint);
-			HitPointHalfSize = *HitPointInfo->HitPoints.Find(HitPoint);
+			//HitPointLocation = WeaponMesh->GetSocketLocation(HitPoint);
+			//HitPointHalfSize = *HitPointInfo->HitPoints.Find(HitPoint);
 		}
 	}
 

@@ -2,46 +2,48 @@
 
 
 #include "EquipmentSystem/PropertyFragment/PropertyFragment_Equipment.h"
+#include "Item/ItemObject.h"
+#include "PropertyFragment/PropertyFragment_EntityLink.h"
 
-void UPropertyFragment_Equipment::SpawnEntity()
+void UPropertyFragment_Equipment::Instantiate(UItemObject* Owner)
 {
-	if (EntityType)
+	Super::Instantiate(Owner);
+
+	Owner->OnAddToInventory.AddDynamic(this, &ThisClass::OnAddToInventoryComponent);
+}
+
+void UPropertyFragment_Equipment::OnAddToInventoryComponent(UInventoryComponent* InventoryComponent)
+{
+	auto EquipmentComponent = Cast<UEquipmentComponent>(InventoryComponent);
+	if (EquipmentComponent)
 	{
-		FActorSpawnParameters SpawnConfig;
-		SpawnConfig.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-		auto World = GetWorld();
-		Entity = World->SpawnActor(EntityType);
-		EquipmentMesh = Entity->GetComponentByClass<UMeshComponent>();
-		if (EquipmentMesh == nullptr)
+		EquipmentComponent->OnPutOnEquipment.AddDynamic(this, &ThisClass::PutOn);
+	}
+}
+
+void UPropertyFragment_Equipment::PutOn(EEquipmentSlots Slot, UItemObject* Item)
+{
+	if (Item != nullptr)
+	{
+		UPropertyFragment_EntityLink* EntityLink = Item->FindPropertyFragment<UPropertyFragment_EntityLink>();
+		if (EntityLink)
 		{
-			UE_LOG(LogTemp, Error, TEXT("Equipment Entity Actor No Mesh"));
+			if (EntityLink->GetEntity() == nullptr)
+			{
+				EntityLink->SpawnEntity();
+			}
+			EquipmentMesh = EntityLink->GetEntity()->GetComponentByClass<UMeshComponent>();
 		}
 	}
-}
 
-void UPropertyFragment_Equipment::DestroyEntity()
-{
-	if (Entity)
-	{
-		Entity->Destroy();
-		Entity = nullptr;
-	}
-}
-
-void UPropertyFragment_Equipment::PutOn()
-{
-	if (ParentMesh != nullptr && EntityType != nullptr && AttachSocket.IsValid())
+	if (ParentMesh != nullptr && EquipmentMesh != nullptr && AttachSocket.IsValid())
 	{
 		FAttachmentTransformRules Rules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true);
-		if (Entity == nullptr)
-		{
-			SpawnEntity();
-		}
-		Entity->AttachToComponent(ParentMesh, Rules, AttachSocket);
+		EquipmentMesh->AttachToComponent(ParentMesh, Rules, AttachSocket);
 	}
 }
 
-void UPropertyFragment_Equipment::TakeOff()
+void UPropertyFragment_Equipment::TakeOff(EEquipmentSlots Slot, UItemObject* Item)
 {
 }
 

@@ -27,13 +27,16 @@ public:
 	void InitSlots(int32 SlotsNumber);
 
 	UFUNCTION(BlueprintCallable)
-	FItemSlotHandle AddItem(UItemObject* Item = nullptr, FItemSlotHandle SlotHandle = FItemSlotHandle());
+	FItemSlotHandle AddItem(UItemObject* Item, FItemSlotHandle SlotHandle = FItemSlotHandle());
 
 	UFUNCTION(BlueprintCallable)
 	bool RemoveItem(FItemSlotHandle SlotHandle);
 
 	UFUNCTION(BlueprintCallable)
 	UItemObject* GetItem(FItemSlotHandle SlotHandle);
+
+	UFUNCTION(BlueprintCallable)
+	FItemSlotHandle ConstructHandle(int32 SlotID);
 
 private:
 	UPROPERTY()

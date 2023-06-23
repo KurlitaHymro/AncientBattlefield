@@ -2,6 +2,7 @@
 
 
 #include "InventoryComponent.h"
+#include "Item/ItemObject.h"
 
 // Sets default values for this component's properties
 UInventoryComponent::UInventoryComponent()
@@ -41,6 +42,7 @@ FItemSlotHandle UInventoryComponent::AddItem(UItemObject* Item, FItemSlotHandle 
 	if (Handle.IsValid())
 	{
 		OnAddItem.Broadcast(Item, Handle.SlotID);
+		Item->OnAddToInventory.Broadcast(this);
 	}
 	return Handle;
 }
@@ -52,6 +54,7 @@ bool UInventoryComponent::RemoveItem(FItemSlotHandle SlotHandle)
 	if (Item != nullptr)
 	{
 		OnRemoveItem.Broadcast(Item, SlotHandle.SlotID);
+		Item->OnRemoveFromInventory.Broadcast(this);
 	}
 
 	return SlotSet.RemoveItem(SlotHandle);
@@ -60,4 +63,12 @@ bool UInventoryComponent::RemoveItem(FItemSlotHandle SlotHandle)
 UItemObject* UInventoryComponent::GetItem(FItemSlotHandle SlotHandle)
 {
 	return SlotSet.FindItem(SlotHandle);
+}
+
+FItemSlotHandle UInventoryComponent::ConstructHandle(int32 SlotID)
+{
+	FItemSlotHandle Handle;
+	Handle.Owner = this;
+	Handle.SlotID = SlotID;
+	return Handle;
 }

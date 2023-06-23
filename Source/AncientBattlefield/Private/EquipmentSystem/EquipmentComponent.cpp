@@ -6,24 +6,25 @@
 #include "Item/ItemObject.h"
 #include "EquipmentSystem/PropertyFragment/PropertyFragment_Equipment.h"
 
+UEquipmentComponent::UEquipmentComponent()
+{
+	
+}
+
 void UEquipmentComponent::InitEquipmentSlots()
 {
 	InitSlots((int32)EEquipmentSlots::EquipmentSlotsNum);
-	for (int32 Index = (int32)EEquipmentSlots::Helmet; Index < (int32)EEquipmentSlots::EquipmentSlotsNum; Index++)
-	{
-		SlotHandles.Add(AddItem());
-	}
 }
 
 bool UEquipmentComponent::PutOnEquipment(UItemObject* Equipment, EEquipmentSlots Slot)
 {
 	if (Equipment != nullptr && Equipment->FindPropertyFragment<UPropertyFragment_Equipment>() != nullptr)
 	{
-		auto Handle = SlotHandles[(int32)Slot];
+		auto Handle = ConstructHandle((int)Slot);
 		if (Handle.IsValid())
 		{
 			AddItem(Equipment, Handle);
-			Equipment->FindPropertyFragment<UPropertyFragment_Equipment>()->PutOn();
+			OnPutOnEquipment.Broadcast(Slot, Equipment);
 			return true;
 		}
 	}
@@ -32,10 +33,12 @@ bool UEquipmentComponent::PutOnEquipment(UItemObject* Equipment, EEquipmentSlots
 
 bool UEquipmentComponent::TakeOffEquipment(EEquipmentSlots Slot)
 {
-	FItemSlotHandle Handle = SlotHandles[(int32)Slot];
+	FItemSlotHandle Handle = ConstructHandle((int)Slot);
 	if (Handle.IsValid())
 	{
+		OnTakeOffEquipment.Broadcast(Slot, GetItem(Handle));
 		RemoveItem(Handle);
+		
 		return true;
 	}
 	return false;
@@ -43,5 +46,5 @@ bool UEquipmentComponent::TakeOffEquipment(EEquipmentSlots Slot)
 
 UItemObject* UEquipmentComponent::GetEquipment(EEquipmentSlots Slot)
 {
-	return GetItem(SlotHandles[(int32)Slot]);
+	return GetItem(ConstructHandle((int)Slot));
 }

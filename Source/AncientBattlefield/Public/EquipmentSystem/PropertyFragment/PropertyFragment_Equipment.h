@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Item/ItemPropertyFragment.h"
+#include "EquipmentSystem/EquipmentComponent.h"
 #include "PropertyFragment_Equipment.generated.h"
 
 /**
@@ -16,32 +17,30 @@ class ANCIENTBATTLEFIELD_API UPropertyFragment_Equipment : public UItemPropertyF
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<AActor> EntityType;
+	UMeshComponent* ParentMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UMeshComponent* ParentMesh;
+	EEquipmentSlots DefaultSlot;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName AttachSocket;
 
+protected:
+	virtual void Instantiate(class UItemObject* Owner) override;
+
+	UFUNCTION()
+	void OnAddToInventoryComponent(UInventoryComponent* InventoryComponent);
+
 public:
 	UFUNCTION(BlueprintCallable)
-	void SpawnEntity();
+	void PutOn(EEquipmentSlots Slot, UItemObject* Item);
 
 	UFUNCTION(BlueprintCallable)
-	void DestroyEntity();
-
-	UFUNCTION(BlueprintCallable)
-	void PutOn();
-
-	UFUNCTION(BlueprintCallable)
-	void TakeOff();
+	void TakeOff(EEquipmentSlots Slot, UItemObject* Item);
 
 	UFUNCTION(BlueprintCallable)
 	UMeshComponent* GetMesh();
 
 private:
-	AActor* Entity;
-
 	UMeshComponent* EquipmentMesh;
 };

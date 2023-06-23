@@ -45,7 +45,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = TraceSettings, meta = (Tooltip = "How you want to debug the trace if at all."))
 	TEnumAsByte<EDrawDebugTrace::Type> DrawDebugType;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = KismetTraceSettings, meta = (Tooltip = "True means it will ignore self."))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = TraceSettings, meta = (Tooltip = "True means it will ignore self."))
 	uint32 bIgnoreSelf : 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = TraceSettings, meta = (Tooltip = "Color when tracing but not hitting."))
@@ -59,7 +59,7 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void Setup();
+	void Setup(UPrimitiveComponent* Reference);
 
 	UFUNCTION(BlueprintCallable)
 	void EnableTrace();
@@ -80,4 +80,7 @@ private:
 protected:
 	UFUNCTION()
 	void TickTrace();
+
+	UFUNCTION()
+	void UpdateSocketLocation();
 };

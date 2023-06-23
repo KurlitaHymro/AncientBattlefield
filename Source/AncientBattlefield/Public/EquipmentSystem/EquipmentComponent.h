@@ -22,6 +22,10 @@ enum class EEquipmentSlots : uint8
 	EquipmentSlotsNum
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FPutOnDelegate, EEquipmentSlots, Slot, UItemObject*, Item);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FTakeOffDelegate, EEquipmentSlots, Slot, UItemObject*, Item);
+
 /**
  * 
  */
@@ -30,9 +34,13 @@ class ANCIENTBATTLEFIELD_API UEquipmentComponent : public UInventoryComponent
 {
 	GENERATED_BODY()
 	
-public:
-
 protected:
+	UEquipmentComponent();
+
+public:
+	FPutOnDelegate OnPutOnEquipment;
+
+	FTakeOffDelegate OnTakeOffEquipment;
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -46,8 +54,5 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	class UItemObject* GetEquipment(EEquipmentSlots Slot);
-
-private:
-	TArray<FItemSlotHandle> SlotHandles;
 
 };

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Item/ItemPropertyFragment.h"
+#include "EquipmentSystem/EquipmentComponent.h"
 #include "PropertyFragment_MeleeWeapon.generated.h"
 
 /**
@@ -15,6 +16,24 @@ class ANCIENTBATTLEFIELD_API UPropertyFragment_MeleeWeapon : public UItemPropert
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "HitPoint Size"))
-	TMap<FName, FVector> HitPoints;
+
+
+protected:
+	virtual void Instantiate(class UItemObject* Owner) override;
+
+	UFUNCTION()
+	void OnAddToInventoryComponent(UInventoryComponent* InventoryComponent);
+
+public:
+	UFUNCTION(BlueprintCallable)
+	void PutOn(EEquipmentSlots Slot, UItemObject* Item);
+
+	UFUNCTION(BlueprintCallable)
+	void TakeOff(EEquipmentSlots Slot, UItemObject* Item);
+
+	UFUNCTION(BlueprintCallable)
+	class UHitTraceComponent* GetHitTraceComponent();
+
+private:
+	class UHitTraceComponent* HitTraceComponent;
 };

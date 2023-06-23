@@ -43,18 +43,23 @@ void UHitTraceComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 	if (bTrace)
 	{
 		TickTrace();
+		UpdateSocketLocation();
 	}
 }
 
-void UHitTraceComponent::Setup()
+void UHitTraceComponent::Setup(UPrimitiveComponent* Reference)
 {
+	ReferenceMesh = Reference;
 	Owner = GetOwner();
 	ActorsToIgnore.Add(Owner);
+	Sockets = ReferenceMesh->GetAllSocketNames();
 }
 
 void UHitTraceComponent::EnableTrace()
 {
 	bTrace = true;
+	SocketsLastLocations.Empty();
+	HitResult.Empty();
 }
 
 void UHitTraceComponent::DisableTrace()
@@ -88,6 +93,14 @@ void UHitTraceComponent::TickTrace()
 			TraceColor,
 			HitColor,
 			DrawTime);
+	}
+}
+
+void UHitTraceComponent::UpdateSocketLocation()
+{
+	for (auto Socket : Sockets)
+	{
+		SocketsLastLocations.Add(Socket, ReferenceMesh->GetSocketLocation(Socket));
 	}
 }
 
