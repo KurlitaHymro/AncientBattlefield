@@ -36,4 +36,6 @@ public:
 
 private:
 	class UHitTraceComponent* HitTraceComponent;
+
+	class UMeshComponent* Mesh;
 };

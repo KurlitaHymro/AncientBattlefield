@@ -5,6 +5,7 @@
 #include "Anim/Components/HitTraceComponent.h"
 #include "Item/ItemObject.h"
 #include "PropertyFragment/PropertyFragment_EntityLink.h"
+#include "EquipmentSystem/PropertyFragment/PropertyFragment_Equipment.h"
 
 void UPropertyFragment_MeleeWeapon::Instantiate(UItemObject* Owner)
 {
@@ -30,6 +31,16 @@ void UPropertyFragment_MeleeWeapon::PutOn(EEquipmentSlots Slot, UItemObject* Ite
 		if (EntityLink)
 		{
 			HitTraceComponent = EntityLink->GetEntity()->GetComponentByClass<UHitTraceComponent>();
+		}
+		UPropertyFragment_Equipment* AsEquipment = Item->FindPropertyFragment<UPropertyFragment_Equipment>();
+		if (AsEquipment)
+		{
+			Mesh = AsEquipment->GetMesh();
+		}
+
+		if (HitTraceComponent && Mesh)
+		{
+			HitTraceComponent->Init(Mesh);
 		}
 	}
 }
