@@ -22,9 +22,9 @@ enum class EEquipmentSlots : uint8
 	EquipmentSlotsNum
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FPutOnDelegate, EEquipmentSlots, Slot, UItemObject*, Item);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInventoryPutOnDelegate, UItemObject*, Item, EEquipmentSlots, Slot);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FTakeOffDelegate, EEquipmentSlots, Slot, UItemObject*, Item);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInventoryTakeOffDelegate, UItemObject*, Item, EEquipmentSlots, Slot);
 
 /**
  * 
@@ -33,26 +33,26 @@ UCLASS()
 class ANCIENTBATTLEFIELD_API UEquipmentComponent : public UInventoryComponent
 {
 	GENERATED_BODY()
-	
-protected:
-	UEquipmentComponent();
 
 public:
 	UPROPERTY(BlueprintAssignable)
-	FPutOnDelegate OnPutOnEquipment;
+	FInventoryPutOnDelegate OnPutOnEquipment;
 
 	UPROPERTY(BlueprintAssignable)
-	FTakeOffDelegate OnTakeOffEquipment;
+	FInventoryTakeOffDelegate OnTakeOffEquipment;
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void InitEquipmentSlots();
+	void EquipmentSetup();
 
 	UFUNCTION(BlueprintCallable)
-	bool PutOnEquipment(class UItemObject* Equipment, EEquipmentSlots Slot);
+	void PutOnEquipment(class UItemObject* Equipment, EEquipmentSlots Slot);
 
 	UFUNCTION(BlueprintCallable)
-	bool TakeOffEquipment(EEquipmentSlots Slot);
+	void TakeOffEquipment(class UItemObject* Equipment);
+
+	UFUNCTION(BlueprintCallable)
+	void TakeOffEquipmentFromSlot(EEquipmentSlots Slot);
 
 	UFUNCTION(BlueprintCallable)
 	class UItemObject* GetEquipment(EEquipmentSlots Slot);

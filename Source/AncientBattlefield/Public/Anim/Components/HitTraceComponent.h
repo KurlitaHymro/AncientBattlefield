@@ -32,10 +32,10 @@ public:
 	UPROPERTY()
 	class UPrimitiveComponent* ReferenceMesh;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interface)
 	TArray<FName> Sockets;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Result, meta = (ToolTip = "Return Value for the plugin. It is a raw hit struct and can be broken down further."))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interface)
 	TArray<FHitResult> HitResult;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = TraceSettings, meta = (Tooltip = "In case you trace by channel."))
@@ -64,7 +64,13 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void Setup(UPrimitiveComponent* Reference);
+	void Setup(UPrimitiveComponent* Reference, bool bSearchSocketsFromMesh = true);
+
+	UFUNCTION(BlueprintCallable)
+	void Teardown();
+
+	UFUNCTION(BlueprintCallable)
+	void SetSockets(const TArray<FName>& SetSockets);
 
 	UFUNCTION(BlueprintCallable)
 	void EnableTrace();

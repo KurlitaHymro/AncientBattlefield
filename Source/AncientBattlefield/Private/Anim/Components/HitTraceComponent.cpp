@@ -10,10 +10,6 @@ UHitTraceComponent::UHitTraceComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	Owner = nullptr;
-	bTrace = false;
-	SocketsLastLocations.Empty();
-
 	TraceChannel = UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Pawn);
 	bTraceComplex = false;
 	ActorsToIgnore.Empty();
@@ -30,8 +26,9 @@ void UHitTraceComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-	
+	Owner = nullptr;
+	bTrace = false;
+	SocketsLastLocations.Empty();
 }
 
 
@@ -47,12 +44,26 @@ void UHitTraceComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 	}
 }
 
-void UHitTraceComponent::Setup(UPrimitiveComponent* Reference)
+void UHitTraceComponent::Setup(UPrimitiveComponent* Reference, bool bSearchSocketsFromMesh)
 {
 	ReferenceMesh = Reference;
 	Owner = GetOwner();
 	ActorsToIgnore.Add(Owner);
-	Sockets = ReferenceMesh->GetAllSocketNames();
+	if (bSearchSocketsFromMesh)
+	{
+		Sockets = ReferenceMesh->GetAllSocketNames();
+	}
+}
+
+void UHitTraceComponent::Teardown()
+{
+	ReferenceMesh = nullptr;
+	Sockets.Empty();
+}
+
+void UHitTraceComponent::SetSockets(const TArray<FName>& SetSockets)
+{
+	Sockets = SetSockets;
 }
 
 void UHitTraceComponent::EnableTrace()
@@ -73,38 +84,27 @@ void UHitTraceComponent::DisableTrace()
 
 void UHitTraceComponent::TickTrace()
 {
-	for (auto Socket : Sockets)
+	for (auto StartSocket : Sockets)
 	{
-		auto LastLocation = SocketsLastLocations.Find(Socket);
+		auto LastLocation = SocketsLastLocations.Find(StartSocket);
 		if (LastLocation == nullptr)
 		{
-			return;
+			continue;
 		}
 		const FVector Start = *LastLocation;
-		const FVector End = ReferenceMesh->GetSocketLocation(Socket);
-
-		TArray<FHitResult> OutHits;
-		UKismetSystemLibrary::LineTraceMulti(
-			Owner,
-			Start,
-			End,
-			TraceChannel,
-			bTraceComplex,
-			ActorsToIgnore,
-			DrawDebugType,
-			OutHits,
-			true,
-			TraceColor,
-			HitColor,
-			DrawTime);
-
-		for (const auto& Hit : OutHits)
+		for (auto EndSocket : Sockets)
 		{
-			if (!HitResult.ContainsByPredicate([&](const FHitResult& Inner) {  return Inner.GetActor() == Hit.GetActor(); }))
-			{
-				HitResult.Add(Hit);
+			TArray<FHitResult> OutHits;
+			const FVector End = ReferenceMesh->GetSocketLocation(EndSocket);
+			UKismetSystemLibrary::LineTraceMulti(Owner, Start, End, TraceChannel, bTraceComplex, ActorsToIgnore, DrawDebugType, OutHits, true, TraceColor, HitColor, DrawTime);
 
-				OnUniqueHit.Broadcast(Hit);
+			for (const auto& Hit : OutHits)
+			{
+				if (!HitResult.ContainsByPredicate([&](const FHitResult& Inner) { return Inner.GetActor() == Hit.GetActor(); }))
+				{
+					HitResult.Add(Hit);
+					OnUniqueHit.Broadcast(Hit);
+				}
 			}
 		}
 	}
