@@ -44,7 +44,7 @@ void UHitTraceComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 	}
 }
 
-void UHitTraceComponent::Init(UPrimitiveComponent* Reference, bool bSearchSocketsFromMesh)
+void UHitTraceComponent::Setup(UPrimitiveComponent* Reference, bool bSearchSocketsFromMesh)
 {
 	ReferenceMesh = Reference;
 	Owner = GetOwner();
@@ -53,6 +53,12 @@ void UHitTraceComponent::Init(UPrimitiveComponent* Reference, bool bSearchSocket
 	{
 		Sockets = ReferenceMesh->GetAllSocketNames();
 	}
+}
+
+void UHitTraceComponent::Teardown()
+{
+	ReferenceMesh = nullptr;
+	Sockets.Empty();
 }
 
 void UHitTraceComponent::SetSockets(const TArray<FName>& SetSockets)

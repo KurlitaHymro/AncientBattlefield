@@ -11,20 +11,16 @@ void UPropertyFragment_MeleeWeapon::Instantiate(UItemObject* Owner)
 {
 	Super::Instantiate(Owner);
 
-	Owner->OnAddToInventory.AddDynamic(this, &ThisClass::OnAddToInventoryComponent);
-}
-
-void UPropertyFragment_MeleeWeapon::OnAddToInventoryComponent(UInventoryComponent* InventoryComponent)
-{
-	auto EquipmentComponent = Cast<UEquipmentComponent>(InventoryComponent);
-	if (EquipmentComponent)
+	UPropertyFragment_Equipment* AsEquipment = Owner->FindPropertyFragment<UPropertyFragment_Equipment>();
+	if (AsEquipment)
 	{
-		EquipmentComponent->OnPutOnEquipment.AddDynamic(this, &ThisClass::PutOn);
+		AsEquipment->OnEquipmentPutOn.AddDynamic(this, &ThisClass::OnWeaponPutOn);
 	}
 }
 
-void UPropertyFragment_MeleeWeapon::PutOn(EEquipmentSlots Slot, UItemObject* Item)
+void UPropertyFragment_MeleeWeapon::OnWeaponPutOn()
 {
+	auto Item = GetOwner();
 	if (Item != nullptr)
 	{
 		UPropertyFragment_EntityLink* EntityLink = Item->FindPropertyFragment<UPropertyFragment_EntityLink>();
@@ -40,14 +36,21 @@ void UPropertyFragment_MeleeWeapon::PutOn(EEquipmentSlots Slot, UItemObject* Ite
 
 		if (HitTraceComponent && Mesh)
 		{
-			HitTraceComponent->Init(Mesh);
+			HitTraceComponent->Setup(Mesh);
 		}
 	}
 }
 
-void UPropertyFragment_MeleeWeapon::TakeOff(EEquipmentSlots Slot, UItemObject* Item)
+void UPropertyFragment_MeleeWeapon::OnWeaponTakeOff()
 {
-
+	auto Item = GetOwner();
+	if (Item != nullptr)
+	{
+		if (HitTraceComponent && Mesh)
+		{
+			HitTraceComponent->Teardown();
+		}
+	}
 }
 
 UHitTraceComponent* UPropertyFragment_MeleeWeapon::GetHitTraceComponent()

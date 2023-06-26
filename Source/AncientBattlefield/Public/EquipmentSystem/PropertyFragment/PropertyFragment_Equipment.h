@@ -7,6 +7,10 @@
 #include "EquipmentSystem/EquipmentComponent.h"
 #include "PropertyFragment_Equipment.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEquipmentPutOnDelegate);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEquipmentTakeOffDelegate);
+
 /**
  * 
  */
@@ -20,27 +24,32 @@ public:
 	UMeshComponent* ParentMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EEquipmentSlots DefaultSlot;
+	TArray<EEquipmentSlots> RestrictSlot;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName AttachSocket;
 
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FEquipmentPutOnDelegate OnEquipmentPutOn;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FEquipmentTakeOffDelegate OnEquipmentTakeOff;
+
 protected:
 	virtual void Instantiate(class UItemObject* Owner) override;
 
-	UFUNCTION()
-	void OnAddToInventoryComponent(UInventoryComponent* InventoryComponent);
-
 public:
 	UFUNCTION(BlueprintCallable)
-	void PutOn(EEquipmentSlots Slot, UItemObject* Item);
+	void PutOn();
 
 	UFUNCTION(BlueprintCallable)
-	void TakeOff(EEquipmentSlots Slot, UItemObject* Item);
+	void TakeOff();
 
 	UFUNCTION(BlueprintCallable)
 	UMeshComponent* GetMesh();
 
 private:
+	AActor* EquipmentEntity;
+
 	UMeshComponent* EquipmentMesh;
 };

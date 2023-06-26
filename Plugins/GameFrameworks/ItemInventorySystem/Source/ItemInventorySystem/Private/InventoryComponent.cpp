@@ -13,62 +13,57 @@ UInventoryComponent::UInventoryComponent()
 
 }
 
-void UInventoryComponent::InitSlots(int32 SlotsNumber)
+void UInventoryComponent::Setup(int32 SlotsNumber)
 {
-	SlotSet.Init(this, SlotsNumber);
-
-	if (SlotsNumber > 0)
-	{
-		OnInitSlot.Broadcast(SlotsNumber);
-	}
+	Size = SlotsNumber;
+	ItemObjectSlot.Init(nullptr, Size);
+	OnSetup.Broadcast(Size);
 }
 
-FItemSlotHandle UInventoryComponent::AddItem(UItemObject* Item, FItemSlotHandle SlotHandle)
+int32 UInventoryComponent::FindVacancy() const
 {
-	FItemSlotHandle Handle;
-	if (SlotHandle.IsValid())
+	int32 SlotID = 0;
+	for (; SlotID < Size; SlotID++)
 	{
-		Handle = SlotHandle;
-		if (SlotSet.FindItem(Handle) != nullptr)
+		if (ItemObjectSlot[SlotID] == nullptr)
 		{
-			RemoveItem(Handle);
+			break;
 		}
-		SlotSet.SetItem(Handle, Item);
 	}
-	else
-	{
-		Handle = SlotSet.AddItem(Item);
-	}
-	if (Handle.IsValid())
-	{
-		OnAddItem.Broadcast(Item, Handle.SlotID);
-		Item->OnAddToInventory.Broadcast(this);
-	}
-	return Handle;
+	return SlotID;
 }
 
-bool UInventoryComponent::RemoveItem(FItemSlotHandle SlotHandle)
+void UInventoryComponent::AddItem(UItemObject* Item, int32 SlotID)
 {
-	UItemObject* Item = SlotSet.FindItem(SlotHandle);
-
-	if (Item != nullptr)
+	if (Item && 0 <= SlotID && SlotID < Size)
 	{
-		OnRemoveItem.Broadcast(Item, SlotHandle.SlotID);
-		Item->OnRemoveFromInventory.Broadcast(this);
+		ItemObjectSlot[SlotID] = Item;
+		Item->BelongingInventory = this;
+		Item->BelongingSlotID = SlotID;
+		OnAddItem.Broadcast(Item, SlotID);
 	}
-
-	return SlotSet.RemoveItem(SlotHandle);
 }
 
-UItemObject* UInventoryComponent::GetItem(FItemSlotHandle SlotHandle)
+void UInventoryComponent::RemoveItem(UItemObject* Item)
 {
-	return SlotSet.FindItem(SlotHandle);
+	if (Item && Item->BelongingInventory == this && Item->BelongingSlotID < Size)
+	{
+		int32 SlotID = Item->BelongingSlotID;
+		Item->BelongingSlotID = Size;
+		Item->BelongingInventory = nullptr;
+		OnRemoveItem.Broadcast(Item, SlotID);
+		ItemObjectSlot[SlotID] = nullptr;
+	}
 }
 
-FItemSlotHandle UInventoryComponent::ConstructHandle(int32 SlotID)
+void UInventoryComponent::RemoveItemFromSlot(int32 SlotID)
 {
-	FItemSlotHandle Handle;
-	Handle.Owner = this;
-	Handle.SlotID = SlotID;
-	return Handle;
+	ItemObjectSlot.RangeCheck(SlotID);
+	RemoveItem(ItemObjectSlot[SlotID]);
+}
+
+UItemObject* UInventoryComponent::GetItem(int32 SlotID)
+{
+	ItemObjectSlot.RangeCheck(SlotID);
+	return ItemObjectSlot[SlotID];
 }

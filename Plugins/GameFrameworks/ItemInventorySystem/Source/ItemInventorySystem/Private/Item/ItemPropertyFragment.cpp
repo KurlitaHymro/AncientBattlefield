@@ -5,15 +5,12 @@
 
 UItemObject* UItemPropertyFragment::GetOwner() const
 {
-	GetOuter();
-
 	return OwnerItemObject;
 }
 
 void UItemPropertyFragment::Instantiate(UItemObject* Owner)
 {
-	UItemObject* OwnerItem = Owner;
-
+	OwnerItemObject = Owner;
 }
 
 void UItemPropertyFragment::InitFromMetaDataTable(const UDataTable* DataTable, FString PrefabName)

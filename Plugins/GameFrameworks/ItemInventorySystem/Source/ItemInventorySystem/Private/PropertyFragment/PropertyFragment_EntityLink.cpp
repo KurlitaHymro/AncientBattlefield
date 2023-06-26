@@ -25,5 +25,9 @@ void UPropertyFragment_EntityLink::DestroyEntity()
 
 AActor* UPropertyFragment_EntityLink::GetEntity()
 {
+	if (Entity == nullptr)
+	{
+		SpawnEntity();
+	}
 	return Entity;
 }

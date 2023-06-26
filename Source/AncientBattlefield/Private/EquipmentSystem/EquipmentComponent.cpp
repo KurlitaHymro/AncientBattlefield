@@ -6,45 +6,40 @@
 #include "Item/ItemObject.h"
 #include "EquipmentSystem/PropertyFragment/PropertyFragment_Equipment.h"
 
-UEquipmentComponent::UEquipmentComponent()
+void UEquipmentComponent::EquipmentSetup()
 {
-	
+	Setup((int32)EEquipmentSlots::EquipmentSlotsNum);
 }
 
-void UEquipmentComponent::InitEquipmentSlots()
-{
-	InitSlots((int32)EEquipmentSlots::EquipmentSlotsNum);
-}
-
-bool UEquipmentComponent::PutOnEquipment(UItemObject* Equipment, EEquipmentSlots Slot)
+void UEquipmentComponent::PutOnEquipment(UItemObject* Equipment, EEquipmentSlots Slot)
 {
 	if (Equipment != nullptr && Equipment->FindPropertyFragment<UPropertyFragment_Equipment>() != nullptr)
 	{
-		auto Handle = ConstructHandle((int)Slot);
-		if (Handle.IsValid())
-		{
-			AddItem(Equipment, Handle);
-			OnPutOnEquipment.Broadcast(Slot, Equipment);
-			return true;
-		}
+		AddItem(Equipment, (int32)Slot);
+		OnPutOnEquipment.Broadcast(Equipment, Slot);
 	}
-	return false;
 }
 
-bool UEquipmentComponent::TakeOffEquipment(EEquipmentSlots Slot)
+void UEquipmentComponent::TakeOffEquipment(UItemObject* Equipment)
 {
-	FItemSlotHandle Handle = ConstructHandle((int)Slot);
-	if (Handle.IsValid())
+	if (Equipment && Equipment->BelongingInventory == this && Equipment->BelongingSlotID < Size)
 	{
-		OnTakeOffEquipment.Broadcast(Slot, GetItem(Handle));
-		RemoveItem(Handle);
-		
-		return true;
+		OnTakeOffEquipment.Broadcast(Equipment, (EEquipmentSlots)Equipment->BelongingSlotID);
+		RemoveItem(Equipment);
 	}
-	return false;
+}
+
+void UEquipmentComponent::TakeOffEquipmentFromSlot(EEquipmentSlots Slot)
+{
+	ItemObjectSlot.RangeCheck((int32)Slot);
+	if (ItemObjectSlot[(int32)Slot] != nullptr)
+	{
+		OnTakeOffEquipment.Broadcast(ItemObjectSlot[(int32)Slot], Slot);
+		RemoveItem(ItemObjectSlot[(int32)Slot]);
+	}
 }
 
 UItemObject* UEquipmentComponent::GetEquipment(EEquipmentSlots Slot)
 {
-	return GetItem(ConstructHandle((int)Slot));
+	return ItemObjectSlot[(int32)Slot];
 }

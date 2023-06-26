@@ -64,7 +64,10 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void Init(UPrimitiveComponent* Reference, bool bSearchSocketsFromMesh = true);
+	void Setup(UPrimitiveComponent* Reference, bool bSearchSocketsFromMesh = true);
+
+	UFUNCTION(BlueprintCallable)
+	void Teardown();
 
 	UFUNCTION(BlueprintCallable)
 	void SetSockets(const TArray<FName>& SetSockets);

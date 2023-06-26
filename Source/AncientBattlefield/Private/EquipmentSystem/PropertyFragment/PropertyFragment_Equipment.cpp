@@ -9,45 +9,61 @@ void UPropertyFragment_Equipment::Instantiate(UItemObject* Owner)
 {
 	Super::Instantiate(Owner);
 
-	Owner->OnAddToInventory.AddDynamic(this, &ThisClass::OnAddToInventoryComponent);
 }
 
-void UPropertyFragment_Equipment::OnAddToInventoryComponent(UInventoryComponent* InventoryComponent)
+void UPropertyFragment_Equipment::PutOn()
 {
-	auto EquipmentComponent = Cast<UEquipmentComponent>(InventoryComponent);
-	if (EquipmentComponent)
-	{
-		EquipmentComponent->OnPutOnEquipment.AddDynamic(this, &ThisClass::PutOn);
-	}
-}
-
-void UPropertyFragment_Equipment::PutOn(EEquipmentSlots Slot, UItemObject* Item)
-{
+	auto Item = GetOwner();
 	if (Item != nullptr)
 	{
 		UPropertyFragment_EntityLink* EntityLink = Item->FindPropertyFragment<UPropertyFragment_EntityLink>();
 		if (EntityLink)
 		{
-			if (EntityLink->GetEntity() == nullptr)
-			{
-				EntityLink->SpawnEntity();
-			}
-			EquipmentMesh = EntityLink->GetEntity()->GetComponentByClass<UMeshComponent>();
+			EquipmentEntity = EntityLink->GetEntity();
 		}
 	}
-
-	if (ParentMesh != nullptr && EquipmentMesh != nullptr && AttachSocket.IsValid())
+	
+	if (ParentMesh != nullptr && EquipmentEntity != nullptr && AttachSocket.IsValid())
 	{
 		FAttachmentTransformRules Rules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true);
-		EquipmentMesh->AttachToComponent(ParentMesh, Rules, AttachSocket);
+		EquipmentEntity->AttachToComponent(ParentMesh, Rules, AttachSocket);
+		OnEquipmentPutOn.Broadcast(); // 仅用于平级通知其他属性片段
+
+		UInventoryComponent* CharacterInventory = Item->BelongingInventory;
+		if (CharacterInventory)
+		{
+			// 必须是具有归属的物品，且同时存在与物品容器共属的装备容器。
+			UEquipmentComponent* CharacterEquipment = CharacterInventory->GetOwner()->FindComponentByClass<UEquipmentComponent>();
+			if (CharacterEquipment)
+			{
+				EEquipmentSlots EquipmentSlot = EEquipmentSlots::EquipmentSlotsNum;
+				for (auto IdleSlot : RestrictSlot)
+				{
+					if (CharacterEquipment->GetItem((int32)IdleSlot) == nullptr)
+					{
+						EquipmentSlot = IdleSlot;
+					}
+				}
+				if (EquipmentSlot < EEquipmentSlots::EquipmentSlotsNum)
+				{
+					CharacterInventory->RemoveItem(Item);
+					CharacterEquipment->PutOnEquipment(Item, EquipmentSlot);
+				}
+			}
+		}
 	}
 }
 
-void UPropertyFragment_Equipment::TakeOff(EEquipmentSlots Slot, UItemObject* Item)
+void UPropertyFragment_Equipment::TakeOff()
 {
+	
 }
 
 UMeshComponent* UPropertyFragment_Equipment::GetMesh()
 {
+	if (EquipmentEntity && EquipmentMesh == nullptr)
+	{
+		EquipmentMesh = EquipmentEntity->FindComponentByClass<UMeshComponent>();
+	}
 	return EquipmentMesh;
 }

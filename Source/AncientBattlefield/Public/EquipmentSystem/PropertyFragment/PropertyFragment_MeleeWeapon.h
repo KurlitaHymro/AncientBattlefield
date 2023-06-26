@@ -21,15 +21,12 @@ public:
 protected:
 	virtual void Instantiate(class UItemObject* Owner) override;
 
-	UFUNCTION()
-	void OnAddToInventoryComponent(UInventoryComponent* InventoryComponent);
-
 public:
-	UFUNCTION(BlueprintCallable)
-	void PutOn(EEquipmentSlots Slot, UItemObject* Item);
+	UFUNCTION()
+	void OnWeaponPutOn();
 
-	UFUNCTION(BlueprintCallable)
-	void TakeOff(EEquipmentSlots Slot, UItemObject* Item);
+	UFUNCTION()
+	void OnWeaponTakeOff();
 
 	UFUNCTION(BlueprintCallable)
 	class UHitTraceComponent* GetHitTraceComponent();

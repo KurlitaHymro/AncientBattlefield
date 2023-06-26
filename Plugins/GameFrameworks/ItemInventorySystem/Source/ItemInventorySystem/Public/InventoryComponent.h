@@ -4,14 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Slot/ItemSlot.h"
 #include "InventoryComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInitSlotsDelegate, int32, SlotsNumber);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventorySetupDelegate, int32, SlotsNumber);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FAddItemDelegate, UItemObject*, Item, int32, LocalID);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInventoryAddItemDelegate, UItemObject*, Item, int32, LocalID);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRemoveItemDelegate, UItemObject*, Item, int32, LocalID);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInventoryRemoveItemDelegate, UItemObject*, Item, int32, LocalID);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class ITEMINVENTORYSYSTEM_API UInventoryComponent : public UActorComponent
@@ -24,32 +23,38 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void InitSlots(int32 SlotsNumber);
+	void Setup(int32 SlotsNumber);
 
 	UFUNCTION(BlueprintCallable)
-	FItemSlotHandle AddItem(UItemObject* Item, FItemSlotHandle SlotHandle = FItemSlotHandle());
+	int32 FindVacancy() const;
 
 	UFUNCTION(BlueprintCallable)
-	bool RemoveItem(FItemSlotHandle SlotHandle);
+	void AddItem(UItemObject* Item, int32 SlotID);
 
 	UFUNCTION(BlueprintCallable)
-	UItemObject* GetItem(FItemSlotHandle SlotHandle);
+	void RemoveItem(UItemObject* Item);
 
 	UFUNCTION(BlueprintCallable)
-	FItemSlotHandle ConstructHandle(int32 SlotID);
+	void RemoveItemFromSlot(int32 SlotID);
 
-private:
+	UFUNCTION(BlueprintCallable)
+	UItemObject* GetItem(int32 SlotID);
+
+protected:
 	UPROPERTY()
-	FItemSlotSet SlotSet;
+	TArray<UItemObject*> ItemObjectSlot;
+
+	UPROPERTY()
+	int32 Size;
 
 public:
 	UPROPERTY(BlueprintAssignable)
-	FInitSlotsDelegate OnInitSlot;
+	FInventorySetupDelegate OnSetup;
 
 	UPROPERTY(BlueprintAssignable)
-	FAddItemDelegate OnAddItem;
+	FInventoryAddItemDelegate OnAddItem;
 
 	UPROPERTY(BlueprintAssignable)
-	FRemoveItemDelegate OnRemoveItem;
+	FInventoryRemoveItemDelegate OnRemoveItem;
 
 };
