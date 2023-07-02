@@ -40,6 +40,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	UItemObject* GetItem(int32 SlotID);
 
+	UFUNCTION(BlueprintCallable)
+	int32 GetSize();
+
 protected:
 	UPROPERTY()
 	TArray<UItemObject*> ItemObjectSlot;

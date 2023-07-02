@@ -22,15 +22,14 @@ void UInventoryComponent::Setup(int32 SlotsNumber)
 
 int32 UInventoryComponent::FindVacancy() const
 {
-	int32 SlotID = 0;
-	for (; SlotID < Size; SlotID++)
+	for (int32 SlotID = 0; SlotID < Size; SlotID++)
 	{
 		if (ItemObjectSlot[SlotID] == nullptr)
 		{
-			break;
+			return SlotID;
 		}
 	}
-	return SlotID;
+	return Size;
 }
 
 void UInventoryComponent::AddItem(UItemObject* Item, int32 SlotID)
@@ -66,4 +65,9 @@ UItemObject* UInventoryComponent::GetItem(int32 SlotID)
 {
 	ItemObjectSlot.RangeCheck(SlotID);
 	return ItemObjectSlot[SlotID];
+}
+
+int32 UInventoryComponent::GetSize()
+{
+	return Size;
 }

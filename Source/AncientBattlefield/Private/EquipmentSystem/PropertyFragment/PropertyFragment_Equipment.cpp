@@ -32,7 +32,7 @@ void UPropertyFragment_Equipment::PutOn()
 		UInventoryComponent* CharacterInventory = Item->BelongingInventory;
 		if (CharacterInventory)
 		{
-			// 必须是具有归属的物品，且同时存在与物品容器共属的装备容器。
+			// 必须存在与物品容器共属的装备容器。
 			UEquipmentComponent* CharacterEquipment = CharacterInventory->GetOwner()->FindComponentByClass<UEquipmentComponent>();
 			if (CharacterEquipment)
 			{
@@ -56,7 +56,32 @@ void UPropertyFragment_Equipment::PutOn()
 
 void UPropertyFragment_Equipment::TakeOff()
 {
-	
+	auto Item = GetOwner();
+	if (Item != nullptr)
+	{
+		UPropertyFragment_EntityLink* EntityLink = Item->FindPropertyFragment<UPropertyFragment_EntityLink>();
+		if (EntityLink)
+		{
+			EntityLink->DestroyEntity();
+		}
+	}
+
+	OnEquipmentTakeOff.Broadcast(); // 仅用于平级通知其他属性片段
+	UEquipmentComponent* CharacterEquipment = Cast<UEquipmentComponent>(Item->BelongingInventory);
+	if (CharacterEquipment)
+	{
+		// 必须存在与装备容器共属的物品容器。
+		UInventoryComponent* CharacterInventory = CharacterEquipment->GetOwner()->FindComponentByClass<UInventoryComponent>();
+		if (CharacterInventory)
+		{
+			int32 SlotID = CharacterInventory->FindVacancy();
+			if (SlotID < CharacterInventory->GetSize())
+			{
+				CharacterEquipment->TakeOffEquipment(Item);
+				CharacterInventory->AddItem(Item, SlotID);
+			}
+		}
+	}
 }
 
 UMeshComponent* UPropertyFragment_Equipment::GetMesh()

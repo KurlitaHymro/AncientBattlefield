@@ -4,26 +4,26 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "SlotWidget.generated.h"
+#include "ItemWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ITEMINVENTORYSYSTEM_API USlotWidget : public UUserWidget
+class ITEMINVENTORYSYSTEM_API UItemWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
 public:
-	UFUNCTION(BlueprintCallable)
-	void InitFromItem(class UItemObject* Item);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UItemObject* Item;
 
 protected:
 	UFUNCTION(BlueprintCallable)
-	FName GetName() { return Name; };
+	FName GetName();
 
 	UFUNCTION(BlueprintCallable)
-	UTexture* GetIcon() { return Icon; };
+	UTexture* GetIcon();
 
 private:
 	FName Name;
