@@ -6,40 +6,30 @@
 #include "Item/ItemObject.h"
 #include "EquipmentSystem/PropertyFragment/PropertyFragment_Equipment.h"
 
-void UEquipmentComponent::EquipmentSetup()
+void UEquipmentComponent::Setup(int32 SlotsNumber)
 {
 	Super::Setup((int32)EEquipmentSlots::EquipmentSlotsNum);
 }
 
-void UEquipmentComponent::PutOnEquipment(UItemObject* Equipment, EEquipmentSlots Slot)
+void UEquipmentComponent::AddItem(UItemObject* Item, int32 SlotID)
 {
-	if (Equipment != nullptr && Equipment->FindPropertyFragment<UPropertyFragment_Equipment>() != nullptr)
+	if (Item != nullptr && Item->FindPropertyFragment<UPropertyFragment_Equipment>() != nullptr)
 	{
-		Super::AddItem(Equipment, (int32)Slot);
-		OnPutOnEquipment.Broadcast(Equipment, Slot);
+		Item->FindPropertyFragment<UPropertyFragment_Equipment>()->ItemEquipmentPutOnDelegate.Broadcast();
+		Super::AddItem(Item, SlotID);
 	}
 }
 
-void UEquipmentComponent::TakeOffEquipment(UItemObject* Equipment)
+void UEquipmentComponent::RemoveItem(UItemObject* Item)
 {
-	if (Equipment && Equipment->BelongingInventory == this && Equipment->BelongingSlotID < Size)
+	if (Item && Item->BelongingInventory == this && Item->BelongingSlotID < Size)
 	{
-		OnTakeOffEquipment.Broadcast(Equipment, (EEquipmentSlots)Equipment->BelongingSlotID);
-		Super::RemoveItem(Equipment);
-	}
-}
-
-void UEquipmentComponent::TakeOffEquipmentFromSlot(EEquipmentSlots Slot)
-{
-	ItemObjectSlot.RangeCheck((int32)Slot);
-	if (ItemObjectSlot[(int32)Slot] != nullptr)
-	{
-		OnTakeOffEquipment.Broadcast(ItemObjectSlot[(int32)Slot], Slot);
-		Super::RemoveItem(ItemObjectSlot[(int32)Slot]);
+		Item->FindPropertyFragment<UPropertyFragment_Equipment>()->ItemEquipmentTakeOffDelegate.Broadcast();
+		Super::RemoveItem(Item);
 	}
 }
 
 UItemObject* UEquipmentComponent::GetEquipment(EEquipmentSlots Slot)
 {
-	return ItemObjectSlot[(int32)Slot];
+	return Super::GetItem((int32)Slot);
 }

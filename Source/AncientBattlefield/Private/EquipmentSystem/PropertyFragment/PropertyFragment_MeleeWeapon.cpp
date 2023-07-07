@@ -14,7 +14,7 @@ void UPropertyFragment_MeleeWeapon::Instantiate(UItemObject* Owner)
 	UPropertyFragment_Equipment* AsEquipment = Owner->FindPropertyFragment<UPropertyFragment_Equipment>();
 	if (AsEquipment)
 	{
-		AsEquipment->OnEquipmentPutOn.AddDynamic(this, &ThisClass::OnWeaponPutOn);
+		AsEquipment->ItemEquipmentPutOnDelegate.AddDynamic(this, &ThisClass::OnWeaponPutOn);
 	}
 }
 

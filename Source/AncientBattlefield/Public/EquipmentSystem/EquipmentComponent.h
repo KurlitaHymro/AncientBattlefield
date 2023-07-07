@@ -22,10 +22,6 @@ enum class EEquipmentSlots : uint8
 	EquipmentSlotsNum
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInventoryPutOnDelegate, UItemObject*, Item, EEquipmentSlots, Slot);
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInventoryTakeOffDelegate, UItemObject*, Item, EEquipmentSlots, Slot);
-
 /**
  * 
  */
@@ -35,26 +31,13 @@ class ANCIENTBATTLEFIELD_API UEquipmentComponent : public UInventoryComponent
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintAssignable)
-	FInventoryPutOnDelegate OnPutOnEquipment;
+	virtual void Setup(int32 SlotsNumber) override;
 
-	UPROPERTY(BlueprintAssignable)
-	FInventoryTakeOffDelegate OnTakeOffEquipment;
+	virtual void AddItem(UItemObject* Item, int32 SlotID) override;
+
+	virtual void RemoveItem(UItemObject* Item) override;
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void EquipmentSetup();
-
-	UFUNCTION(BlueprintCallable)
-	void PutOnEquipment(class UItemObject* Equipment, EEquipmentSlots Slot);
-
-	UFUNCTION(BlueprintCallable)
-	void TakeOffEquipment(class UItemObject* Equipment);
-
-	UFUNCTION(BlueprintCallable)
-	void TakeOffEquipmentFromSlot(EEquipmentSlots Slot);
-
-	UFUNCTION(BlueprintCallable)
-	class UItemObject* GetEquipment(EEquipmentSlots Slot);
-
+	UItemObject* GetEquipment(EEquipmentSlots Slot);
 };

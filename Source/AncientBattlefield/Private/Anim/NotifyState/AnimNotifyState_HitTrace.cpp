@@ -13,7 +13,7 @@ void UAnimNotifyState_HitTrace::NotifyBegin(USkeletalMeshComponent* MeshComp, UA
 	Super::NotifyBegin(MeshComp, Animation, TotalDuration, EventReference);
 	OwnerCharacter = Cast<ACombatCharacter>(MeshComp->GetOwner());
 
-	UItemObject* HitWeapon = OwnerCharacter->GetEquipmentSystemComponent()->GetEquipment(EquipmentSlot);
+	UItemObject* HitWeapon = OwnerCharacter->GetEquipmentSystemComponent()->GetItem((int32)EquipmentSlot);
 	if (HitWeapon != nullptr)
 	{
 		UPropertyFragment_Equipment* HitWeaponInfo = HitWeapon->FindPropertyFragment<UPropertyFragment_Equipment>();

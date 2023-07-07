@@ -7,9 +7,9 @@
 #include "EquipmentSystem/EquipmentComponent.h"
 #include "PropertyFragment_Equipment.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEquipmentPutOnDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FItemEquipmentPutOnDelegate);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEquipmentTakeOffDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FItemEquipmentTakeOffDelegate);
 
 /**
  * 
@@ -30,13 +30,19 @@ public:
 	FName AttachSocket;
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)
-	FEquipmentPutOnDelegate OnEquipmentPutOn;
+	FItemEquipmentPutOnDelegate ItemEquipmentPutOnDelegate;
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)
-	FEquipmentTakeOffDelegate OnEquipmentTakeOff;
+	FItemEquipmentTakeOffDelegate ItemEquipmentTakeOffDelegate;
 
 protected:
 	virtual void Instantiate(class UItemObject* Owner) override;
+
+	UFUNCTION()
+	void OnEquipmentPutOn();
+
+	UFUNCTION()
+	void OnEquipmentTakeOff();
 
 public:
 	UFUNCTION(BlueprintCallable)

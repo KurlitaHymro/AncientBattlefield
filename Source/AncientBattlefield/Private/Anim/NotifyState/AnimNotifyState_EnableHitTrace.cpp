@@ -19,7 +19,7 @@ void UAnimNotifyState_EnableHitTrace::NotifyBegin(USkeletalMeshComponent* MeshCo
 		auto EquipmentSystemComponent = OwnerCharacter->GetEquipmentSystemComponent();
 		if (EquipmentSystemComponent)
 		{
-			auto Weapon = EquipmentSystemComponent->GetEquipment(EEquipmentSlots::MainHand);
+			auto Weapon = EquipmentSystemComponent->GetItem((int32)EEquipmentSlots::MainHand);
 			if (Weapon)
 			{
 				auto MeleeWeaponProperty = Weapon->FindPropertyFragment<UPropertyFragment_MeleeWeapon>();

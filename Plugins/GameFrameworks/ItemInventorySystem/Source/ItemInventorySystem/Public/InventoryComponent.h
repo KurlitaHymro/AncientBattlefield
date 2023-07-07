@@ -23,25 +23,25 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void Setup(int32 SlotsNumber);
+	virtual void Setup(int32 SlotsNumber);
 
 	UFUNCTION(BlueprintCallable)
-	int32 FindVacancy() const;
+	virtual int32 FindVacancy() const;
 
 	UFUNCTION(BlueprintCallable)
-	void AddItem(UItemObject* Item, int32 SlotID);
+	virtual void AddItem(UItemObject* Item, int32 SlotID);
 
 	UFUNCTION(BlueprintCallable)
-	void RemoveItem(UItemObject* Item);
+	virtual void RemoveItem(UItemObject* Item);
 
 	UFUNCTION(BlueprintCallable)
-	void RemoveItemFromSlot(int32 SlotID);
+	virtual void RemoveItemFromSlot(int32 SlotID);
 
 	UFUNCTION(BlueprintCallable)
-	UItemObject* GetItem(int32 SlotID);
+	virtual UItemObject* GetItem(int32 SlotID);
 
 	UFUNCTION(BlueprintCallable)
-	int32 GetSize();
+	virtual int32 GetSize();
 
 protected:
 	UPROPERTY()
@@ -52,12 +52,12 @@ protected:
 
 public:
 	UPROPERTY(BlueprintAssignable)
-	FInventorySetupDelegate OnSetup;
+	FInventorySetupDelegate InventorySetupDelegate;
 
 	UPROPERTY(BlueprintAssignable)
-	FInventoryAddItemDelegate OnAddItem;
+	FInventoryAddItemDelegate InventoryAddItemDelegate;
 
 	UPROPERTY(BlueprintAssignable)
-	FInventoryRemoveItemDelegate OnRemoveItem;
+	FInventoryRemoveItemDelegate InventoryRemoveItemDelegate;
 
 };

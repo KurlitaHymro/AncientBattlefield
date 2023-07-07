@@ -17,7 +17,7 @@ void UInventoryComponent::Setup(int32 SlotsNumber)
 {
 	Size = SlotsNumber;
 	ItemObjectSlot.Init(nullptr, Size);
-	OnSetup.Broadcast(Size);
+	InventorySetupDelegate.Broadcast(Size);
 }
 
 int32 UInventoryComponent::FindVacancy() const
@@ -39,7 +39,7 @@ void UInventoryComponent::AddItem(UItemObject* Item, int32 SlotID)
 		ItemObjectSlot[SlotID] = Item;
 		Item->BelongingInventory = this;
 		Item->BelongingSlotID = SlotID;
-		OnAddItem.Broadcast(Item, SlotID);
+		InventoryAddItemDelegate.Broadcast(Item, SlotID);
 	}
 }
 
@@ -50,7 +50,7 @@ void UInventoryComponent::RemoveItem(UItemObject* Item)
 		int32 SlotID = Item->BelongingSlotID;
 		Item->BelongingSlotID = Size;
 		Item->BelongingInventory = nullptr;
-		OnRemoveItem.Broadcast(Item, SlotID);
+		InventoryRemoveItemDelegate.Broadcast(Item, SlotID);
 		ItemObjectSlot[SlotID] = nullptr;
 	}
 }
