@@ -8,8 +8,6 @@
 #include "InventorySystemInterface.h"
 #include "CombatCharacter.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHitActorDelegate, AActor*, Target);
-
 /**
  * Combat Gameplay Core Character
  * 负责各项战斗相关模块（诸如技能系统、装备系统、伤害系统等）之间的功能配合。
@@ -50,7 +48,4 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	class UEquipmentComponent* EquipmentComponent;
 
-public:
-	UPROPERTY(BlueprintAssignable, BlueprintCallable)
-	FHitActorDelegate OnHitActor;
 };

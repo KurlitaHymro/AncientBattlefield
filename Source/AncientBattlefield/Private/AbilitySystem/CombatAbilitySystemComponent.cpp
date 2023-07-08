@@ -5,21 +5,6 @@
 #include "CombatCore/CombatCharacter.h"
 #include "AbilitySystemGlobals.h"
 
-void UCombatAbilitySystemComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
-	OwnerCharacter = Cast<ACombatCharacter>(GetOwner());
-	OwnerCharacter->OnHitActor.AddDynamic(this, &ThisClass::HandleHitEvent);
-}
-
-void UCombatAbilitySystemComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-	Super::EndPlay(EndPlayReason);
-
-	OwnerCharacter->OnHitActor.RemoveAll(this);
-}
-
 void UCombatAbilitySystemComponent::HandleHitEvent(AActor* Target)
 {
 	AActor* Instigator = GetOwner();

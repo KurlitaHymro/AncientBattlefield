@@ -103,7 +103,7 @@ void UHitTraceComponent::TickTrace()
 				if (!HitResult.ContainsByPredicate([&](const FHitResult& Inner) { return Inner.GetActor() == Hit.GetActor(); }))
 				{
 					HitResult.Add(Hit);
-					OnUniqueHit.Broadcast(Hit);
+					UniqueHitDelegate.Broadcast(Hit);
 				}
 			}
 		}

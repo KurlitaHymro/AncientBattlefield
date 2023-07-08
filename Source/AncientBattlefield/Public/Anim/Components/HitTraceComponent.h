@@ -26,7 +26,7 @@ public:
 
 public:
 	UPROPERTY(BlueprintAssignable)
-	FUniqueHitDelegate OnUniqueHit;
+	FUniqueHitDelegate UniqueHitDelegate;
 
 public:
 	UPROPERTY()
