@@ -16,7 +16,7 @@ void UEquipmentComponent::AddItem(UItemObject* Item, int32 SlotID)
 	if (Item != nullptr && Item->FindPropertyFragment<UPropertyFragment_Equipment>() != nullptr)
 	{
 		Super::AddItem(Item, SlotID);
-		Item->FindPropertyFragment<UPropertyFragment_Equipment>()->ItemEquipmentPutOnDelegate.Broadcast();
+		Item->FindPropertyFragment<UPropertyFragment_Equipment>()->OnEquipmentPutOn();
 	}
 }
 
@@ -25,7 +25,7 @@ void UEquipmentComponent::RemoveItem(UItemObject* Item)
 	if (Item && Item->BelongingInventory == this && Item->BelongingSlotID < Size)
 	{
 		Super::RemoveItem(Item);
-		Item->FindPropertyFragment<UPropertyFragment_Equipment>()->ItemEquipmentTakeOffDelegate.Broadcast();
+		Item->FindPropertyFragment<UPropertyFragment_Equipment>()->OnEquipmentTakeOff();
 	}
 }
 

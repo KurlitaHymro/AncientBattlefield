@@ -15,15 +15,12 @@ class ANCIENTBATTLEFIELD_API UPropertyFragment_MeleeWeapon : public UItemPropert
 {
 	GENERATED_BODY()
 
-protected:
-	virtual void Instantiate(class UItemObject* Owner) override;
-
 public:
 	UFUNCTION()
-	void OnWeaponPutOn();
+	void OnWeaponPutOn(class UPropertyFragment_Equipment* Equipment);
 
 	UFUNCTION()
-	void OnWeaponTakeOff();
+	void OnWeaponTakeOff(class UPropertyFragment_Equipment* Equipment);
 
 	UFUNCTION(BlueprintCallable)
 	class UHitTraceComponent* GetHitTraceComponent();

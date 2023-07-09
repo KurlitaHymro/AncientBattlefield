@@ -15,7 +15,7 @@ class ITEMINVENTORYSYSTEM_API UPropertyFragment_EntityLink : public UItemPropert
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (InstanceEditable = true, ExposeOnSpawn = true))
 	TSubclassOf<AActor> EntityType;
 
 public:

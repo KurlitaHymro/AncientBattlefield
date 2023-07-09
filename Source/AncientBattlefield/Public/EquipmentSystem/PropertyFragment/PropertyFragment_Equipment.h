@@ -7,10 +7,6 @@
 #include "EquipmentSystem/EquipmentComponent.h"
 #include "PropertyFragment_Equipment.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FItemEquipmentPutOnDelegate);
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FItemEquipmentTakeOffDelegate);
-
 /**
  * 
  */
@@ -23,26 +19,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UMeshComponent* ParentMesh;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (InstanceEditable = true, ExposeOnSpawn = true))
 	TArray<EEquipmentSlots> RestrictSlot;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (InstanceEditable = true, ExposeOnSpawn = true))
 	FName AttachSocket;
-
-	UPROPERTY(BlueprintAssignable, BlueprintCallable)
-	FItemEquipmentPutOnDelegate ItemEquipmentPutOnDelegate;
-
-	UPROPERTY(BlueprintAssignable, BlueprintCallable)
-	FItemEquipmentTakeOffDelegate ItemEquipmentTakeOffDelegate;
-
-protected:
-	virtual void Instantiate(class UItemObject* Owner) override;
-
-	UFUNCTION()
-	void OnEquipmentPutOn();
-
-	UFUNCTION()
-	void OnEquipmentTakeOff();
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -53,6 +34,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	UMeshComponent* GetMesh();
+
+	UFUNCTION()
+	void OnEquipmentPutOn();
+
+	UFUNCTION()
+	void OnEquipmentTakeOff();
 
 private:
 	AActor* EquipmentEntity;

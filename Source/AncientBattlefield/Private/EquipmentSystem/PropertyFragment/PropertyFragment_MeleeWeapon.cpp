@@ -9,19 +9,7 @@
 #include "CombatCore/CombatCharacter.h"
 #include "AbilitySystem/CombatAbilitySystemComponent.h"
 
-void UPropertyFragment_MeleeWeapon::Instantiate(UItemObject* Owner)
-{
-	Super::Instantiate(Owner);
-
-	UPropertyFragment_Equipment* EquipmentInfo = Owner->FindPropertyFragment<UPropertyFragment_Equipment>();
-	if (EquipmentInfo)
-	{
-		EquipmentInfo->ItemEquipmentPutOnDelegate.AddDynamic(this, &ThisClass::OnWeaponPutOn);
-		EquipmentInfo->ItemEquipmentTakeOffDelegate.AddDynamic(this, &ThisClass::OnWeaponTakeOff);
-	}
-}
-
-void UPropertyFragment_MeleeWeapon::OnWeaponPutOn()
+void UPropertyFragment_MeleeWeapon::OnWeaponPutOn(UPropertyFragment_Equipment* Equipment)
 {
 	auto Item = GetOwner();
 	if (Item != nullptr && Item->BelongingInventory != nullptr)
@@ -32,17 +20,13 @@ void UPropertyFragment_MeleeWeapon::OnWeaponPutOn()
 			AbilitySystemComponent = Cast<UCombatAbilitySystemComponent>(OwnerCharacter->GetAbilitySystemComponent());
 		}
 		UPropertyFragment_EntityLink* EntityLink = Item->FindPropertyFragment<UPropertyFragment_EntityLink>();
-		if (EntityLink)
+		if (EntityLink && EntityLink->GetEntity())
 		{
 			HitTraceComponent = EntityLink->GetEntity()->GetComponentByClass<UHitTraceComponent>();
 		}
-		UPropertyFragment_Equipment* EquipmentInfo = Item->FindPropertyFragment<UPropertyFragment_Equipment>();
-		if (EquipmentInfo)
-		{
-			Mesh = EquipmentInfo->GetMesh();
-		}
+		Mesh = Equipment->GetMesh();
 
-		if (AbilitySystemComponent && HitTraceComponent && Mesh)
+		if (AbilitySystemComponent != nullptr && HitTraceComponent != nullptr && Mesh != nullptr)
 		{
 			HitTraceComponent->Setup(Mesh);
 			HitTraceComponent->UniqueHitDelegate.AddDynamic(this, &ThisClass::OnWeaponHit);
@@ -50,7 +34,7 @@ void UPropertyFragment_MeleeWeapon::OnWeaponPutOn()
 	}
 }
 
-void UPropertyFragment_MeleeWeapon::OnWeaponTakeOff()
+void UPropertyFragment_MeleeWeapon::OnWeaponTakeOff(UPropertyFragment_Equipment* Equipment)
 {
 	auto Item = GetOwner();
 	if (Item != nullptr)

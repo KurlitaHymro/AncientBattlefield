@@ -4,28 +4,37 @@
 #include "EquipmentSystem/PropertyFragment/PropertyFragment_Equipment.h"
 #include "Item/ItemObject.h"
 #include "PropertyFragment/PropertyFragment_EntityLink.h"
-
-void UPropertyFragment_Equipment::Instantiate(UItemObject* Owner)
-{
-	Super::Instantiate(Owner);
-
-	ItemEquipmentPutOnDelegate.AddDynamic(this, &ThisClass::OnEquipmentPutOn);
-	ItemEquipmentTakeOffDelegate.AddDynamic(this, &ThisClass::OnEquipmentTakeOff);
-}
+#include "EquipmentSystem/PropertyFragment/PropertyFragment_MeleeWeapon.h"
+#include "CombatCore/CombatCharacter.h"
 
 void UPropertyFragment_Equipment::OnEquipmentPutOn()
 {
-	if (ParentMesh != nullptr && AttachSocket.IsValid())
+	auto Item = GetOwner();
+	if (Item != nullptr && Item->BelongingInventory != nullptr && AttachSocket.IsValid())
 	{
-		auto Item = GetOwner();
-		if (Item != nullptr)
+		auto OwnerCharacter = Cast<ACombatCharacter>(Item->BelongingInventory->GetOwner());
+		if (OwnerCharacter)
 		{
+			ParentMesh = OwnerCharacter->GetMesh();
+		}
+		if (ParentMesh)
+		{
+			// 时序上近战武器依赖实体生命周期，故不能用代理去做。
 			UPropertyFragment_EntityLink* EntityLink = Item->FindPropertyFragment<UPropertyFragment_EntityLink>();
 			if (EntityLink)
 			{
+				EntityLink->SpawnEntity();
 				EquipmentEntity = EntityLink->GetEntity();
-				FAttachmentTransformRules Rules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true);
-				EquipmentEntity->AttachToComponent(ParentMesh, Rules, AttachSocket);
+				if (EquipmentEntity)
+				{
+					FAttachmentTransformRules Rules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true);
+					EntityLink->GetEntity()->AttachToComponent(ParentMesh, Rules, AttachSocket);
+
+					EquipmentMesh = EquipmentEntity->FindComponentByClass<UMeshComponent>();
+
+					UPropertyFragment_MeleeWeapon* MeleeWeapon = Item->FindPropertyFragment<UPropertyFragment_MeleeWeapon>();
+					MeleeWeapon->OnWeaponPutOn(this);
+				}
 			}
 		}
 	}
@@ -39,9 +48,14 @@ void UPropertyFragment_Equipment::OnEquipmentTakeOff()
 		if (Item != nullptr)
 		{
 			UPropertyFragment_EntityLink* EntityLink = Item->FindPropertyFragment<UPropertyFragment_EntityLink>();
-			if (EntityLink)
+			if (EntityLink && EntityLink->GetEntity())
 			{
+				UPropertyFragment_MeleeWeapon* MeleeWeapon = Item->FindPropertyFragment<UPropertyFragment_MeleeWeapon>();
+				MeleeWeapon->OnWeaponTakeOff(this);
+
 				EntityLink->DestroyEntity();
+				EquipmentEntity = nullptr;
+				EquipmentMesh = nullptr;
 			}
 		}
 	}
@@ -104,9 +118,5 @@ void UPropertyFragment_Equipment::TakeOff()
 
 UMeshComponent* UPropertyFragment_Equipment::GetMesh()
 {
-	if (EquipmentEntity && EquipmentMesh == nullptr)
-	{
-		EquipmentMesh = EquipmentEntity->FindComponentByClass<UMeshComponent>();
-	}
 	return EquipmentMesh;
 }
