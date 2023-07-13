@@ -30,8 +30,6 @@ void UPropertyFragment_Equipment::OnEquipmentPutOn()
 					FAttachmentTransformRules Rules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true);
 					EntityLink->GetEntity()->AttachToComponent(ParentMesh, Rules, AttachSocket);
 
-					EquipmentMesh = EquipmentEntity->FindComponentByClass<UMeshComponent>();
-
 					UPropertyFragment_MeleeWeapon* MeleeWeapon = Item->FindPropertyFragment<UPropertyFragment_MeleeWeapon>();
 					MeleeWeapon->OnWeaponPutOn(this);
 				}
@@ -55,10 +53,16 @@ void UPropertyFragment_Equipment::OnEquipmentTakeOff()
 
 				EntityLink->DestroyEntity();
 				EquipmentEntity = nullptr;
-				EquipmentMesh = nullptr;
 			}
 		}
 	}
+}
+
+void UPropertyFragment_Equipment::InitFromMetaDataTable(const UDataTable* DataTable, FString PrefabName)
+{
+
+
+	Super::InitFromMetaDataTable(DataTable, PrefabName);
 }
 
 void UPropertyFragment_Equipment::PutOn()
@@ -114,9 +118,4 @@ void UPropertyFragment_Equipment::TakeOff()
 			}
 		}
 	}
-}
-
-UMeshComponent* UPropertyFragment_Equipment::GetMesh()
-{
-	return EquipmentMesh;
 }

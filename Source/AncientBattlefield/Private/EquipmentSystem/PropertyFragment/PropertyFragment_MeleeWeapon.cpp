@@ -23,8 +23,8 @@ void UPropertyFragment_MeleeWeapon::OnWeaponPutOn(UPropertyFragment_Equipment* E
 		if (EntityLink && EntityLink->GetEntity())
 		{
 			HitTraceComponent = EntityLink->GetEntity()->GetComponentByClass<UHitTraceComponent>();
+			Mesh = EntityLink->GetMesh();
 		}
-		Mesh = Equipment->GetMesh();
 
 		if (AbilitySystemComponent != nullptr && HitTraceComponent != nullptr && Mesh != nullptr)
 		{

@@ -26,8 +26,13 @@ public:
 	void DestroyEntity();
 
 	UFUNCTION(BlueprintCallable)
-	AActor* GetEntity();
+	FORCEINLINE AActor* GetEntity() { return Entity; };
+
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE UMeshComponent* GetMesh() { return Mesh; };
 
 private:
 	AActor* Entity;
+
+	UMeshComponent* Mesh;
 };

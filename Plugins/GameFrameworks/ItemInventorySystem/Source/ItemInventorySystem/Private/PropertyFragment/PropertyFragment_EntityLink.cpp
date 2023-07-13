@@ -11,6 +11,7 @@ void UPropertyFragment_EntityLink::SpawnEntity()
 		SpawnConfig.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 		auto World = GetWorld();
 		Entity = World->SpawnActor(EntityType);
+		Mesh = Entity->GetComponentByClass<UMeshComponent>();
 	}
 }
 
@@ -21,9 +22,4 @@ void UPropertyFragment_EntityLink::DestroyEntity()
 		Entity->Destroy();
 		Entity = nullptr;
 	}
-}
-
-AActor* UPropertyFragment_EntityLink::GetEntity()
-{
-	return Entity;
 }

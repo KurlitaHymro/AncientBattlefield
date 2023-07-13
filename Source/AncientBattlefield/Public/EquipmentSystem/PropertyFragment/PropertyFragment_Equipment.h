@@ -25,15 +25,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (InstanceEditable = true, ExposeOnSpawn = true))
 	FName AttachSocket;
 
+protected:
+	virtual void InitFromMetaDataTable(const class UDataTable* DataTable, FString PrefabName) override;
+
 public:
 	UFUNCTION(BlueprintCallable)
 	void PutOn();
 
 	UFUNCTION(BlueprintCallable)
 	void TakeOff();
-
-	UFUNCTION(BlueprintCallable)
-	UMeshComponent* GetMesh();
 
 	UFUNCTION()
 	void OnEquipmentPutOn();
@@ -43,6 +43,4 @@ public:
 
 private:
 	AActor* EquipmentEntity;
-
-	UMeshComponent* EquipmentMesh;
 };

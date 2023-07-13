@@ -52,21 +52,11 @@ void UHitTraceComponent::Setup(UPrimitiveComponent* Reference, bool bSearchSocke
 	if (bSearchSocketsFromMesh)
 	{
 		Sockets = ReferenceMesh->GetAllSocketNames();
-		UE_LOG(LogTemp, Error, TEXT("Setup"));
-		for (auto s : Sockets)
-		{
-			UE_LOG(LogTemp, Error, TEXT("Setup::%s"), *s.ToString());
-		}
 	}
 }
 
 void UHitTraceComponent::Teardown()
 {
-	UE_LOG(LogTemp, Error, TEXT("Teardown"));
-	for (auto s : Sockets)
-	{
-		UE_LOG(LogTemp, Error, TEXT("Teardown::%s"), *s.ToString());
-	}
 	ReferenceMesh = nullptr;
 	Sockets.Empty();
 }
@@ -85,11 +75,6 @@ void UHitTraceComponent::EnableTrace()
 	bTrace = true;
 	HitResult.Empty();
 	SocketsLastLocations.Empty();
-	UE_LOG(LogTemp, Error, TEXT("Enable"));
-	for (auto s : Sockets)
-	{
-		UE_LOG(LogTemp, Error, TEXT("Enable::%s"), *s.ToString());
-	}
 }
 
 void UHitTraceComponent::DisableTrace()
