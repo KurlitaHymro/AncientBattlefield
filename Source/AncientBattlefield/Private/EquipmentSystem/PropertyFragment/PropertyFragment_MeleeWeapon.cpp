@@ -24,12 +24,14 @@ void UPropertyFragment_MeleeWeapon::OnWeaponPutOn(UPropertyFragment_Equipment* E
 		if (EntityLink && EntityLink->GetEntity())
 		{
 			HitTraceComponent = EntityLink->GetEntity()->GetComponentByClass<UHitTraceComponent>();
+			Mesh = EntityLink->GetEntity()->GetComponentByClass<UStaticMeshComponent>();
 		}
-		UPropertyFragment_PhysicsMesh* PhysicsMesh = Item->FindPropertyFragment<UPropertyFragment_PhysicsMesh>();
-		if (PhysicsMesh && PhysicsMesh->Mesh)
-		{
-			Mesh = PhysicsMesh->Mesh;
-		}
+		
+		//UPropertyFragment_PhysicsMesh* PhysicsMesh = Item->FindPropertyFragment<UPropertyFragment_PhysicsMesh>();
+		//if (PhysicsMesh && PhysicsMesh->Mesh)
+		//{
+		//	Mesh = PhysicsMesh->Mesh;
+		//}
 		if (AbilitySystemComponent != nullptr && HitTraceComponent != nullptr && Mesh != nullptr)
 		{
 			HitTraceComponent->Setup(Mesh);

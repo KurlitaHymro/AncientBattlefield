@@ -11,11 +11,16 @@ void UPropertyFragment_PhysicsMesh::Instantiate(UItemObject* Owner)
 	Super::Instantiate(Owner);
 
 	UPropertyFragment_EntityLink* EntityLink = GetOwner()->FindPropertyFragment<UPropertyFragment_EntityLink>();
-	if (EntityLink)
+	if (EntityLink && Mesh == nullptr)
 	{
 		Mesh = Mesh != nullptr ? Mesh : EntityLink->GetEntity()->FindComponentByClass<UMeshComponent>();
 		Mesh = Mesh != nullptr ? Mesh : EntityLink->GetEntity()->FindComponentByClass<UStaticMeshComponent>();
 		Mesh = Mesh != nullptr ? Mesh : EntityLink->GetEntity()->FindComponentByClass<USkeletalMeshComponent>();
+	}
+
+	if (Owner->BelongingInventory == nullptr)
+	{
+		SetEntityState(EEntityState::PhysicsCollisionMesh);
 	}
 }
 

@@ -29,7 +29,7 @@ public:
 	FUniqueHitDelegate UniqueHitDelegate;
 
 public:
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interface)
 	class UPrimitiveComponent* ReferenceMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interface)

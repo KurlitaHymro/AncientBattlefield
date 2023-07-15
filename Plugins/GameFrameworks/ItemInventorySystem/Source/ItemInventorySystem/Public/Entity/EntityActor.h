@@ -11,23 +11,22 @@ class ITEMINVENTORYSYSTEM_API AEntityActor : public AActor
 {
 	GENERATED_BODY()
 	
-public:	
-	// Sets default values for this actor's properties
-	AEntityActor();
-
-protected:
-	virtual void BeginPlay() override;
-
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (Tooltip = "If this Actor will Create ItemObject. (Ensure any Item has only one PrimitiveActor)"))
 	bool bPrimitiveActor;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (InstanceEditable = true, ExposeOnSpawn = true))
 	class UItemObject* ItemObject;
 
 	UPROPERTY()
 	class UPropertyFragment_EntityLink* Link;
 
+public:
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void CreateItem();
+	virtual void CreateItem_Implementation();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void ResetItem();
+	virtual void ResetItem_Implementation();
 };

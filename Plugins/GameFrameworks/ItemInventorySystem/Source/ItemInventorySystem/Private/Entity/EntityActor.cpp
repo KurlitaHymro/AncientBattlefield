@@ -5,31 +5,17 @@
 #include "Item/ItemObject.h"
 #include "PropertyFragment/PropertyFragment_EntityLink.h"
 
-// Sets default values
-AEntityActor::AEntityActor()
+void AEntityActor::CreateItem_Implementation()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	ItemObject = NewObject<UItemObject>(this);
 
+	Link = NewObject<UPropertyFragment_EntityLink>(this);
+	Link->EntityType = GetClass();
+	Link->Entity = this;
+	ItemObject->AddPropertyFragment(Link);
 }
 
-void AEntityActor::BeginPlay()
+void AEntityActor::ResetItem_Implementation()
 {
-	if (bPrimitiveActor && ItemObject == nullptr)
-	{
-		ItemObject = NewObject<UItemObject>(this);
-		Link = NewObject<UPropertyFragment_EntityLink>(this);
-		Link->EntityType = GetClass();
-		Link->Entity = this;
-		ItemObject->AddPropertyFragment(Link);
-	}
-
-	Super::BeginPlay();
-}
-
-void AEntityActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-	Super::EndPlay(EndPlayReason);
-
-	ItemObject = nullptr;
+	Link->Entity = this;
 }

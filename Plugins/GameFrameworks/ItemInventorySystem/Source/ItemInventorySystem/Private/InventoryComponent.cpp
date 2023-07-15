@@ -36,10 +36,10 @@ void UInventoryComponent::AddItem(UItemObject* Item, int32 SlotID)
 {
 	if (Item && 0 <= SlotID && SlotID < Size)
 	{
-		ItemObjectSlot[SlotID] = Item;
 		Item->BelongingInventory = this;
 		Item->BelongingSlotID = SlotID;
 		InventoryAddItemDelegate.Broadcast(Item, SlotID);
+		ItemObjectSlot[SlotID] = Item;
 	}
 }
 
@@ -48,9 +48,9 @@ void UInventoryComponent::RemoveItem(UItemObject* Item)
 	if (Item && Item->BelongingInventory == this && Item->BelongingSlotID < Size)
 	{
 		int32 SlotID = Item->BelongingSlotID;
+		InventoryRemoveItemDelegate.Broadcast(Item, SlotID);
 		Item->BelongingSlotID = Size;
 		Item->BelongingInventory = nullptr;
-		InventoryRemoveItemDelegate.Broadcast(Item, SlotID);
 		ItemObjectSlot[SlotID] = nullptr;
 	}
 }

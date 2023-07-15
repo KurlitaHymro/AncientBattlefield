@@ -9,6 +9,7 @@ void UPropertyFragment_EntityLink::SpawnEntity()
 	{
 		FActorSpawnParameters SpawnConfig;
 		SpawnConfig.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
 		auto World = GetWorld();
 		Entity = Cast<AEntityActor>(World->SpawnActor(EntityType));
 		Entity->Link = this;

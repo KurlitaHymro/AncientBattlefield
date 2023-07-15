@@ -24,8 +24,8 @@ void UEquipmentComponent::RemoveItem(UItemObject* Item)
 {
 	if (Item && Item->BelongingInventory == this && Item->BelongingSlotID < Size)
 	{
-		Super::RemoveItem(Item);
 		Item->FindPropertyFragment<UPropertyFragment_Equipment>()->OnEquipmentTakeOff();
+		Super::RemoveItem(Item);
 	}
 }
 
