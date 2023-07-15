@@ -55,12 +55,15 @@ void UPropertyFragment_Equipment::OnEquipmentTakeOff()
 		auto Item = GetOwner();
 		if (Item != nullptr)
 		{
+			UPropertyFragment_MeleeWeapon* MeleeWeapon = Item->FindPropertyFragment<UPropertyFragment_MeleeWeapon>();
+			if (MeleeWeapon)
+			{
+				MeleeWeapon->OnWeaponTakeOff(this);
+			}
+			
 			UPropertyFragment_EntityLink* EntityLink = Item->FindPropertyFragment<UPropertyFragment_EntityLink>();
 			if (EntityLink && EntityLink->GetEntity())
 			{
-				UPropertyFragment_MeleeWeapon* MeleeWeapon = Item->FindPropertyFragment<UPropertyFragment_MeleeWeapon>();
-				MeleeWeapon->OnWeaponTakeOff(this);
-
 				EntityLink->DestroyEntity();
 				EquipmentEntity = nullptr;
 			}
