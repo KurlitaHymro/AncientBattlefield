@@ -4,6 +4,7 @@
 #include "EquipmentSystem/PropertyFragment/PropertyFragment_Equipment.h"
 #include "Item/ItemObject.h"
 #include "PropertyFragment/PropertyFragment_EntityLink.h"
+#include "PropertyFragment/PropertyFragment_PhysicsMesh.h"
 #include "EquipmentSystem/PropertyFragment/PropertyFragment_MeleeWeapon.h"
 #include "CombatCore/CombatCharacter.h"
 
@@ -30,8 +31,17 @@ void UPropertyFragment_Equipment::OnEquipmentPutOn()
 					FAttachmentTransformRules Rules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true);
 					EntityLink->GetEntity()->AttachToComponent(ParentMesh, Rules, AttachSocket);
 
+					UPropertyFragment_PhysicsMesh* PhysicsMesh = Item->FindPropertyFragment<UPropertyFragment_PhysicsMesh>();
+					if (PhysicsMesh && PhysicsMesh->Mesh)
+					{
+						PhysicsMesh->SetEntityState(EEntityState::OnlyMesh);
+					}
+
 					UPropertyFragment_MeleeWeapon* MeleeWeapon = Item->FindPropertyFragment<UPropertyFragment_MeleeWeapon>();
-					MeleeWeapon->OnWeaponPutOn(this);
+					if (MeleeWeapon)
+					{
+						MeleeWeapon->OnWeaponPutOn(this);
+					}
 				}
 			}
 		}

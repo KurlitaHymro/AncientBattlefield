@@ -10,8 +10,9 @@ void UPropertyFragment_EntityLink::SpawnEntity()
 		FActorSpawnParameters SpawnConfig;
 		SpawnConfig.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 		auto World = GetWorld();
-		Entity = World->SpawnActor(EntityType);
-		Mesh = Entity->GetComponentByClass<UMeshComponent>();
+		Entity = Cast<AEntityActor>(World->SpawnActor(EntityType));
+		Entity->Link = this;
+		Entity->ItemObject = GetOwner();
 	}
 }
 

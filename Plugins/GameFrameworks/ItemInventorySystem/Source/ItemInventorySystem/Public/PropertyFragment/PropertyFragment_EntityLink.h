@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Item/ItemPropertyFragment.h"
+#include "Entity/EntityActor.h"
 #include "PropertyFragment_EntityLink.generated.h"
 
 /**
@@ -16,7 +17,7 @@ class ITEMINVENTORYSYSTEM_API UPropertyFragment_EntityLink : public UItemPropert
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (InstanceEditable = true, ExposeOnSpawn = true))
-	TSubclassOf<AActor> EntityType;
+	TSubclassOf<AEntityActor> EntityType;
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -26,13 +27,10 @@ public:
 	void DestroyEntity();
 
 	UFUNCTION(BlueprintCallable)
-	FORCEINLINE AActor* GetEntity() { return Entity; };
-
-	UFUNCTION(BlueprintCallable)
-	FORCEINLINE UMeshComponent* GetMesh() { return Mesh; };
+	FORCEINLINE AEntityActor* GetEntity() { return Entity; };
 
 private:
-	AActor* Entity;
+	friend class AEntityActor;
 
-	UMeshComponent* Mesh;
+	AEntityActor* Entity;
 };
