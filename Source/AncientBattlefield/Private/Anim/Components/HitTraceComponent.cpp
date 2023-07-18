@@ -68,7 +68,7 @@ void UHitTraceComponent::SetSockets(const TArray<FName>& SetSockets)
 
 void UHitTraceComponent::EnableTrace()
 {
-	if (ReferenceMesh == nullptr)
+	if (ReferenceMesh == nullptr || Owner == nullptr)
 	{
 		return;
 	}

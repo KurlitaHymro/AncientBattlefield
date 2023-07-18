@@ -11,7 +11,8 @@
 			"AdditionalDependencies": [
 				"CombatFramework",
 				"ItemInventorySystem",
-				"Engine"
+				"Engine",
+				"ComponentReceiverActors"
 			]
 		}
 	],

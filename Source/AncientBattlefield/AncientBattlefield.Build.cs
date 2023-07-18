@@ -27,6 +27,7 @@ public class AncientBattlefield : ModuleRules
 			"PawnEnhancedInput",
 			"EnhancedInput",
 			"ItemInventorySystem",
+			"AIModule",
 		});
 
 		// Uncomment if you are using Slate UI
