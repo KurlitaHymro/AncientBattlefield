@@ -34,12 +34,13 @@ public:
 	static UAbilityTask_PlayMontageWaitEvent* CreatePlayMontageWaitEventProxy(
 		UGameplayAbility* OwningAbility,
 		FName TaskInstanceName,
-		UAnimMontage* MontageToPlay,
-		FGameplayTagContainer EventTags,
+		FGameplayTagContainer TagFilter,
+		bool bStopWhenAbilityEnds = true,
+		UAnimMontage* MontageToPlay = nullptr,
 		float Rate = 1.f,
 		FName StartSection = NAME_None,
-		bool bStopWhenAbilityEnds = true,
-		float AnimRootMotionTranslationScale = 1.f);
+		float AnimRootMotionTranslationScale = 1.f,
+		float StartTimeSeconds = 0.f);
 
 	virtual void Activate() override;
 
@@ -48,6 +49,10 @@ public:
 	virtual void OnDestroy(bool AbilityEnded) override;
 
 	virtual FString GetDebugString() const override;
+
+	/** One of the triggering gameplay events happened */
+	UPROPERTY(BlueprintAssignable)
+	FMontageWaitEventDelegate OnReceiveEvent;
 
 	/** The montage completely finished playing */
 	UPROPERTY(BlueprintAssignable)
@@ -65,9 +70,8 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FMontageWaitEventDelegate OnCancelled;
 
-	/** One of the triggering gameplay events happened */
 	UPROPERTY(BlueprintAssignable)
-	FMontageWaitEventDelegate OnReceiveEvent;
+	FMontageWaitEventDelegate OnTimeOut;
 
 protected:
 	void OnMontageBlendingOut(UAnimMontage* Montage, bool bInterrupted);
@@ -78,6 +82,8 @@ protected:
 	
 	void OnGameplayEvent(FGameplayTag EventTag, const FGameplayEventData* Payload);
 
+	void OnMontageTimeOut();
+
 private:
 	/** Montage that is playing */
 	UPROPERTY()
@@ -85,7 +91,7 @@ private:
 
 	/** List of tags to match against gameplay events */
 	UPROPERTY()
-	FGameplayTagContainer EventTags;
+	FGameplayTagContainer TagFilter;
 
 	/** Playback rate */
 	UPROPERTY()
@@ -99,6 +105,10 @@ private:
 	UPROPERTY()
 	float AnimRootMotionTranslationScale;
 
+	/** Time to start montage */
+	UPROPERTY()
+	float StartTimeSeconds;
+
 	/** Rather montage should be aborted if ability ends */
 	UPROPERTY()
 	bool bStopWhenAbilityEnds;
@@ -109,4 +119,5 @@ private:
 	FOnMontageEnded MontageEndedDelegate;
 	FDelegateHandle CancelledHandle;
 	FDelegateHandle EventHandle;
+	FTimerHandle TimeOutHandle;
 };

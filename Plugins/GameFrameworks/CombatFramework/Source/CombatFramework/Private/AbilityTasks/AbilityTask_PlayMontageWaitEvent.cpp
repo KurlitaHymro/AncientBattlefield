@@ -4,9 +4,15 @@
 #include "AbilityTasks/AbilityTask_PlayMontageWaitEvent.h"
 #include "AbilitySystemGlobals.h"
 #include "AbilitySystemComponent.h"
+#include "CombatFramework.h"
 #include "GameFramework/Character.h"
 #include "Animation/AnimInstance.h"
 
+/**
+ * 激活时播放失败、外部取消会触发取消。
+ * 能力取消、打断播放的混出会触发打断。
+ * 正常播放会依次触发混出、完成。
+ */
 UAbilityTask_PlayMontageWaitEvent::UAbilityTask_PlayMontageWaitEvent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
@@ -17,20 +23,23 @@ UAbilityTask_PlayMontageWaitEvent::UAbilityTask_PlayMontageWaitEvent(const FObje
 UAbilityTask_PlayMontageWaitEvent* UAbilityTask_PlayMontageWaitEvent::CreatePlayMontageWaitEventProxy(
 	UGameplayAbility* OwningAbility,
 	FName TaskInstanceName,
-	UAnimMontage* MontageToPlay,
-	FGameplayTagContainer EventTags,
-	float Rate, FName StartSection,
+	FGameplayTagContainer TagFilter,
 	bool bStopWhenAbilityEnds,
-	float AnimRootMotionTranslationScale)
+	UAnimMontage* MontageToPlay,
+	float Rate,
+	FName StartSection,
+	float AnimRootMotionTranslationScale,
+	float StartTimeSeconds)
 {
 	UAbilitySystemGlobals::NonShipping_ApplyGlobalAbilityScaler_Rate(Rate);
 
 	UAbilityTask_PlayMontageWaitEvent* MyObj = NewAbilityTask<UAbilityTask_PlayMontageWaitEvent>(OwningAbility, TaskInstanceName);
 	MyObj->MontageToPlay = MontageToPlay;
-	MyObj->EventTags = EventTags;
+	MyObj->TagFilter = TagFilter;
 	MyObj->Rate = Rate;
 	MyObj->StartSection = StartSection;
 	MyObj->AnimRootMotionTranslationScale = AnimRootMotionTranslationScale;
+	MyObj->StartTimeSeconds = StartTimeSeconds;
 	MyObj->bStopWhenAbilityEnds = bStopWhenAbilityEnds;
 
 	return MyObj;
@@ -49,47 +58,51 @@ void UAbilityTask_PlayMontageWaitEvent::Activate()
 	{
 		const FGameplayAbilityActorInfo* ActorInfo = Ability->GetCurrentActorInfo();
 		UAnimInstance* AnimInstance = ActorInfo->GetAnimInstance();
-		if (AnimInstance != nullptr)
+		if (AnimInstance != nullptr && Rate > 0.f && StartTimeSeconds >= 0.f)
 		{
-			EventHandle = ASC->AddGameplayEventTagContainerDelegate(EventTags, FGameplayEventTagMulticastDelegate::FDelegate::CreateUObject(this, &UAbilityTask_PlayMontageWaitEvent::OnGameplayEvent));
-
-			if (ASC->PlayMontage(Ability, Ability->GetCurrentActivationInfo(), MontageToPlay, Rate, StartSection) > 0.f)
+			float During = ASC->PlayMontage(Ability, Ability->GetCurrentActivationInfo(), MontageToPlay, Rate, StartSection, StartTimeSeconds);
+			if (During > 0.f)
 			{
+				float TimeOut = FMath::Clamp((During - StartTimeSeconds), 0.f, During) / Rate;
 				if (ShouldBroadcastAbilityTaskDelegates() == false)
 				{
 					return;
 				}
+				EventHandle = ASC->AddGameplayEventTagContainerDelegate(TagFilter, FGameplayEventTagMulticastDelegate::FDelegate::CreateUObject(this, &ThisClass::OnGameplayEvent));
+
+				CancelledHandle = Ability->OnGameplayAbilityCancelled.AddUObject(this, &UAbilityTask_PlayMontageWaitEvent::OnAbilityCancelled);
+
+				BlendingOutDelegate.BindUObject(this, &UAbilityTask_PlayMontageWaitEvent::OnMontageBlendingOut);
+				AnimInstance->Montage_SetBlendingOutDelegate(BlendingOutDelegate, MontageToPlay);
+
+				MontageEndedDelegate.BindUObject(this, &UAbilityTask_PlayMontageWaitEvent::OnMontageEnded);
+				AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, MontageToPlay);
+
+				GetWorld()->GetTimerManager().SetTimer(TimeOutHandle, this, &ThisClass::OnMontageTimeOut, TimeOut, false);
+
+				ACharacter* Character = Cast<ACharacter>(GetAvatarActor());
+				if (Character && (Character->GetLocalRole() == ROLE_Authority ||
+					(Character->GetLocalRole() == ROLE_AutonomousProxy && Ability->GetNetExecutionPolicy() == EGameplayAbilityNetExecutionPolicy::LocalPredicted)))
+				{
+					Character->SetAnimRootMotionTranslationScale(AnimRootMotionTranslationScale);
+				}
+
+				bPlayedMontage = true;
 			}
-
-			CancelledHandle = Ability->OnGameplayAbilityCancelled.AddUObject(this, &UAbilityTask_PlayMontageWaitEvent::OnAbilityCancelled);
-
-			BlendingOutDelegate.BindUObject(this, &UAbilityTask_PlayMontageWaitEvent::OnMontageBlendingOut);
-			AnimInstance->Montage_SetBlendingOutDelegate(BlendingOutDelegate, MontageToPlay);
-
-			MontageEndedDelegate.BindUObject(this, &UAbilityTask_PlayMontageWaitEvent::OnMontageEnded);
-			AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, MontageToPlay);
-
-			ACharacter* Character = Cast<ACharacter>(GetAvatarActor());
-			if (Character && (Character->GetLocalRole() == ROLE_Authority ||
-				(Character->GetLocalRole() == ROLE_AutonomousProxy && Ability->GetNetExecutionPolicy() == EGameplayAbilityNetExecutionPolicy::LocalPredicted)))
-			{
-				Character->SetAnimRootMotionTranslationScale(AnimRootMotionTranslationScale);
-			}
-
-			bPlayedMontage = true;
 		}
 		else
 		{
-
+			UE_LOG(LogCombatFramework, Warning, TEXT("UAbilityTask_PlayMontageWaitEvent call to PlayMontage failed!"));
 		}
 	}
 	else
 	{
-
+		UE_LOG(LogCombatFramework, Warning, TEXT("UAbilityTask_PlayMontageWaitEvent called on invalid AbilitySystemComponent"));
 	}
 
 	if (!bPlayedMontage)
 	{
+		UE_LOG(LogCombatFramework, Warning, TEXT("UAbilityTask_PlayMontageAndWait called in Ability %s failed to play montage %s; Task Instance Name %s."), *Ability->GetName(), *GetNameSafe(MontageToPlay), *InstanceName.ToString());
 		if (ShouldBroadcastAbilityTaskDelegates())
 		{
 			OnCancelled.Broadcast(FGameplayTag(), FGameplayEventData());
@@ -101,17 +114,17 @@ void UAbilityTask_PlayMontageWaitEvent::Activate()
 
 void UAbilityTask_PlayMontageWaitEvent::ExternalCancel()
 {
-	if (AbilitySystemComponent != nullptr && Ability)
+	if (ShouldBroadcastAbilityTaskDelegates())
 	{
-		OnAbilityCancelled();
+		OnCancelled.Broadcast(FGameplayTag(), FGameplayEventData());
 	}
-
 	Super::ExternalCancel();
 }
 
 void UAbilityTask_PlayMontageWaitEvent::OnDestroy(bool AbilityEnded)
 {
-	if (AbilitySystemComponent != nullptr && Ability)
+	// This delegate, however, should be cleared as it is a multicast
+	if (Ability)
 	{
 		Ability->OnGameplayAbilityCancelled.Remove(CancelledHandle);
 		if (AbilityEnded && bStopWhenAbilityEnds)
@@ -119,7 +132,8 @@ void UAbilityTask_PlayMontageWaitEvent::OnDestroy(bool AbilityEnded)
 			StopPlayingMontage();
 		}
 
-		AbilitySystemComponent->RemoveGameplayEventTagContainerDelegate(EventTags, EventHandle);
+		AbilitySystemComponent->RemoveGameplayEventTagContainerDelegate(TagFilter, EventHandle);
+		GetWorld()->GetTimerManager().ClearTimer(TimeOutHandle);
 	}
 
 	Super::OnDestroy(AbilityEnded);
@@ -127,7 +141,19 @@ void UAbilityTask_PlayMontageWaitEvent::OnDestroy(bool AbilityEnded)
 
 FString UAbilityTask_PlayMontageWaitEvent::GetDebugString() const
 {
-	return FString();
+	UAnimMontage* PlayingMontage = nullptr;
+	if (Ability)
+	{
+		const FGameplayAbilityActorInfo* ActorInfo = Ability->GetCurrentActorInfo();
+		UAnimInstance* AnimInstance = ActorInfo->GetAnimInstance();
+
+		if (AnimInstance != nullptr)
+		{
+			PlayingMontage = AnimInstance->Montage_IsActive(MontageToPlay) ? ToRawPtr(MontageToPlay) : AnimInstance->GetCurrentActiveMontage();
+		}
+	}
+
+	return FString::Printf(TEXT("PlayMontageWaitEvent. MontageToPlay: %s  (Currently Playing): %s"), *GetNameSafe(MontageToPlay), *GetNameSafe(PlayingMontage));
 }
 
 void UAbilityTask_PlayMontageWaitEvent::OnMontageBlendingOut(UAnimMontage* Montage, bool bInterrupted)
@@ -136,7 +162,10 @@ void UAbilityTask_PlayMontageWaitEvent::OnMontageBlendingOut(UAnimMontage* Monta
 	{
 		if (Montage == MontageToPlay)
 		{
-			AbilitySystemComponent->ClearAnimatingAbility(Ability);
+			if (UAbilitySystemComponent* ASC = AbilitySystemComponent.Get())
+			{
+				ASC->ClearAnimatingAbility(Ability);
+			}
 
 			// Reset AnimRootMotionTranslationScale
 			ACharacter* Character = Cast<ACharacter>(GetAvatarActor());
@@ -170,7 +199,7 @@ void UAbilityTask_PlayMontageWaitEvent::OnAbilityCancelled()
 	{
 		if (ShouldBroadcastAbilityTaskDelegates())
 		{
-			OnCancelled.Broadcast(FGameplayTag(), FGameplayEventData());
+			OnInterrupted.Broadcast(FGameplayTag(), FGameplayEventData());
 		}
 	}
 }
@@ -197,6 +226,15 @@ void UAbilityTask_PlayMontageWaitEvent::OnGameplayEvent(FGameplayTag EventTag, c
 	}
 }
 
+void UAbilityTask_PlayMontageWaitEvent::OnMontageTimeOut()
+{
+	UE_LOG(LogCombatFramework, Warning, TEXT("UAbilityTask_PlayMontageAndWait task time out at %s"), *FDateTime::Now().ToString());
+	if (ShouldBroadcastAbilityTaskDelegates())
+	{
+		OnTimeOut.Broadcast(FGameplayTag(), FGameplayEventData());
+	}
+}
+
 bool UAbilityTask_PlayMontageWaitEvent::StopPlayingMontage()
 {
 	if (Ability == nullptr)
@@ -216,6 +254,7 @@ bool UAbilityTask_PlayMontageWaitEvent::StopPlayingMontage()
 		return false;
 	}
 
+	// The ability would have been interrupted, in which case we should automatically stop the montage
 	UAbilitySystemComponent* ASC = AbilitySystemComponent.Get();
 	if (ASC && Ability)
 	{
