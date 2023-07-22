@@ -14,7 +14,7 @@ void UAnimNotifyState_EnableHitTrace::NotifyBegin(USkeletalMeshComponent* MeshCo
 	Super::NotifyBegin(MeshComp, Animation, TotalDuration, EventReference);
 
 	OwnerCharacter = Cast<ACombatCharacter>(MeshComp->GetOwner());
-	if (OwnerCharacter)
+	if (OwnerCharacter && OwnerCharacter->bIsActive)
 	{
 		auto EquipmentSystemComponent = OwnerCharacter->GetEquipmentSystemComponent();
 		if (EquipmentSystemComponent)
@@ -33,17 +33,18 @@ void UAnimNotifyState_EnableHitTrace::NotifyBegin(USkeletalMeshComponent* MeshCo
 
 	if (HitTraceComponent)
 	{
-		HitTraceComponent->EnableTrace();
 		HitActors.Empty();
+		HitTraceComponent->EnableTrace();
 	}
-}
+} 
 
 void UAnimNotifyState_EnableHitTrace::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
 	Super::NotifyEnd(MeshComp, Animation, EventReference);
 
-	if (OwnerCharacter && HitTraceComponent)
+	if (HitTraceComponent)
 	{
 		HitTraceComponent->DisableTrace();
+		HitTraceComponent = nullptr;
 	}
 }

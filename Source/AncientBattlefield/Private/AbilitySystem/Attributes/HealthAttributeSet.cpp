@@ -21,8 +21,8 @@ void UHealthAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribut
 	{
 		if (NewValue <= 0.f)
 		{
-			//ABattleCharacter* TargetCharacter = GetTypedOuter<ABattleCharacter>();
-			//TargetCharacter->Die();
+			ACombatCharacter* TargetCharacter = GetTypedOuter<ACombatCharacter>();
+			TargetCharacter->Die();
 		}
 	}
 }

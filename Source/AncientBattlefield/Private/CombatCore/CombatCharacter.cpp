@@ -53,6 +53,11 @@ void ACombatCharacter::PreInitializeComponents()
 void ACombatCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (CombatAbilityComponent && InventoryComponent && EquipmentComponent)
+	{
+		bIsActive = true;
+	}
 }
 
 UAbilitySystemComponent* ACombatCharacter::GetAbilitySystemComponent() const
@@ -68,4 +73,28 @@ UInventoryComponent* ACombatCharacter::GetInventorySystemComponent() const
 UEquipmentComponent* ACombatCharacter::GetEquipmentSystemComponent() const
 {
 	return EquipmentComponent;
+}
+
+void ACombatCharacter::Die_Implementation()
+{
+	CombatCharacterDieDelegate.Broadcast();
+
+	for (auto i = 0; i < EquipmentComponent->GetSize(); i++)
+	{
+		auto Equipment = EquipmentComponent->GetEquipment((EEquipmentSlots)i);
+		if (Equipment)
+		{
+			EquipmentComponent->RemoveItem(Equipment);
+		}
+	}
+
+	FTimerHandle Handle;
+	GetWorldTimerManager().SetTimer(Handle, this, &ThisClass::OnDestroy, 5.0f, false);
+
+	DetachFromControllerPendingDestroy();
+}
+
+void ACombatCharacter::OnDestroy_Implementation()
+{
+	Destroy();
 }

@@ -8,6 +8,8 @@
 #include "InventorySystemInterface.h"
 #include "CombatCharacter.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCharacterBehaviorDelegate);
+
 /**
  * Combat Gameplay Core Character
  * 负责各项战斗相关模块（诸如技能系统、装备系统、伤害系统等）之间的功能配合。
@@ -32,6 +34,13 @@ protected:
 	virtual void BeginPlay();
 
 public:
+	UPROPERTY(BlueprintReadWrite)
+	bool bIsActive = false;
+
+	UPROPERTY(BlueprintAssignable)
+	FCharacterBehaviorDelegate CombatCharacterDieDelegate;
+
+public:
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	virtual class UInventoryComponent* GetInventorySystemComponent() const override;
@@ -48,4 +57,13 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	class UEquipmentComponent* EquipmentComponent;
 
+public:
+	UFUNCTION(BlueprintNativeEvent)
+	void Die();
+	virtual void Die_Implementation();
+
+protected:
+	UFUNCTION(BlueprintNativeEvent)
+	void OnDestroy();
+	virtual void OnDestroy_Implementation();
 };
