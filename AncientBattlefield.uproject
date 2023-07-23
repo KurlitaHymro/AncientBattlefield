@@ -12,7 +12,8 @@
 				"CombatFramework",
 				"ItemInventorySystem",
 				"Engine",
-				"ComponentReceiverActors"
+				"ComponentReceiverActors",
+				"AIModule"
 			]
 		}
 	],
