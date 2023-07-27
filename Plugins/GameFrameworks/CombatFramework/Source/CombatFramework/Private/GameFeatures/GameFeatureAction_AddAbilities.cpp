@@ -127,7 +127,7 @@ void UGameFeatureAction_AddAbilities::AddToWorld(const FWorldContext& WorldConte
 				if (!Entry.ActorClass.IsNull())
 				{
 					UGameFrameworkComponentManager::FExtensionHandlerDelegate AddAbilitiesDelegate = UGameFrameworkComponentManager::FExtensionHandlerDelegate::CreateUObject(
-						this, &UGameFeatureAction_AddAbilities::HandleActorExtension, EntryIndex);
+						this, &ThisClass::HandleActorExtension, EntryIndex);
 					TSharedPtr<FComponentRequestHandle> ExtensionRequestHandle = ComponentMan->AddExtensionHandler(Entry.ActorClass, AddAbilitiesDelegate);
 
 					ComponentRequests.Add(ExtensionRequestHandle);

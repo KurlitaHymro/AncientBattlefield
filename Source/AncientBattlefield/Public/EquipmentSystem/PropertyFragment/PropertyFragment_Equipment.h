@@ -26,7 +26,7 @@ public:
 	FName AttachSocket;
 
 protected:
-	virtual void InitFromMetaDataTable(const class UDataTable* DataTable, FString PrefabName) override;
+
 
 public:
 	UFUNCTION(BlueprintCallable)

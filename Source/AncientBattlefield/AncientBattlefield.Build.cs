@@ -13,6 +13,7 @@ public class AncientBattlefield : ModuleRules
 			"CoreUObject",
 			"Engine",
 			"InputCore",
+			"DataRegistry",
 			"ComponentReceiverActors",
 			"GameFeatures",
 			"GameFeaturesExpansions",

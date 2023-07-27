@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFeatureAction.h"
+#include "GameFeatureAction_AddToWorld.h"
 #include "GameFeatureAction_AddSpawnedActors.generated.h"
 
 /** Record for the an actor to spawn along with a game feature data. */
@@ -41,14 +41,13 @@ struct FSpawningWorldActorsEntry
  * 
  */
 UCLASS(meta = (DisplayName = "Add Spawned Actors"))
-class GAMEFEATURESEXPANSIONS_API UGameFeatureAction_AddSpawnedActors final : public UGameFeatureAction
+class GAMEFEATURESEXPANSIONS_API UGameFeatureAction_AddSpawnedActors final : public UGameFeatureAction_AddToWorld
 {
 	GENERATED_BODY()
 
 public:
 	//~ Begin UGameFeatureAction interface
 	virtual void OnGameFeatureActivating() override;
-	virtual void OnGameFeatureDeactivating(FGameFeatureDeactivatingContext& Context) override;
 
 #if WITH_EDITORONLY_DATA
 	virtual void AddAdditionalAssetBundleData(FAssetBundleData& AssetBundleData) override;
@@ -66,9 +65,7 @@ public:
 	TArray<FSpawningWorldActorsEntry> ActorsList;
 
 private:
-	void HandleGameInstanceStart(UGameInstance* GameInstance);
-
-	void AddToWorld(const FWorldContext& WorldContext);
+	void AddToWorld(const FWorldContext& WorldContext) override;
 
 	void Reset();
 

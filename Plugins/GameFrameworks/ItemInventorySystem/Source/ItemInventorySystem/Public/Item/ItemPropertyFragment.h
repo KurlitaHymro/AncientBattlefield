@@ -15,17 +15,7 @@ class ITEMINVENTORYSYSTEM_API UItemPropertyFragment : public UObject
 {
 	GENERATED_BODY()
 
-
 public:
-	UFUNCTION()
-	UItemObject* GetOwner() const;
-
-public:
-	virtual void Instantiate(class UItemObject* Owner);
-
-	UFUNCTION(BlueprintCallable)
-	virtual void InitFromMetaDataTable(const class UDataTable* DataTable, FString PrefabName);
-
-private:
-	UItemObject* OwnerItemObject;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (InstanceEditable = true, ExposeOnSpawn = true))
+	class UItemObject* Owner;
 };

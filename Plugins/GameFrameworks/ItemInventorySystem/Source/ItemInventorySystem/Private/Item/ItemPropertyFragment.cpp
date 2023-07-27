@@ -2,18 +2,3 @@
 
 
 #include "Item/ItemPropertyFragment.h"
-
-UItemObject* UItemPropertyFragment::GetOwner() const
-{
-	return OwnerItemObject;
-}
-
-void UItemPropertyFragment::Instantiate(UItemObject* Owner)
-{
-	OwnerItemObject = Owner;
-}
-
-void UItemPropertyFragment::InitFromMetaDataTable(const UDataTable* DataTable, FString PrefabName)
-{
-	
-}

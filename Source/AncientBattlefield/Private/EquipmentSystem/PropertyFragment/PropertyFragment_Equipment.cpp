@@ -10,18 +10,17 @@
 
 void UPropertyFragment_Equipment::OnEquipmentPutOn()
 {
-	auto Item = GetOwner();
-	if (Item != nullptr && Item->BelongingInventory != nullptr && AttachSocket.IsValid())
+	if (Owner != nullptr && Owner->BelongingInventory != nullptr && AttachSocket.IsValid())
 	{
-		auto OwnerCharacter = Cast<ACombatCharacter>(Item->BelongingInventory->GetOwner());
-		if (OwnerCharacter)
+		auto BelongingCharacter = Cast<ACombatCharacter>(Owner->BelongingInventory->GetOwner());
+		if (BelongingCharacter)
 		{
-			ParentMesh = OwnerCharacter->GetMesh();
+			ParentMesh = BelongingCharacter->GetMesh();
 		}
 		if (ParentMesh)
 		{
-			// 时序上近战武器依赖实体生命周期，故不能用代理去做。
-			UPropertyFragment_EntityLink* EntityLink = Item->FindPropertyFragment<UPropertyFragment_EntityLink>();
+			// 时序上近战武器依赖实体生命周期，故不能用代理去做Owner
+			UPropertyFragment_EntityLink* EntityLink = Owner->FindPropertyFragment<UPropertyFragment_EntityLink>();
 			if (EntityLink)
 			{
 				EntityLink->SpawnEntity();
@@ -31,13 +30,13 @@ void UPropertyFragment_Equipment::OnEquipmentPutOn()
 					FAttachmentTransformRules Rules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true);
 					EntityLink->GetEntity()->AttachToComponent(ParentMesh, Rules, AttachSocket);
 
-					UPropertyFragment_PhysicsMesh* PhysicsMesh = Item->FindPropertyFragment<UPropertyFragment_PhysicsMesh>();
+					UPropertyFragment_PhysicsMesh* PhysicsMesh = Owner->FindPropertyFragment<UPropertyFragment_PhysicsMesh>();
 					if (PhysicsMesh && PhysicsMesh->Mesh)
 					{
 						PhysicsMesh->SetEntityState(EEntityState::OnlyMesh);
 					}
 
-					UPropertyFragment_MeleeWeapon* MeleeWeapon = Item->FindPropertyFragment<UPropertyFragment_MeleeWeapon>();
+					UPropertyFragment_MeleeWeapon* MeleeWeapon = Owner->FindPropertyFragment<UPropertyFragment_MeleeWeapon>();
 					if (MeleeWeapon)
 					{
 						MeleeWeapon->OnWeaponPutOn(this);
@@ -52,16 +51,15 @@ void UPropertyFragment_Equipment::OnEquipmentTakeOff()
 {
 	if (EquipmentEntity != nullptr)
 	{
-		auto Item = GetOwner();
-		if (Item != nullptr)
+		if (Owner != nullptr)
 		{
-			UPropertyFragment_MeleeWeapon* MeleeWeapon = Item->FindPropertyFragment<UPropertyFragment_MeleeWeapon>();
+			UPropertyFragment_MeleeWeapon* MeleeWeapon = Owner->FindPropertyFragment<UPropertyFragment_MeleeWeapon>();
 			if (MeleeWeapon)
 			{
 				MeleeWeapon->OnWeaponTakeOff(this);
 			}
 			
-			UPropertyFragment_EntityLink* EntityLink = Item->FindPropertyFragment<UPropertyFragment_EntityLink>();
+			UPropertyFragment_EntityLink* EntityLink = Owner->FindPropertyFragment<UPropertyFragment_EntityLink>();
 			if (EntityLink && EntityLink->GetEntity())
 			{
 				EntityLink->DestroyEntity();
@@ -71,21 +69,13 @@ void UPropertyFragment_Equipment::OnEquipmentTakeOff()
 	}
 }
 
-void UPropertyFragment_Equipment::InitFromMetaDataTable(const UDataTable* DataTable, FString PrefabName)
-{
-
-
-	Super::InitFromMetaDataTable(DataTable, PrefabName);
-}
-
 void UPropertyFragment_Equipment::PutOn()
 {
-	auto Item = GetOwner();
-	if (!Item)
+	if (!Owner)
 	{
 		return;
 	}
-	UInventoryComponent* CharacterInventory = Item->BelongingInventory;
+	UInventoryComponent* CharacterInventory = Owner->BelongingInventory;
 	if (CharacterInventory)
 	{
 		// 查找与物品容器共属的装备容器，然后移动物品到最优先的可用位置。
@@ -102,8 +92,8 @@ void UPropertyFragment_Equipment::PutOn()
 			}
 			if (EquipmentSlot < EEquipmentSlots::EquipmentSlotsNum)
 			{
-				CharacterInventory->RemoveItem(Item);
-				CharacterEquipment->AddItem(Item, (int32)EquipmentSlot);
+				CharacterInventory->RemoveItem(Owner);
+				CharacterEquipment->AddItem(Owner, (int32)EquipmentSlot);
 			}
 		}
 	}
@@ -111,12 +101,11 @@ void UPropertyFragment_Equipment::PutOn()
 
 void UPropertyFragment_Equipment::TakeOff()
 {
-	auto Item = GetOwner();
-	if (!Item)
+	if (!Owner)
 	{
 		return;
 	}
-	UEquipmentComponent* CharacterEquipment = Cast<UEquipmentComponent>(Item->BelongingInventory);
+	UEquipmentComponent* CharacterEquipment = Cast<UEquipmentComponent>(Owner->BelongingInventory);
 	if (CharacterEquipment)
 	{
 		// 查找与装备容器共属的物品容器，然后移动物品到空槽。
@@ -126,8 +115,8 @@ void UPropertyFragment_Equipment::TakeOff()
 			int32 SlotID = CharacterInventory->FindVacancy();
 			if (SlotID < CharacterInventory->GetSize())
 			{
-				CharacterEquipment->RemoveItem(Item);
-				CharacterInventory->AddItem(Item, SlotID);
+				CharacterEquipment->RemoveItem(Owner);
+				CharacterInventory->AddItem(Owner, SlotID);
 			}
 		}
 	}

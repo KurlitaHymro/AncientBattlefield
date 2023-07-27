@@ -12,15 +12,14 @@
 
 void UPropertyFragment_MeleeWeapon::OnWeaponPutOn(UPropertyFragment_Equipment* Equipment)
 {
-	auto Item = GetOwner();
-	if (Item != nullptr && Item->BelongingInventory != nullptr)
+	if (Owner != nullptr && Owner->BelongingInventory != nullptr)
 	{
-		auto OwnerCharacter = Cast<ACombatCharacter>(Item->BelongingInventory->GetOwner());
-		if (OwnerCharacter)
+		auto BelongingCharacter = Cast<ACombatCharacter>(Owner->BelongingInventory->GetOwner());
+		if (BelongingCharacter)
 		{
-			AbilitySystemComponent = Cast<UCombatAbilitySystemComponent>(OwnerCharacter->GetAbilitySystemComponent());
+			AbilitySystemComponent = Cast<UCombatAbilitySystemComponent>(BelongingCharacter->GetAbilitySystemComponent());
 		}
-		UPropertyFragment_EntityLink* EntityLink = Item->FindPropertyFragment<UPropertyFragment_EntityLink>();
+		UPropertyFragment_EntityLink* EntityLink = Owner->FindPropertyFragment<UPropertyFragment_EntityLink>();
 		if (EntityLink && EntityLink->GetEntity())
 		{
 			HitTraceComponent = EntityLink->GetEntity()->GetComponentByClass<UHitTraceComponent>();
@@ -42,8 +41,7 @@ void UPropertyFragment_MeleeWeapon::OnWeaponPutOn(UPropertyFragment_Equipment* E
 
 void UPropertyFragment_MeleeWeapon::OnWeaponTakeOff(UPropertyFragment_Equipment* Equipment)
 {
-	auto Item = GetOwner();
-	if (Item != nullptr)
+	if (Owner != nullptr)
 	{
 		if (AbilitySystemComponent && HitTraceComponent && Mesh)
 		{

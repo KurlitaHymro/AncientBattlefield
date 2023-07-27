@@ -2,8 +2,6 @@
 
 
 #include "GameFeatureAction_AddSpawnedActors.h"
-#include "Engine/Engine.h"
-#include "Engine/World.h"
 #include "Engine/AssetManager.h"
 #include "GameFeaturesSubsystemSettings.h"
 
@@ -11,20 +9,9 @@
 
 void UGameFeatureAction_AddSpawnedActors::OnGameFeatureActivating()
 {
-	GameInstanceStartHandle = FWorldDelegates::OnStartGameInstance.AddUObject(this, &UGameFeatureAction_AddSpawnedActors::HandleGameInstanceStart);
-
-	// Add to any worlds with associated game instances that have already been initialized
-	for (const FWorldContext& WorldContext : GEngine->GetWorldContexts())
-	{
-		AddToWorld(WorldContext);
-	}
+	Super::OnGameFeatureActivating();
 
 	Reset();
-}
-
-void UGameFeatureAction_AddSpawnedActors::OnGameFeatureDeactivating(FGameFeatureDeactivatingContext& Context)
-{
-	FWorldDelegates::OnStartGameInstance.Remove(GameInstanceStartHandle);
 }
 
 #if WITH_EDITORONLY_DATA
@@ -68,13 +55,6 @@ EDataValidationResult UGameFeatureAction_AddSpawnedActors::IsDataValid(TArray<FT
 }
 #endif
 
-void UGameFeatureAction_AddSpawnedActors::HandleGameInstanceStart(UGameInstance* GameInstance)
-{
-	if (FWorldContext* WorldContext = GameInstance->GetWorldContext())
-	{
-		AddToWorld(*WorldContext);
-	}
-}
 
 void UGameFeatureAction_AddSpawnedActors::AddToWorld(const FWorldContext& WorldContext)
 {

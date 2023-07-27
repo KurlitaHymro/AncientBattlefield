@@ -13,7 +13,7 @@ void UPropertyFragment_EntityLink::SpawnEntity()
 		auto World = GetWorld();
 		Entity = Cast<AEntityActor>(World->SpawnActor(EntityType));
 		Entity->Link = this;
-		Entity->ItemObject = GetOwner();
+		Entity->ItemObject = Owner;
 	}
 }
 

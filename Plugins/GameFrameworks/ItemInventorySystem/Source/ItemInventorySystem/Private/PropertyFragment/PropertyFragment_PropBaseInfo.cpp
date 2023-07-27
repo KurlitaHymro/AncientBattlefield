@@ -2,14 +2,23 @@
 
 
 #include "PropertyFragment/PropertyFragment_PropBaseInfo.h"
+#include "DataRegistrySubsystem.h"
 
-void UPropertyFragment_PropBaseInfo::InitFromMetaDataTable(const UDataTable* DataTable, FString PrefabName)
+void UPropertyFragment_PropBaseInfo::InitFromDataTable(const UDataTable* DataTable, FName PrefabName)
 {
-	FPropertyFragmentPropBaseInfo* MetaData = DataTable->FindRow<FPropertyFragmentPropBaseInfo>(FName(*PrefabName), DataTable->GetName(), true);
-	if (MetaData)
+	FPropertyFragmentPropBaseInfo* Prefab = DataTable->FindRow<FPropertyFragmentPropBaseInfo>(PrefabName, DataTable->GetName(), true);
+	if (Prefab)
 	{
-		PropertyFragment = *MetaData;
+		PropertyFragment = *Prefab;
 	}
-	
-	Super::InitFromMetaDataTable(DataTable, PrefabName);
+}
+
+void UPropertyFragment_PropBaseInfo::InitFromRegistry(const FName RegistryType, FName PrefabName)
+{
+	auto Registry = UDataRegistrySubsystem::Get()->GetRegistryForType(RegistryType);
+	if (Registry)
+	{
+		auto Prefab = Registry->GetCachedItem<FPropertyFragmentPropBaseInfo>(FDataRegistryId(RegistryType, PrefabName));
+		PropertyFragment = *Prefab;
+	}
 }

@@ -11,7 +11,7 @@ void UItemObject::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) cons
 
 void UItemObject::AddPropertyFragment(UItemPropertyFragment* PropertyFragmentObject)
 {
-	PropertyFragmentObject->Instantiate(this);
+	PropertyFragmentObject->Owner = this;
 	PropertyFragments.Add(PropertyFragmentObject);
 }
 

@@ -28,7 +28,6 @@ public:
 	UMeshComponent* Mesh;
 
 protected:
-	virtual void Instantiate(class UItemObject* Owner) override;
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -38,5 +37,5 @@ public:
 	void Abandon();
 
 	UFUNCTION(BlueprintCallable)
-	void Pickup(UInventoryComponent* Owner);
+	void Pickup(UInventoryComponent* TargetInventory);
 };
