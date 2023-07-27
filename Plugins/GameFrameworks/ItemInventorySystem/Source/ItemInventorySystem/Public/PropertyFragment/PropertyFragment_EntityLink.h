@@ -4,8 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "Item/ItemPropertyFragment.h"
-#include "Entity/EntityActor.h"
 #include "PropertyFragment_EntityLink.generated.h"
+
+USTRUCT(BlueprintType, meta = (DisplayName = "EntityLink"))
+struct FPropertyFragmentEntityLink : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSoftClassPtr<AActor> EntityType;
+};
 
 /**
  * 
@@ -16,8 +24,11 @@ class ITEMINVENTORYSYSTEM_API UPropertyFragment_EntityLink : public UItemPropert
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (InstanceEditable = true, ExposeOnSpawn = true))
-	TSubclassOf<AEntityActor> EntityType;
+	virtual void InitFromDataTable(const class UDataTable* DataTable, FName PrefabName) override;
+
+	virtual void InitFromRegistry(const FName RegistryType, FName PrefabName) override;
+
+	virtual FName GetRegistryTypeName() override;
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -27,10 +38,12 @@ public:
 	void DestroyEntity();
 
 	UFUNCTION(BlueprintCallable)
-	FORCEINLINE AEntityActor* GetEntity() { return Entity; };
+	FORCEINLINE AActor* GetEntity() { return Entity; };
+
+public:
+	UPROPERTY(BlueprintReadOnly)
+	FPropertyFragmentEntityLink PropertyFragment;
 
 private:
-	friend class AEntityActor;
-
-	AEntityActor* Entity;
+	AActor* Entity;
 };

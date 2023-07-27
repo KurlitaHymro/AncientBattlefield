@@ -7,28 +7,24 @@
 #include "DataRegistrySubsystem.h"
 #include "PropertyFragment/PropertyFragment_PropBaseInfo.h"
 
-UItemObject* UInventoryItemConfig::NewInventoryItem(FName PrefabName)
+UItemObject* UInventoryItemConfig::NewInventoryItem(UObject* Outer, FName PrefabName)
 {
-	UItemObject* Item = NewObject<UItemObject>();
+	UItemObject* Item = NewObject<UItemObject>(Outer);
 	auto ItemPrefabRegistry = UDataRegistrySubsystem::Get()->GetRegistryForType(FName("ItemPrefabRegistry"));
 	if (ItemPrefabRegistry)
 	{
 		auto ItemPrefab = ItemPrefabRegistry->GetCachedItem<FAncientBattlefieldItem>(FDataRegistryId(FName("ItemPrefabRegistry"), PrefabName));
 		if (ItemPrefab != nullptr)
 		{
-			if (ItemPrefab->bPropBaseInfo)
+			for (auto PropertyFragment : ItemPrefab->PropertyFragments)
 			{
-				auto PropertyFragment = NewObject<UPropertyFragment_PropBaseInfo>();
-				if (ItemPrefab->PropBaseInfoPrefab.IsValid() && !ItemPrefab->PropBaseInfoPrefab.IsNone())
+				UClass* PropertyClass = PropertyFragment.PropertyClass.LoadSynchronous();
+				UItemPropertyFragment* PropertyInstance = NewObject<UItemPropertyFragment>(Item, PropertyClass);
+				if (PropertyFragment.PropertyPrefab.IsValid() && !PropertyFragment.PropertyPrefab.IsNone())
 				{
-					auto PropBaseInfoRegistry = UDataRegistrySubsystem::Get()->GetRegistryForType(FName("PropBaseInfoRegistry"));
-					if (PropBaseInfoRegistry)
-					{
-						auto PropertyFragmentPrefab = PropBaseInfoRegistry->GetCachedItem<FPropertyFragmentPropBaseInfo>(FDataRegistryId(FName("PropBaseInfoRegistry"), ItemPrefab->PropBaseInfoPrefab));
-						PropertyFragment->PropertyFragment = *PropertyFragmentPrefab;
-					}
+					PropertyInstance->InitFromRegistry(PropertyInstance->GetRegistryTypeName(), PropertyFragment.PropertyPrefab);
 				}
-				Item->AddPropertyFragment(PropertyFragment);
+				Item->AddPropertyFragment(PropertyInstance);
 			}
 		}
 	}

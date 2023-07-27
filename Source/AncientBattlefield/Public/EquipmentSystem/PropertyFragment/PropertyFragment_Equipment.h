@@ -7,6 +7,15 @@
 #include "EquipmentSystem/EquipmentComponent.h"
 #include "PropertyFragment_Equipment.generated.h"
 
+USTRUCT(BlueprintType, meta = (DisplayName = "Equipment"))
+struct FPropertyFragmentEquipment : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TMap<EEquipmentSlots, FName> EquipmentSlots;
+};
+
 /**
  * 
  */
@@ -16,17 +25,11 @@ class ANCIENTBATTLEFIELD_API UPropertyFragment_Equipment : public UItemPropertyF
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UMeshComponent* ParentMesh;
+	virtual void InitFromDataTable(const class UDataTable* DataTable, FName PrefabName) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (InstanceEditable = true, ExposeOnSpawn = true))
-	TArray<EEquipmentSlots> RestrictSlot;
+	virtual void InitFromRegistry(const FName RegistryType, FName PrefabName) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (InstanceEditable = true, ExposeOnSpawn = true))
-	FName AttachSocket;
-
-protected:
-
+	virtual FName GetRegistryTypeName() override;
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -36,11 +39,15 @@ public:
 	void TakeOff();
 
 	UFUNCTION()
-	void OnEquipmentPutOn();
+	void OnEquipmentPutOn(UMeshComponent* TargetMesh, EEquipmentSlots TargetSlot);
 
 	UFUNCTION()
 	void OnEquipmentTakeOff();
 
+public:
+	UPROPERTY(BlueprintReadOnly)
+	FPropertyFragmentEquipment PropertyFragment;
+
 private:
-	AActor* EquipmentEntity;
+	UMeshComponent* ParentMesh;
 };

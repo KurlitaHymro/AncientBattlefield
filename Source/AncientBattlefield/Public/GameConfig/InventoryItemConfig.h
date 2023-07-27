@@ -7,16 +7,25 @@
 #include "Engine/DataTable.h"
 #include "InventoryItemConfig.generated.h"
 
+USTRUCT(BlueprintType, meta = (DisplayName = "PropBaseInfo"))
+struct FPropertyFragmentConfig
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly)
+	TSoftClassPtr<class UItemPropertyFragment> PropertyClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	FName PropertyPrefab;
+};
+
 USTRUCT(BlueprintType, meta = (DisplayName = "AncientBattlefieldItem"))
 struct FAncientBattlefieldItem : public FTableRowBase
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditDefaultsOnly)
-	bool bPropBaseInfo;
-
-	UPROPERTY(EditDefaultsOnly)
-	FName PropBaseInfoPrefab;
+	TArray<FPropertyFragmentConfig> PropertyFragments;
 };
 
 /**
@@ -29,6 +38,6 @@ class ANCIENTBATTLEFIELD_API UInventoryItemConfig : public UBlueprintFunctionLib
 
 public:
 	UFUNCTION(BlueprintCallable)
-	static class UItemObject* NewInventoryItem(FName PrefabName);
+	static class UItemObject* NewInventoryItem(UObject* Outer, FName PrefabName);
 	
 };

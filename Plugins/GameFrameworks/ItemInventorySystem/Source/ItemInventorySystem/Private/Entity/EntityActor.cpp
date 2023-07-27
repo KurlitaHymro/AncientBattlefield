@@ -7,15 +7,10 @@
 
 void AEntityActor::CreateItem_Implementation()
 {
-	ItemObject = NewObject<UItemObject>(this);
 
-	Link = NewObject<UPropertyFragment_EntityLink>(this);
-	Link->EntityType = GetClass();
-	Link->Entity = this;
-	ItemObject->AddPropertyFragment(Link);
 }
 
 void AEntityActor::ResetItem_Implementation()
 {
-	Link->Entity = this;
+
 }

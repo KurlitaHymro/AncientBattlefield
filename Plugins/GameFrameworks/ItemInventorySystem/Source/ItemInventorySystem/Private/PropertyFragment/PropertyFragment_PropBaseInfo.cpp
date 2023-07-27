@@ -22,3 +22,8 @@ void UPropertyFragment_PropBaseInfo::InitFromRegistry(const FName RegistryType, 
 		PropertyFragment = *Prefab;
 	}
 }
+
+FName UPropertyFragment_PropBaseInfo::GetRegistryTypeName()
+{
+	return FName("PropBaseInfoRegistry");
+}

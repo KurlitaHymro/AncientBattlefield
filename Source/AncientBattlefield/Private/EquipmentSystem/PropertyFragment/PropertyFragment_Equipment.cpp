@@ -2,79 +2,38 @@
 
 
 #include "EquipmentSystem/PropertyFragment/PropertyFragment_Equipment.h"
+#include "DataRegistrySubsystem.h"
 #include "Item/ItemObject.h"
 #include "PropertyFragment/PropertyFragment_EntityLink.h"
 #include "PropertyFragment/PropertyFragment_PhysicsMesh.h"
 #include "EquipmentSystem/PropertyFragment/PropertyFragment_MeleeWeapon.h"
-#include "CombatCore/CombatCharacter.h"
 
-void UPropertyFragment_Equipment::OnEquipmentPutOn()
+void UPropertyFragment_Equipment::InitFromDataTable(const UDataTable* DataTable, FName PrefabName)
 {
-	if (Owner != nullptr && Owner->BelongingInventory != nullptr && AttachSocket.IsValid())
+	FPropertyFragmentEquipment* Prefab = DataTable->FindRow<FPropertyFragmentEquipment>(PrefabName, DataTable->GetName(), true);
+	if (Prefab)
 	{
-		auto BelongingCharacter = Cast<ACombatCharacter>(Owner->BelongingInventory->GetOwner());
-		if (BelongingCharacter)
-		{
-			ParentMesh = BelongingCharacter->GetMesh();
-		}
-		if (ParentMesh)
-		{
-			// 时序上近战武器依赖实体生命周期，故不能用代理去做Owner
-			UPropertyFragment_EntityLink* EntityLink = Owner->FindPropertyFragment<UPropertyFragment_EntityLink>();
-			if (EntityLink)
-			{
-				EntityLink->SpawnEntity();
-				EquipmentEntity = EntityLink->GetEntity();
-				if (EquipmentEntity)
-				{
-					FAttachmentTransformRules Rules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true);
-					EntityLink->GetEntity()->AttachToComponent(ParentMesh, Rules, AttachSocket);
-
-					UPropertyFragment_PhysicsMesh* PhysicsMesh = Owner->FindPropertyFragment<UPropertyFragment_PhysicsMesh>();
-					if (PhysicsMesh && PhysicsMesh->Mesh)
-					{
-						PhysicsMesh->SetEntityState(EEntityState::OnlyMesh);
-					}
-
-					UPropertyFragment_MeleeWeapon* MeleeWeapon = Owner->FindPropertyFragment<UPropertyFragment_MeleeWeapon>();
-					if (MeleeWeapon)
-					{
-						MeleeWeapon->OnWeaponPutOn(this);
-					}
-				}
-			}
-		}
+		PropertyFragment = *Prefab;
 	}
 }
 
-void UPropertyFragment_Equipment::OnEquipmentTakeOff()
+void UPropertyFragment_Equipment::InitFromRegistry(const FName RegistryType, FName PrefabName)
 {
-	if (EquipmentEntity != nullptr)
+	auto Registry = UDataRegistrySubsystem::Get()->GetRegistryForType(RegistryType);
+	if (Registry)
 	{
-		if (Owner != nullptr)
-		{
-			UPropertyFragment_MeleeWeapon* MeleeWeapon = Owner->FindPropertyFragment<UPropertyFragment_MeleeWeapon>();
-			if (MeleeWeapon)
-			{
-				MeleeWeapon->OnWeaponTakeOff(this);
-			}
-			
-			UPropertyFragment_EntityLink* EntityLink = Owner->FindPropertyFragment<UPropertyFragment_EntityLink>();
-			if (EntityLink && EntityLink->GetEntity())
-			{
-				EntityLink->DestroyEntity();
-				EquipmentEntity = nullptr;
-			}
-		}
+		auto Prefab = Registry->GetCachedItem<FPropertyFragmentEquipment>(FDataRegistryId(RegistryType, PrefabName));
+		PropertyFragment = *Prefab;
 	}
+}
+
+FName UPropertyFragment_Equipment::GetRegistryTypeName()
+{
+	return FName("EquipmentRegistry");
 }
 
 void UPropertyFragment_Equipment::PutOn()
 {
-	if (!Owner)
-	{
-		return;
-	}
 	UInventoryComponent* CharacterInventory = Owner->BelongingInventory;
 	if (CharacterInventory)
 	{
@@ -83,11 +42,11 @@ void UPropertyFragment_Equipment::PutOn()
 		if (CharacterEquipment)
 		{
 			EEquipmentSlots EquipmentSlot = EEquipmentSlots::EquipmentSlotsNum;
-			for (auto IdleSlot : RestrictSlot)
+			for (auto IdleSlot : PropertyFragment.EquipmentSlots)
 			{
-				if (CharacterEquipment->GetItem((int32)IdleSlot) == nullptr)
+				if (CharacterEquipment->GetItem((int32)IdleSlot.Key) == nullptr)
 				{
-					EquipmentSlot = IdleSlot;
+					EquipmentSlot = IdleSlot.Key;
 				}
 			}
 			if (EquipmentSlot < EEquipmentSlots::EquipmentSlotsNum)
@@ -119,5 +78,55 @@ void UPropertyFragment_Equipment::TakeOff()
 				CharacterInventory->AddItem(Owner, SlotID);
 			}
 		}
+	}
+}
+
+void UPropertyFragment_Equipment::OnEquipmentPutOn(UMeshComponent* TargetMesh, EEquipmentSlots TargetSlot)
+{
+	if (TargetMesh && !ParentMesh)
+	{
+		ParentMesh = TargetMesh;
+		// 时序上近战武器依赖实体生命周期，故不能用代理去做Owner
+		UPropertyFragment_EntityLink* EntityLink = Owner->FindPropertyFragment<UPropertyFragment_EntityLink>();
+		if (EntityLink)
+		{
+			EntityLink->SpawnEntity();
+			AActor* EquipmentEntity = EntityLink->GetEntity();
+			auto Slot = PropertyFragment.EquipmentSlots.Find(TargetSlot);
+			if (EquipmentEntity && Slot)
+			{
+				FAttachmentTransformRules Rules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true);
+				EquipmentEntity->AttachToComponent(ParentMesh, Rules, *Slot);
+
+				UPropertyFragment_PhysicsMesh* PhysicsMesh = Owner->FindPropertyFragment<UPropertyFragment_PhysicsMesh>();
+				if (PhysicsMesh && PhysicsMesh->Mesh)
+				{
+					PhysicsMesh->SetEntityState(EEntityState::OnlyMesh);
+				}
+
+				UPropertyFragment_MeleeWeapon* MeleeWeapon = Owner->FindPropertyFragment<UPropertyFragment_MeleeWeapon>();
+				if (MeleeWeapon)
+				{
+					MeleeWeapon->OnWeaponPutOn(this);
+				}
+			}
+		}
+	}
+}
+
+void UPropertyFragment_Equipment::OnEquipmentTakeOff()
+{
+	ParentMesh = nullptr;
+
+	UPropertyFragment_MeleeWeapon* MeleeWeapon = Owner->FindPropertyFragment<UPropertyFragment_MeleeWeapon>();
+	if (MeleeWeapon)
+	{
+		MeleeWeapon->OnWeaponTakeOff(this);
+	}
+
+	UPropertyFragment_EntityLink* EntityLink = Owner->FindPropertyFragment<UPropertyFragment_EntityLink>();
+	if (EntityLink && EntityLink->GetEntity())
+	{
+		EntityLink->DestroyEntity();
 	}
 }
