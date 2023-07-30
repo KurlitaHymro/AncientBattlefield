@@ -4,6 +4,7 @@
 #include "EquipmentSystem/PropertyFragment/PropertyFragment_Equipment.h"
 #include "DataRegistrySubsystem.h"
 #include "Item/ItemObject.h"
+#include "CombatCore/CombatCharacter.h"
 #include "PropertyFragment/PropertyFragment_EntityLink.h"
 #include "PropertyFragment/PropertyFragment_PhysicsMesh.h"
 #include "EquipmentSystem/PropertyFragment/PropertyFragment_MeleeWeapon.h"
@@ -81,11 +82,12 @@ void UPropertyFragment_Equipment::TakeOff()
 	}
 }
 
-void UPropertyFragment_Equipment::OnEquipmentPutOn(UMeshComponent* TargetMesh, EEquipmentSlots TargetSlot)
+void UPropertyFragment_Equipment::OnEquipmentPutOn(AActor* Target, EEquipmentSlots TargetSlot)
 {
-	if (TargetMesh && !ParentMesh)
+	auto Character = Cast<ACombatCharacter>(Target);
+	if (Character && Character->GetMesh() && !ParentMesh)
 	{
-		ParentMesh = TargetMesh;
+		ParentMesh = Character->GetMesh();
 		// 时序上近战武器依赖实体生命周期，故不能用代理去做Owner
 		UPropertyFragment_EntityLink* EntityLink = Owner->FindPropertyFragment<UPropertyFragment_EntityLink>();
 		if (EntityLink)
@@ -99,15 +101,16 @@ void UPropertyFragment_Equipment::OnEquipmentPutOn(UMeshComponent* TargetMesh, E
 				EquipmentEntity->AttachToComponent(ParentMesh, Rules, *Slot);
 
 				UPropertyFragment_PhysicsMesh* PhysicsMesh = Owner->FindPropertyFragment<UPropertyFragment_PhysicsMesh>();
-				if (PhysicsMesh && PhysicsMesh->Mesh)
+				if (PhysicsMesh)
 				{
-					PhysicsMesh->SetEntityState(EEntityState::OnlyMesh);
+					UMeshComponent* Mesh = EquipmentEntity->FindComponentByClass<UMeshComponent>();
+					PhysicsMesh->SetEntityState(Mesh, EEntityState::OnlyMesh);
 				}
 
 				UPropertyFragment_MeleeWeapon* MeleeWeapon = Owner->FindPropertyFragment<UPropertyFragment_MeleeWeapon>();
 				if (MeleeWeapon)
 				{
-					MeleeWeapon->OnWeaponPutOn(this);
+					MeleeWeapon->OnWeaponPutOn(Character->GetAbilitySystemComponent());
 				}
 			}
 		}
@@ -121,7 +124,7 @@ void UPropertyFragment_Equipment::OnEquipmentTakeOff()
 	UPropertyFragment_MeleeWeapon* MeleeWeapon = Owner->FindPropertyFragment<UPropertyFragment_MeleeWeapon>();
 	if (MeleeWeapon)
 	{
-		MeleeWeapon->OnWeaponTakeOff(this);
+		MeleeWeapon->OnWeaponTakeOff();
 	}
 
 	UPropertyFragment_EntityLink* EntityLink = Owner->FindPropertyFragment<UPropertyFragment_EntityLink>();

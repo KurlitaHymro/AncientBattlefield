@@ -3,6 +3,7 @@
 
 #include "PropertyFragment/PropertyFragment_EntityLink.h"
 #include "DataRegistrySubsystem.h"
+#include "Components/GameFrameworkComponentManager.h"
 
 void UPropertyFragment_EntityLink::InitFromDataTable(const UDataTable* DataTable, FName PrefabName)
 {
@@ -30,7 +31,7 @@ FName UPropertyFragment_EntityLink::GetRegistryTypeName()
 
 void UPropertyFragment_EntityLink::SpawnEntity()
 {
-	if (PropertyFragment.EntityType != nullptr)
+	if (PropertyFragment.EntityType != nullptr && Entity == nullptr)
 	{
 		FActorSpawnParameters SpawnConfig;
 		SpawnConfig.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
@@ -39,7 +40,8 @@ void UPropertyFragment_EntityLink::SpawnEntity()
 		TSubclassOf<AActor> EntityType = PropertyFragment.EntityType.LoadSynchronous();
 		if (EntityType)
 		{
-			Entity = World->SpawnActor(EntityType);
+			Entity = Cast<AEntityActor>(World->SpawnActor(EntityType));
+			Entity->ItemObject = Owner;
 		}
 	}
 }
@@ -51,4 +53,25 @@ void UPropertyFragment_EntityLink::DestroyEntity()
 		Entity->Destroy();
 		Entity = nullptr;
 	}
+}
+
+// Sets default values
+AEntityActor::AEntityActor()
+{
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = false;
+}
+
+// Called when the game starts or when spawned
+void AEntityActor::BeginPlay()
+{
+	Super::BeginPlay();
+
+}
+
+// Called every frame
+void AEntityActor::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
 }

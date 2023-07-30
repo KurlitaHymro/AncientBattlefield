@@ -17,10 +17,10 @@ class ANCIENTBATTLEFIELD_API UPropertyFragment_MeleeWeapon : public UItemPropert
 
 public:
 	UFUNCTION()
-	void OnWeaponPutOn(class UPropertyFragment_Equipment* Equipment);
+	void OnWeaponPutOn(class UAbilitySystemComponent* TargetASC);
 
 	UFUNCTION()
-	void OnWeaponTakeOff(class UPropertyFragment_Equipment* Equipment);
+	void OnWeaponTakeOff();
 
 	UFUNCTION(BlueprintCallable)
 	class UHitTraceComponent* GetHitTraceComponent();
@@ -33,6 +33,4 @@ private:
 	class UCombatAbilitySystemComponent* AbilitySystemComponent;
 
 	class UHitTraceComponent* HitTraceComponent;
-
-	class UMeshComponent* Mesh;
 };

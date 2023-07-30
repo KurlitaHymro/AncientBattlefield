@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Item/ItemPropertyFragment.h"
+#include "GameFramework/Actor.h"
 #include "PropertyFragment_EntityLink.generated.h"
 
 USTRUCT(BlueprintType, meta = (DisplayName = "EntityLink"))
@@ -12,7 +13,7 @@ struct FPropertyFragmentEntityLink : public FTableRowBase
 	GENERATED_BODY()
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TSoftClassPtr<AActor> EntityType;
+	TSoftClassPtr<AEntityActor> EntityType;
 };
 
 /**
@@ -38,12 +39,32 @@ public:
 	void DestroyEntity();
 
 	UFUNCTION(BlueprintCallable)
-	FORCEINLINE AActor* GetEntity() { return Entity; };
+	FORCEINLINE AEntityActor* GetEntity() { return Entity; };
 
 public:
 	UPROPERTY(BlueprintReadOnly)
 	FPropertyFragmentEntityLink PropertyFragment;
 
 private:
-	AActor* Entity;
+	AEntityActor* Entity;
+};
+
+UCLASS()
+class ITEMINVENTORYSYSTEM_API AEntityActor : public AActor
+{
+	GENERATED_BODY()
+
+public:
+	// Sets default values for this actor's properties
+	AEntityActor();
+
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (InstanceEditable = true, ExposeOnSpawn = true))
+	class UItemObject* ItemObject;
 };

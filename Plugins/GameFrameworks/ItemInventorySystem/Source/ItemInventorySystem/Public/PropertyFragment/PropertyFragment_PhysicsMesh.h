@@ -24,17 +24,11 @@ class ITEMINVENTORYSYSTEM_API UPropertyFragment_PhysicsMesh : public UItemProper
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (InstanceEditable = true, ExposeOnSpawn = trueTooltip = "Preferably set on spawn, or Ensure the existence of EntityLink which has Mesh"))
-	UMeshComponent* Mesh;
-
-protected:
-
-public:
 	UFUNCTION(BlueprintCallable)
-	void SetEntityState(EEntityState State);
+	void SetEntityState(UMeshComponent* Mesh, EEntityState State);
 
 	UFUNCTION(BlueprintCallable)
-	void Abandon();
+	void Abandon(float LocationOffset = 150.f, FRotator Rotator = FRotator::ZeroRotator);
 
 	UFUNCTION(BlueprintCallable)
 	void Pickup(UInventoryComponent* TargetInventory);

@@ -41,7 +41,10 @@ public:
 	virtual UItemObject* GetItem(int32 SlotID);
 
 	UFUNCTION(BlueprintCallable)
-	virtual int32 GetSize();
+	virtual int32 GetSize() const;
+
+	UFUNCTION(BlueprintCallable)
+	virtual FString GetStaticDescription() const;
 
 protected:
 	UPROPERTY()

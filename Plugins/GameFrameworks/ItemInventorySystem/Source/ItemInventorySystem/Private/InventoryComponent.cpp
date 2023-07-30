@@ -67,7 +67,21 @@ UItemObject* UInventoryComponent::GetItem(int32 SlotID)
 	return ItemObjectSlot[SlotID];
 }
 
-int32 UInventoryComponent::GetSize()
+int32 UInventoryComponent::GetSize() const
 {
 	return Size;
 }
+
+FString UInventoryComponent::GetStaticDescription() const
+{
+	FString Description = FString::Printf(TEXT("%s"), *this->GetName());
+	for (int32 i = 0; i < Size; i++)
+	{
+		if (ItemObjectSlot[i])
+		{
+			auto ItemInfo = ItemObjectSlot[i]->GetFName().ToString();
+			Description += FString::Printf(TEXT("[%02d]{%s}"), i, *ItemInfo);
+		}
+	}
+	return Description;
+} 

@@ -39,7 +39,7 @@ public:
 	void TakeOff();
 
 	UFUNCTION()
-	void OnEquipmentPutOn(UMeshComponent* TargetMesh, EEquipmentSlots TargetSlot);
+	void OnEquipmentPutOn(AActor* Target, EEquipmentSlots TargetSlot);
 
 	UFUNCTION()
 	void OnEquipmentTakeOff();

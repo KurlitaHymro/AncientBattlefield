@@ -4,7 +4,6 @@
 #include "EquipmentSystem/EquipmentComponent.h"
 #include "Components/PawnComponent.h"
 #include "Item/ItemObject.h"
-#include "CombatCore/CombatCharacter.h"
 #include "EquipmentSystem/PropertyFragment/PropertyFragment_Equipment.h"
 
 void UEquipmentComponent::Setup(int32 SlotsNumber)
@@ -14,10 +13,9 @@ void UEquipmentComponent::Setup(int32 SlotsNumber)
 
 void UEquipmentComponent::AddItem(UItemObject* Item, int32 SlotID)
 {
-	auto TargetMesh = Cast<ACombatCharacter>(GetOwner())->GetMesh();
 	if (Item != nullptr && Item->FindPropertyFragment<UPropertyFragment_Equipment>() != nullptr)
 	{
-		Item->FindPropertyFragment<UPropertyFragment_Equipment>()->OnEquipmentPutOn(TargetMesh, (EEquipmentSlots)SlotID); // 实体显现-纯模型化-检测绑定
+		Item->FindPropertyFragment<UPropertyFragment_Equipment>()->OnEquipmentPutOn(GetOwner(), (EEquipmentSlots)SlotID); // 实体显现-纯模型化-检测绑定
 		Super::AddItem(Item, SlotID);
 	}
 }

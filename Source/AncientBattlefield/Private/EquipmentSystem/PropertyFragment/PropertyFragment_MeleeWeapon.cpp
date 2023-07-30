@@ -7,50 +7,35 @@
 #include "PropertyFragment/PropertyFragment_EntityLink.h"
 #include "PropertyFragment/PropertyFragment_PhysicsMesh.h"
 #include "EquipmentSystem/PropertyFragment/PropertyFragment_Equipment.h"
-#include "CombatCore/CombatCharacter.h"
 #include "AbilitySystem/CombatAbilitySystemComponent.h"
 
-void UPropertyFragment_MeleeWeapon::OnWeaponPutOn(UPropertyFragment_Equipment* Equipment)
+void UPropertyFragment_MeleeWeapon::OnWeaponPutOn(UAbilitySystemComponent* TargetASC)
 {
-	if (Owner != nullptr && Owner->BelongingInventory != nullptr)
+	AbilitySystemComponent = Cast<UCombatAbilitySystemComponent>(TargetASC);
+
+	UPropertyFragment_EntityLink* EntityLink = Owner->FindPropertyFragment<UPropertyFragment_EntityLink>();
+	UMeshComponent* Mesh = nullptr;
+	if (EntityLink && EntityLink->GetEntity())
 	{
-		auto BelongingCharacter = Cast<ACombatCharacter>(Owner->BelongingInventory->GetOwner());
-		if (BelongingCharacter)
-		{
-			AbilitySystemComponent = Cast<UCombatAbilitySystemComponent>(BelongingCharacter->GetAbilitySystemComponent());
-		}
-		UPropertyFragment_EntityLink* EntityLink = Owner->FindPropertyFragment<UPropertyFragment_EntityLink>();
-		if (EntityLink && EntityLink->GetEntity())
-		{
-			HitTraceComponent = EntityLink->GetEntity()->GetComponentByClass<UHitTraceComponent>();
-			Mesh = EntityLink->GetEntity()->GetComponentByClass<UStaticMeshComponent>();
-		}
-		
-		//UPropertyFragment_PhysicsMesh* PhysicsMesh = Item->FindPropertyFragment<UPropertyFragment_PhysicsMesh>();
-		//if (PhysicsMesh && PhysicsMesh->Mesh)
-		//{
-		//	Mesh = PhysicsMesh->Mesh;
-		//}
-		if (AbilitySystemComponent != nullptr && HitTraceComponent != nullptr && Mesh != nullptr)
-		{
-			HitTraceComponent->Setup(Mesh);
-			HitTraceComponent->UniqueHitDelegate.AddDynamic(this, &ThisClass::OnWeaponHit);
-		}
+		HitTraceComponent = EntityLink->GetEntity()->GetComponentByClass<UHitTraceComponent>();
+		Mesh = EntityLink->GetEntity()->GetComponentByClass<UMeshComponent>();
+	}
+
+	if (AbilitySystemComponent != nullptr && HitTraceComponent != nullptr && Mesh != nullptr)
+	{
+		HitTraceComponent->Setup(Mesh);
+		HitTraceComponent->UniqueHitDelegate.AddDynamic(this, &ThisClass::OnWeaponHit);
 	}
 }
 
-void UPropertyFragment_MeleeWeapon::OnWeaponTakeOff(UPropertyFragment_Equipment* Equipment)
+void UPropertyFragment_MeleeWeapon::OnWeaponTakeOff()
 {
-	if (Owner != nullptr)
+	if (AbilitySystemComponent && HitTraceComponent)
 	{
-		if (AbilitySystemComponent && HitTraceComponent && Mesh)
-		{
-			HitTraceComponent->Teardown();
-			HitTraceComponent->UniqueHitDelegate.RemoveAll(this);
-			AbilitySystemComponent = nullptr;
-			HitTraceComponent = nullptr;
-			Mesh = nullptr;
-		}
+		HitTraceComponent->Teardown();
+		HitTraceComponent->UniqueHitDelegate.RemoveAll(this);
+		AbilitySystemComponent = nullptr;
+		HitTraceComponent = nullptr;
 	}
 }
 
