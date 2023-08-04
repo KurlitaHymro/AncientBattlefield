@@ -34,10 +34,6 @@
 			]
 		},
 		{
-			"Name": "CombatCore",
-			"Enabled": true
-		},
-		{
 			"Name": "SwordAndShield",
 			"Enabled": true
 		},
@@ -53,6 +49,10 @@
 		},
 		{
 			"Name": "DatasmithImporter",
+			"Enabled": true
+		},
+		{
+			"Name": "CombatCore",
 			"Enabled": true
 		}
 	]

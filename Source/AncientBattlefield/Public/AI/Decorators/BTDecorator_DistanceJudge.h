@@ -22,6 +22,6 @@ class ANCIENTBATTLEFIELD_API UBTDecorator_DistanceJudge : public UBTDecorator_Bl
 
 protected:
 	virtual bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const override;
-
 	virtual EBlackboardNotificationResult OnBlackboardKeyValueChange(const UBlackboardComponent& Blackboard, FBlackboard::FKey ChangedKeyID) override;
+	virtual FString GetStaticDescription() const override;
 };

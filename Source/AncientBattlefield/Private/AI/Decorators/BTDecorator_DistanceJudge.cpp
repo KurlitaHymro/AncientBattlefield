@@ -60,3 +60,8 @@ EBlackboardNotificationResult UBTDecorator_DistanceJudge::OnBlackboardKeyValueCh
 
 	return EBlackboardNotificationResult::ContinueObserving;
 }
+
+FString UBTDecorator_DistanceJudge::GetStaticDescription() const
+{
+	return FString::Printf(TEXT("%s [%.1f, %.1f]"), *Super::GetStaticDescription(), MinDistance, MaxDistance);
+}
