@@ -46,5 +46,5 @@ UHitTraceComponent* UPropertyFragment_MeleeWeapon::GetHitTraceComponent()
 
 void UPropertyFragment_MeleeWeapon::OnWeaponHit(FHitResult HitResult)
 {
-	AbilitySystemComponent->HandleHitEvent(HitResult.GetActor());
+	AbilitySystemComponent->HandleHitEvent(FGameplayTag::RequestGameplayTag(FName("AncientBattlefield.Event.Hit.MeleeWeapon")), HitResult.GetActor());
 }

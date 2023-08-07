@@ -35,15 +35,8 @@ class ANCIENTBATTLEFIELD_API UGameplayAbility_Anim : public UGameplayAbility
 	GENERATED_UCLASS_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly)
-	TMap<FGameplayTag, TSubclassOf<UGameplayEffect>> HitEffectMap;
-
-public:
 	UFUNCTION(BlueprintCallable, Category = Ability)
 	virtual void ExecuteAnimTask(FAbilityTaskAnimMontageConfig AnimConfig, FGameplayTagContainer EventTags);
-
-	UFUNCTION(BlueprintCallable, Category = Ability)
-	virtual FGameplayAbilityTargetDataHandle AssembleTargetData(const FGameplayEventData& EventData);
 
 protected:
 	UFUNCTION(Category = Ability, BlueprintNativeEvent)

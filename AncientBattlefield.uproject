@@ -13,7 +13,8 @@
 				"ItemInventorySystem",
 				"Engine",
 				"ComponentReceiverActors",
-				"AIModule"
+				"AIModule",
+				"GameplayAbilities"
 			]
 		}
 	],

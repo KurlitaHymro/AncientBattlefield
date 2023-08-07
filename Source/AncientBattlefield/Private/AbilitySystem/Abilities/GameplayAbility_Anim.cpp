@@ -27,17 +27,6 @@ void UGameplayAbility_Anim::ExecuteAnimTask(FAbilityTaskAnimMontageConfig AnimCo
 	MontageTask->Activate();
 }
 
-FGameplayAbilityTargetDataHandle UGameplayAbility_Anim::AssembleTargetData(const FGameplayEventData& EventData)
-{
-	FGameplayAbilityTargetDataHandle TargetData;
-	AActor* Target = Cast<AActor>(EventData.Target);
-	FGameplayAbilityTargetData_ActorArray* HitActorArrayData = new FGameplayAbilityTargetData_ActorArray();
-	HitActorArrayData->TargetActorArray.Add(Target);
-	TargetData.Add(HitActorArrayData);
-
-	return TargetData;
-}
-
 void UGameplayAbility_Anim::OnCancelled_Implementation(FGameplayTag EventTag, FGameplayEventData EventData)
 {
 	MontageTask->EndTask();
@@ -63,14 +52,17 @@ void UGameplayAbility_Anim::OnCompleted_Implementation(FGameplayTag EventTag, FG
 
 void UGameplayAbility_Anim::OnReceiveEvent_Implementation(FGameplayTag EventTag, FGameplayEventData EventData)
 {
-	auto Effect = HitEffectMap.Find(EventTag);
-	auto ASC = GetAbilitySystemComponentFromActorInfo_Ensured();
-	if (Effect && ASC)
-	{
-		auto DamageEffectSpecHandle = MakeOutgoingGameplayEffectSpec(*Effect, GetAbilityLevel());
-		auto DataHandle = AssembleTargetData(EventData);
-		ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, DamageEffectSpecHandle, DataHandle);
-	}
+	//auto ASC = GetAbilitySystemComponentFromActorInfo_Ensured();
+	//if (Effect && ASC)
+	//{
+	//	auto DamageEffectSpecHandle = MakeOutgoingGameplayEffectSpec(*Effect, GetAbilityLevel());
+	//	AActor* Target = Cast<AActor>(EventData.Target);
+	//	FGameplayAbilityTargetData_ActorArray* HitActorArrayData = new FGameplayAbilityTargetData_ActorArray();
+	//	HitActorArrayData->TargetActorArray.Add(Target);
+	//	FGameplayAbilityTargetDataHandle TargetData;
+	//	TargetData.Add(HitActorArrayData);
+	//	ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, DamageEffectSpecHandle, TargetData);
+	//}
 }
 
 void UGameplayAbility_Anim::OnPlayMontageTimeOut_Implementation(FGameplayTag EventTag, FGameplayEventData EventData)

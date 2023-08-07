@@ -16,6 +16,8 @@ class ANCIENTBATTLEFIELD_API UCombatAbilitySystemComponent : public URegisteredA
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void HandleHitEvent(AActor* Target);
+	void HandleHitEvent(FGameplayTag EventTag, AActor* Target);
 
+	UFUNCTION(BlueprintCallable)
+	void HandleDamageDefault(UAbilitySystemComponent* Target);
 };
