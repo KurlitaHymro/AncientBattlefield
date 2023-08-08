@@ -88,10 +88,41 @@ void ACombatCharacter::Die_Implementation()
 		}
 	}
 
+	if (!AnimConfig.DieAnim.IsEmpty())
+	{
+		auto Anim = AnimConfig.DieAnim[FMath::Rand() % AnimConfig.DieAnim.Num()];
+		PlayAnimMontage(Anim);
+	}
+
 	FTimerHandle Handle;
 	GetWorldTimerManager().SetTimer(Handle, this, &ThisClass::OnDestroy, 5.0f, false);
 
 	DetachFromControllerPendingDestroy();
+	bIsActive = false;
+}
+
+void ACombatCharacter::Unstable_Implementation(float StableState)
+{
+	if (!bIsActive)
+	{
+		return;
+	}
+	UAnimMontage* Anim = nullptr;
+	float RootMotionOffset;
+	float FindMagnitude = 0;
+	for (auto UnstableLevel : AnimConfig.UnstableAnim)
+	{
+		if (StableState < FindMagnitude && StableState <= UnstableLevel.MagnitudeThreshold)
+		{
+			FindMagnitude = UnstableLevel.MagnitudeThreshold;
+			Anim = UnstableLevel.Montage;
+			RootMotionOffset = UnstableLevel.AnimRootMotionOffset;
+		}
+	}
+	if (Anim)
+	{
+		PlayAnimMontage(Anim);
+	}
 }
 
 void ACombatCharacter::OnDestroy_Implementation()

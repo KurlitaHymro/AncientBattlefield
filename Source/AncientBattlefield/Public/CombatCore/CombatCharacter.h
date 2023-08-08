@@ -10,6 +10,34 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCharacterBehaviorDelegate);
 
+USTRUCT(BlueprintType)
+struct FUnstableAnimConfig
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float MagnitudeThreshold;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UAnimMontage* Montage;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float AnimRootMotionOffset;
+};
+
+USTRUCT(BlueprintType)
+struct FCombatCharacterAnimConfig
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TArray<UAnimMontage*> DieAnim;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TArray<FUnstableAnimConfig> UnstableAnim;
+};
+
+
 /**
  * Combat Gameplay Core Character
  * 负责各项战斗相关模块（诸如技能系统、装备系统、伤害系统等）之间的功能配合。
@@ -34,8 +62,11 @@ protected:
 	virtual void BeginPlay();
 
 public:
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, Category = "CombatGameplay")
 	bool bIsActive = false;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = AnimSettings)
+	FCombatCharacterAnimConfig AnimConfig;
 
 	UPROPERTY(BlueprintAssignable)
 	FCharacterBehaviorDelegate CombatCharacterDieDelegate;
@@ -61,6 +92,10 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 	void Die();
 	virtual void Die_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent)
+	void Unstable(float StableState);
+	virtual void Unstable_Implementation(float StableState);
 
 protected:
 	UFUNCTION(BlueprintNativeEvent)

@@ -2,7 +2,7 @@
 
 
 #include "AbilitySystem/Attributes/DefenseAttributeSet.h"
-#include "AbilitySystemGlobals.h"
+#include "CombatCore/CombatCharacter.h"
 
 void UDefenseAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue)
 {
@@ -10,14 +10,8 @@ void UDefenseAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribu
 	{
 		if (NewValue < 0)
 		{
-			//auto ASC = CastChecked<UAbilitySystemComponent>(GetOuter());
-			//if (ASC)
-			//{
-			//	FGameplayEventData Payload;
-			//	Payload.EventMagnitude = NewValue;
-			//	ASC->HandleGameplayEvent(FGameplayTag::RequestGameplayTag(FName("Battle.Base.Trigger.UnderAttackDefault")), &Payload);
-			//}
-
+			ACombatCharacter* TargetCharacter = GetTypedOuter<ACombatCharacter>();
+			TargetCharacter->Unstable(NewValue);
 		}
 		StableState.SetCurrentValue(StableState.GetBaseValue());
 	}
