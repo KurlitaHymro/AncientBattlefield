@@ -12,7 +12,7 @@
 ACombatCharacter::ACombatCharacter()
 {
 	// Set size for collision capsule
-	GetCapsuleComponent()->InitCapsuleSize(36.f, 88.0f);
+	GetCapsuleComponent()->InitCapsuleSize(50.f, 88.0f);
 
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;

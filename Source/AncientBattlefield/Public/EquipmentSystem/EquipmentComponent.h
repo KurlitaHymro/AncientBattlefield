@@ -37,6 +37,8 @@ public:
 
 	virtual void RemoveItem(UItemObject* Item) override;
 
+	virtual bool CanMoveTo(UItemObject* Item, int32 SlotID) const override;
+
 public:
 	UFUNCTION(BlueprintCallable)
 	UItemObject* GetEquipment(EEquipmentSlots Slot);

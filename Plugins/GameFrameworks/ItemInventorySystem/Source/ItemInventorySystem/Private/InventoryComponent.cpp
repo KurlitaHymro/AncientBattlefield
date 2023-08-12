@@ -32,6 +32,15 @@ int32 UInventoryComponent::FindVacancy() const
 	return Size;
 }
 
+bool UInventoryComponent::CanMoveTo(UItemObject* Item, int32 SlotID) const
+{
+	if (Item && 0 <= SlotID && SlotID < Size)
+	{
+		return true;
+	}
+	return false;
+}
+
 void UInventoryComponent::AddItem(UItemObject* Item, int32 SlotID)
 {
 	if (Item && 0 <= SlotID && SlotID < Size)
@@ -59,6 +68,24 @@ void UInventoryComponent::RemoveItemFromSlot(int32 SlotID)
 {
 	ItemObjectSlot.RangeCheck(SlotID);
 	RemoveItem(ItemObjectSlot[SlotID]);
+}
+
+UItemObject* UInventoryComponent::SwapItem(int32 SlotID, UItemObject* OtherItem)
+{
+	UItemObject* ThisItem = GetItem(SlotID);
+	if (ThisItem && OtherItem && OtherItem->BelongingInventory)
+	{
+		UInventoryComponent* OtherInventory = OtherItem->BelongingInventory;
+		int32 OtherSlot = OtherItem->BelongingSlotID;
+		if (CanMoveTo(OtherItem, SlotID) && OtherInventory->CanMoveTo(ThisItem, OtherSlot))
+		{
+			this->RemoveItem(ThisItem);
+			OtherInventory->RemoveItem(OtherItem);
+			this->AddItem(OtherItem, SlotID);
+			OtherInventory->AddItem(ThisItem, OtherSlot);
+		}
+	}
+	return ThisItem;
 }
 
 UItemObject* UInventoryComponent::GetItem(int32 SlotID)

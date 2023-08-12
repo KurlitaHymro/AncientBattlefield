@@ -13,7 +13,7 @@ void UEquipmentComponent::Setup(int32 SlotsNumber)
 
 void UEquipmentComponent::AddItem(UItemObject* Item, int32 SlotID)
 {
-	if (Item != nullptr && Item->FindPropertyFragment<UPropertyFragment_Equipment>() != nullptr)
+	if (Item != nullptr && CanMoveTo(Item, SlotID))
 	{
 		Item->FindPropertyFragment<UPropertyFragment_Equipment>()->OnEquipmentPutOn(GetOwner(), (EEquipmentSlots)SlotID); // 实体显现-纯模型化-检测绑定
 		Super::AddItem(Item, SlotID);
@@ -27,6 +27,18 @@ void UEquipmentComponent::RemoveItem(UItemObject* Item)
 		Item->FindPropertyFragment<UPropertyFragment_Equipment>()->OnEquipmentTakeOff(); // 检测解绑-实体销毁
 		Super::RemoveItem(Item);
 	}
+}
+
+bool UEquipmentComponent::CanMoveTo(UItemObject* Item, int32 SlotID) const
+{
+	if (auto Result = Super::CanMoveTo(Item, SlotID))
+	{
+		 if (UPropertyFragment_Equipment* EquipmentInfo = Item->FindPropertyFragment<UPropertyFragment_Equipment>())
+		 {
+			 return EquipmentInfo->PropertyFragment.EquipmentSlots.Contains((EEquipmentSlots)SlotID);
+		 }
+	}
+	return false;
 }
 
 UItemObject* UEquipmentComponent::GetEquipment(EEquipmentSlots Slot)

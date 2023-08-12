@@ -29,6 +29,9 @@ public:
 	virtual int32 FindVacancy() const;
 
 	UFUNCTION(BlueprintCallable)
+	virtual bool CanMoveTo(UItemObject* Item, int32 SlotID) const;
+
+	UFUNCTION(BlueprintCallable)
 	virtual void AddItem(UItemObject* Item, int32 SlotID);
 
 	UFUNCTION(BlueprintCallable)
@@ -36,6 +39,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void RemoveItemFromSlot(int32 SlotID);
+
+	UFUNCTION(BlueprintCallable)
+	virtual UItemObject* SwapItem(int32 SlotID, UItemObject* OtherItem);
 
 	UFUNCTION(BlueprintCallable)
 	virtual UItemObject* GetItem(int32 SlotID);
