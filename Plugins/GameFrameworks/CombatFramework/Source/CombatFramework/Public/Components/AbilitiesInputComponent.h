@@ -6,6 +6,9 @@
 #include "PawnInputComponent.h"
 #include "AbilitiesInputComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilitiesInputPressedDelegate, class UInputAction*, Action);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilitiesInputReleasedDelegate, class UInputAction*, Action);
+
 USTRUCT()
 struct FAbilityInputBinding
 {
@@ -13,7 +16,7 @@ struct FAbilityInputBinding
 
 	uint32 OnPressedHandle = 0;
 	uint32 OnReleasedHandle = 0;
-	TArray<int32> AbilitesStack;
+	int32 AbilityID;
 };
 
 /**
@@ -33,6 +36,16 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
 	void TeardownActionBinding(UInputAction* InputAction);
+
+	UFUNCTION(BlueprintCallable, Category = "Abilities")
+	int32 FindMappedAbilitiy(UInputAction* InputAction);
+
+public:
+	UPROPERTY(BlueprintAssignable)
+	FAbilitiesInputPressedDelegate PressedDelegate;
+
+	UPROPERTY(BlueprintAssignable)
+	FAbilitiesInputReleasedDelegate ReleasedDelegate;
 
 protected:
 	/** Native/BP Event to set up player controls */

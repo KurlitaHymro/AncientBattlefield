@@ -17,30 +17,30 @@ void UAbilitiesInputComponent::SetupBinding(UInputAction* InputAction, int32 Abi
 	FAbilityInputBinding* AbilityInputBinding = MappedAbilities.Find(InputAction);
 	if (AbilityInputBinding)
 	{
-		ASC->DisableAbility(AbilityInputBinding->AbilitesStack.Top());
+		ASC->DisableAbility(AbilityInputBinding->AbilityID);
 	}
 	else
 	{
 		AbilityInputBinding = &MappedAbilities.Add(InputAction);
-	}
 
-	AbilityInputBinding->AbilitesStack.Push(AbilityID);
-
-	// Bind to InputAction
-	if (InputComponent)
-	{
-		// Pressed event
-		if (AbilityInputBinding->OnPressedHandle == 0)
+		// Bind to InputAction
+		if (InputComponent)
 		{
-			AbilityInputBinding->OnPressedHandle = InputComponent->BindAction(InputAction, ETriggerEvent::Started, this, &ThisClass::OnAbilityInputPressed, InputAction).GetHandle();
-		}
+			// Pressed event
+			if (AbilityInputBinding->OnPressedHandle == 0)
+			{
+				AbilityInputBinding->OnPressedHandle = InputComponent->BindAction(InputAction, ETriggerEvent::Started, this, &ThisClass::OnAbilityInputPressed, InputAction).GetHandle();
+			}
 
-		// Released event
-		if (AbilityInputBinding->OnReleasedHandle == 0)
-		{
-			AbilityInputBinding->OnReleasedHandle = InputComponent->BindAction(InputAction, ETriggerEvent::Completed, this, &ThisClass::OnAbilityInputReleased, InputAction).GetHandle();
+			// Released event
+			if (AbilityInputBinding->OnReleasedHandle == 0)
+			{
+				AbilityInputBinding->OnReleasedHandle = InputComponent->BindAction(InputAction, ETriggerEvent::Completed, this, &ThisClass::OnAbilityInputReleased, InputAction).GetHandle();
+			}
 		}
 	}
+	ASC->EnableAbility(AbilityID);
+	AbilityInputBinding->AbilityID = AbilityID;
 }
 
 void UAbilitiesInputComponent::TeardownAbilityBinding(int32 AbilityID)
@@ -51,7 +51,7 @@ void UAbilitiesInputComponent::TeardownAbilityBinding(int32 AbilityID)
 	auto MappedIterator = MappedAbilities.CreateIterator();
 	while (MappedIterator)
 	{
-		if (MappedIterator.Value().AbilitesStack.Top() == AbilityID)
+		if (MappedIterator.Value().AbilityID == AbilityID)
 		{
 			break;
 		}
@@ -63,17 +63,7 @@ void UAbilitiesInputComponent::TeardownAbilityBinding(int32 AbilityID)
 	{
 		FAbilityInputBinding& AbilityInputBinding = MappedIterator.Value();
 
-		if (AbilityInputBinding.AbilitesStack.Remove(AbilityID) > 0)
-		{
-			if (AbilityInputBinding.AbilitesStack.Num() > 0)
-			{
-				ASC->EnableAbility(AbilityID);
-			}
-			else
-			{
-				TeardownActionBinding(MappedIterator.Key());
-			}
-		}
+		ASC->DisableAbility(AbilityInputBinding.AbilityID);
 	}
 }
 
@@ -88,14 +78,19 @@ void UAbilitiesInputComponent::TeardownActionBinding(UInputAction* InputAction)
 			InputComponent->RemoveBindingByHandle(Binding->OnPressedHandle);
 			InputComponent->RemoveBindingByHandle(Binding->OnReleasedHandle);
 		}
-
-		for (auto AbilityID : Binding->AbilitesStack)
-		{
-			ASC->DisableAbility(AbilityID);
-		}
-
+		ASC->DisableAbility(Binding->AbilityID);
 		MappedAbilities.Remove(InputAction);
 	}
+}
+
+int32 UAbilitiesInputComponent::FindMappedAbilitiy(UInputAction* InputAction)
+{
+	auto Binding = MappedAbilities.Find(InputAction);
+	if (Binding)
+	{
+		return Binding->AbilityID;
+	}
+	return 0;
 }
 
 void UAbilitiesInputComponent::SetupPlayerControls_Implementation(UEnhancedInputComponent* PlayerInputComponent)
@@ -131,10 +126,7 @@ void UAbilitiesInputComponent::EnableBindings()
 	{
 		for (auto& InputBinding : MappedAbilities)
 		{
-			for (auto AbilityID : InputBinding.Value.AbilitesStack)
-			{
-				ASC->EnableAbility(AbilityID);
-			}
+			ASC->EnableAbility(InputBinding.Value.AbilityID);
 		}
 	}
 }
@@ -151,10 +143,7 @@ void UAbilitiesInputComponent::DisableBindings()
 
 		if (ASC)
 		{
-			for (auto AbilityID : InputBinding.Value.AbilitesStack)
-			{
-				ASC->DisableAbility(AbilityID);
-			}
+			ASC->DisableAbility(InputBinding.Value.AbilityID);
 		}
 	}
 
@@ -166,9 +155,10 @@ void UAbilitiesInputComponent::OnAbilityInputPressed(UInputAction* InputAction)
 	if (ASC)
 	{
 		FAbilityInputBinding* FoundBinding = MappedAbilities.Find(InputAction);
-		if (FoundBinding)
+		if (FoundBinding && FoundBinding->AbilityID)
 		{
-			ASC->AbilityLocalInputPressed(FoundBinding->AbilitesStack.Top());
+			ASC->AbilityLocalInputPressed(FoundBinding->AbilityID);
+			PressedDelegate.Broadcast(InputAction);
 		}
 	}
 }
@@ -178,9 +168,10 @@ void UAbilitiesInputComponent::OnAbilityInputReleased(UInputAction* InputAction)
 	if (ASC)
 	{
 		FAbilityInputBinding* FoundBinding = MappedAbilities.Find(InputAction);
-		if (FoundBinding)
+		if (FoundBinding && FoundBinding->AbilityID)
 		{
-			ASC->AbilityLocalInputReleased(FoundBinding->AbilitesStack.Top());
+			ASC->AbilityLocalInputReleased(FoundBinding->AbilityID);
+			ReleasedDelegate.Broadcast(InputAction);
 		}
 	}
 }
