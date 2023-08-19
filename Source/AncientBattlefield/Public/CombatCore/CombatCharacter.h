@@ -65,6 +65,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "CombatGameplay")
 	bool bIsActive = false;
 
+	UPROPERTY(BlueprintReadWrite, Category = "CombatGameplay")
+	FName DefaultBodyForm;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = AnimSettings)
 	FCombatCharacterAnimConfig AnimConfig;
 
@@ -80,7 +83,10 @@ public:
 
 protected:
 	UPROPERTY(BlueprintReadOnly)
-	class UAbilitySystemComponent* CombatAbilityComponent;
+	class UCombatAbilitySystemComponent* CombatAbilityComponent;
+
+	UPROPERTY(BlueprintReadOnly)
+	class UAbilitiesInputComponent* AbilitiesInputComponent;
 
 	UPROPERTY(BlueprintReadOnly)
 	class UInventoryComponent* InventoryComponent;

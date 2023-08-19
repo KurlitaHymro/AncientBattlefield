@@ -13,7 +13,7 @@ UCombatAbilitySystemComponent::UCombatAbilitySystemComponent()
 {
 	DamageDefault.AddTag(FGameplayTag::RequestGameplayTag(FName("AncientBattlefield.Event.Hit.MeleeWeapon")));
 
-	AdvanceInput.AdvanceInputTag = FGameplayTag::RequestGameplayTag(FName("AncientBattlefield.Status.WaitInput"));
+	AdvanceInput.AdvanceInputTag = FGameplayTag::RequestGameplayTag(FName("AncientBattlefield.Status.BodyForm"));
 	AdvanceInput.AbilityID = 0;
 	AdvanceInput.bIsPressed = false;
 }

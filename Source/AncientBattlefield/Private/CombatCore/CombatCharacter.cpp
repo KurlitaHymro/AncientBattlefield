@@ -4,6 +4,7 @@
 #include "CombatCore/CombatCharacter.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
+#include "Components/AbilitiesInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "AbilitySystem/CombatAbilitySystemComponent.h"
 #include "InventoryComponent.h"
@@ -35,6 +36,8 @@ ACombatCharacter::ACombatCharacter()
 	CombatAbilityComponent = CreateDefaultSubobject<UCombatAbilitySystemComponent>(TEXT("CombatAbilitySystemComponent"));
 	CombatAbilityComponent->SetIsReplicated(true);
 
+	AbilitiesInputComponent = CreateDefaultSubobject<UAbilitiesInputComponent>(TEXT("AbilitiesInputComponent"));
+
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory"));
 
 	EquipmentComponent = CreateDefaultSubobject<UEquipmentComponent>(TEXT("Equipment"));
@@ -57,6 +60,7 @@ void ACombatCharacter::BeginPlay()
 	if (CombatAbilityComponent && InventoryComponent && EquipmentComponent)
 	{
 		bIsActive = true;
+		CombatAbilityComponent->SwitchBodyForm(DefaultBodyForm);
 	}
 }
 
