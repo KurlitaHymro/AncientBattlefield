@@ -60,7 +60,7 @@ void ACombatCharacter::BeginPlay()
 	if (CombatAbilityComponent && InventoryComponent && EquipmentComponent)
 	{
 		bIsActive = true;
-		CombatAbilityComponent->SwitchBodyForm(DefaultBodyForm);
+		CombatAbilityComponent->SwitchBodyForm(CombatAbilityComponent->DefaultBodyForm);
 	}
 }
 

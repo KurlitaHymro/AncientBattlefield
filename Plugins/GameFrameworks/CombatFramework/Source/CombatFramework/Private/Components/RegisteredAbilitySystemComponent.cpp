@@ -70,3 +70,13 @@ int32 URegisteredAbilitySystemComponent::FindAbilityByType(TSoftClassPtr<UGamepl
 	}
 	return RegisteredAbilitySystemComponent_Impl::InvalidID;
 }
+
+TSoftClassPtr<UGameplayAbility> URegisteredAbilitySystemComponent::GetAbilityType(int32 AbilityID)
+{
+	FBattleAbilityEntry* Ability = MappedAbilities.Find(AbilityID);
+	if (Ability)
+	{
+		return Ability->AbilityType;
+	}
+	return nullptr;
+}

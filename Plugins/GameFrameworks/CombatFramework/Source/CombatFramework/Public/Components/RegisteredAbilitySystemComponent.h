@@ -46,6 +46,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
 	int32 FindAbilityByType(TSoftClassPtr<UGameplayAbility> AbilityType);
 
+	UFUNCTION(BlueprintCallable, Category = "Abilities")
+	TSoftClassPtr<UGameplayAbility> GetAbilityType(int32 AbilityID);
+
 private:
 	UPROPERTY(transient)
 	TMap<int32, FBattleAbilityEntry> MappedAbilities;
