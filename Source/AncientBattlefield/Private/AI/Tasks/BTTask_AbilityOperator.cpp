@@ -3,7 +3,8 @@
 
 #include "AI/Tasks/BTTask_AbilityOperator.h"
 #include "CombatCore/CombatCharacter.h"
-#include "AbilitySystem/CombatAbilitySystemComponent.h"
+#include "Components/AbilitiesInputComponent.h"
+#include "InputAction.h"
 #include "AIController.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(BTTask_AbilityOperator)
@@ -15,8 +16,8 @@ UBTTask_AbilityOperator::UBTTask_AbilityOperator(const FObjectInitializer& Objec
 	bCreateNodeInstance = true;
 	DuringTime = 0.5f;
 	bTickIntervals = true;
-	FGameplayAbilitySpec AbilitySpec(AbilityType.LoadSynchronous());
 	TimerDelegate = FTimerDelegate::CreateUObject(this, &ThisClass::OnAbilityTimerDone);
+	InputAction = Action.LoadSynchronous();
 	INIT_TASK_NODE_NOTIFY_FLAGS();
 }
 
@@ -24,20 +25,20 @@ EBTNodeResult::Type UBTTask_AbilityOperator::ExecuteTask(UBehaviorTreeComponent&
 {
 	AAIController* const MyController = OwnerComp.GetAIOwner();
 	MyOwnerComp = &OwnerComp;
-	if (AbilityType && MyController && MyController->GetPawn())
+	if (Action && !InputAction)
+	{
+		InputAction = Action.LoadSynchronous();
+	}
+	if (Action && MyController && MyController->GetPawn())
 	{
 		ACombatCharacter* const MyCharacter = Cast<ACombatCharacter>(MyController->GetPawn());
-		ASC = Cast<UCombatAbilitySystemComponent>(MyCharacter->GetAbilitySystemComponent());
-		if (ASC)
+		AIC = MyCharacter->GetAbilitiesInputComponent();
+		if (AIC && InputAction)
 		{
+			AIC->TryPress(InputAction);
 			TimerHandle.Invalidate();
-			AbilityID = ASC->FindAbilityByType(AbilityType);
-			if (AbilityID != 0)
-			{
-				ASC->AbilityLocalInputPressed(AbilityID);
-				MyController->GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, DuringTime, false);
-				return EBTNodeResult::InProgress;
-			}
+			MyController->GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, DuringTime, false);
+			return EBTNodeResult::InProgress;
 		}
 	}
 	return EBTNodeResult::Failed;
@@ -52,9 +53,9 @@ EBTNodeResult::Type UBTTask_AbilityOperator::AbortTask(UBehaviorTreeComponent& O
 	}
 	TimerHandle.Invalidate();
 
-	if (ASC && AbilityID > 0)
+	if (AIC && InputAction)
 	{
-		ASC->AbilityLocalInputReleased(AbilityID);
+		AIC->TryReleased(InputAction);
 	}
 
 	return EBTNodeResult::Aborted;
@@ -73,7 +74,7 @@ void UBTTask_AbilityOperator::DescribeRuntimeValues(const UBehaviorTreeComponent
 
 FString UBTTask_AbilityOperator::GetStaticDescription() const
 {
-	return FString::Printf(TEXT("%s[%s]: %.1fs"), *Super::GetStaticDescription(), *AbilityType.GetAssetName(), DuringTime);
+	return FString::Printf(TEXT("%s[%s]: %.1fs"), *Super::GetStaticDescription(), *Action.GetAssetName(), DuringTime);
 }
 
 #if WITH_EDITOR
@@ -85,9 +86,9 @@ FName UBTTask_AbilityOperator::GetNodeIconName() const
 
 void UBTTask_AbilityOperator::OnAbilityTimerDone()
 {
-	if (ASC && AbilityID > 0)
+	if (AIC && InputAction)
 	{
-		ASC->AbilityLocalInputReleased(AbilityID);
+		AIC->TryReleased(InputAction);
 		FinishLatentTask(*MyOwnerComp, EBTNodeResult::Succeeded);
 	}
 }

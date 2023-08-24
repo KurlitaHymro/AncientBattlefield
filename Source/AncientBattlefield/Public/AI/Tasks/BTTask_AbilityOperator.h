@@ -20,7 +20,7 @@ class ANCIENTBATTLEFIELD_API UBTTask_AbilityOperator : public UBTTaskNode
 	GENERATED_UCLASS_BODY()
 	
 	UPROPERTY(Category = "Ability", EditAnywhere)
-	TSoftClassPtr<class UGameplayAbility> AbilityType;
+	TSoftObjectPtr<class UInputAction> Action;
 
 	/** wait time in seconds */
 	UPROPERTY(Category = "Ability", EditAnywhere, meta = (ClampMin = "0.0", UIMin = "0.0"))
@@ -44,6 +44,6 @@ private:
 
 	FTimerDelegate TimerDelegate;
 	FTimerHandle TimerHandle;
-	TObjectPtr<class UCombatAbilitySystemComponent> ASC;
-	int32 AbilityID;
+	TObjectPtr<class UAbilitiesInputComponent> AIC;
+	TObjectPtr<class UInputAction> InputAction;
 };

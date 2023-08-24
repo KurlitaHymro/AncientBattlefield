@@ -78,6 +78,7 @@ public:
 
 	virtual class UEquipmentComponent* GetEquipmentSystemComponent() const;
 
+	virtual class UAbilitiesInputComponent* GetAbilitiesInputComponent() const;
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	class UCombatAbilitySystemComponent* CombatAbilityComponent;

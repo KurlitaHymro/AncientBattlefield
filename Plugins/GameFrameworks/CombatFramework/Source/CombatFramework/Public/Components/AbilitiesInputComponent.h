@@ -40,6 +40,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
 	int32 FindMappedAbilitiy(UInputAction* InputAction);
 
+	UFUNCTION(BlueprintCallable, Category = "Abilities")
+	void TryPress(UInputAction* InputAction);
+
+	UFUNCTION(BlueprintCallable, Category = "Abilities")
+	void TryReleased(UInputAction* InputAction);
+
 public:
 	UPROPERTY(BlueprintAssignable)
 	FAbilitiesInputPressedDelegate PressedDelegate;
@@ -66,4 +72,7 @@ private:
 
 	UPROPERTY(transient)
 	TMap<UInputAction*, FAbilityInputBinding> MappedAbilities;
+
+	UPROPERTY(transient)
+	TMap<UInputAction*, bool> ActionStatus;
 };

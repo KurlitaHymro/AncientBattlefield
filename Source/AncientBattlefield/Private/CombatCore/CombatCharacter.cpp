@@ -79,6 +79,11 @@ UEquipmentComponent* ACombatCharacter::GetEquipmentSystemComponent() const
 	return EquipmentComponent;
 }
 
+UAbilitiesInputComponent* ACombatCharacter::GetAbilitiesInputComponent() const
+{
+	return AbilitiesInputComponent;
+}
+
 void ACombatCharacter::Die_Implementation()
 {
 	CombatCharacterDieDelegate.Broadcast();

@@ -93,6 +93,47 @@ int32 UAbilitiesInputComponent::FindMappedAbilitiy(UInputAction* InputAction)
 	return 0;
 }
 
+void UAbilitiesInputComponent::TryPress(UInputAction* InputAction)
+{
+	bool* Status = ActionStatus.Find(InputAction);
+	if (!Status)
+	{
+		Status = &ActionStatus.Add(InputAction);
+	}
+
+	if (!(*Status))
+	{
+		*Status = true;
+		if (ASC)
+		{
+			FAbilityInputBinding* FoundBinding = MappedAbilities.Find(InputAction);
+			if (FoundBinding && FoundBinding->AbilityID)
+			{
+				ASC->AbilityLocalInputPressed(FoundBinding->AbilityID);
+				PressedDelegate.Broadcast(InputAction);
+			}
+		}
+	}
+}
+
+void UAbilitiesInputComponent::TryReleased(UInputAction* InputAction)
+{
+	bool* Status = ActionStatus.Find(InputAction);
+	if (Status && *Status)
+	{
+		*Status = false;
+		if (ASC)
+		{
+			FAbilityInputBinding* FoundBinding = MappedAbilities.Find(InputAction);
+			if (FoundBinding && FoundBinding->AbilityID)
+			{
+				ASC->AbilityLocalInputReleased(FoundBinding->AbilityID);
+				ReleasedDelegate.Broadcast(InputAction);
+			}
+		}
+	}
+}
+
 void UAbilitiesInputComponent::SetupPlayerControls_Implementation(UEnhancedInputComponent* PlayerInputComponent)
 {
 	DisableBindings();
@@ -152,26 +193,10 @@ void UAbilitiesInputComponent::DisableBindings()
 
 void UAbilitiesInputComponent::OnAbilityInputPressed(UInputAction* InputAction)
 {
-	if (ASC)
-	{
-		FAbilityInputBinding* FoundBinding = MappedAbilities.Find(InputAction);
-		if (FoundBinding && FoundBinding->AbilityID)
-		{
-			ASC->AbilityLocalInputPressed(FoundBinding->AbilityID);
-			PressedDelegate.Broadcast(InputAction);
-		}
-	}
+	TryPress(InputAction);
 }
 
 void UAbilitiesInputComponent::OnAbilityInputReleased(UInputAction* InputAction)
 {
-	if (ASC)
-	{
-		FAbilityInputBinding* FoundBinding = MappedAbilities.Find(InputAction);
-		if (FoundBinding && FoundBinding->AbilityID)
-		{
-			ASC->AbilityLocalInputReleased(FoundBinding->AbilityID);
-			ReleasedDelegate.Broadcast(InputAction);
-		}
-	}
+	TryReleased(InputAction);
 }
