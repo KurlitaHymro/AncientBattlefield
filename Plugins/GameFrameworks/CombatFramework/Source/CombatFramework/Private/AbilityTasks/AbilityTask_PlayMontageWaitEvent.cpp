@@ -87,6 +87,7 @@ void UAbilityTask_PlayMontageWaitEvent::Activate()
 					Character->SetAnimRootMotionTranslationScale(AnimRootMotionTranslationScale);
 				}
 
+				//UE_LOG(LogCombatFramework, Warning, TEXT("UAbilityTask_PlayMontageAndWait task activate at %d'%d''"), FDateTime::Now().GetSecond(), FDateTime::Now().GetMillisecond());
 				bPlayedMontage = true;
 			}
 		}
@@ -228,7 +229,6 @@ void UAbilityTask_PlayMontageWaitEvent::OnGameplayEvent(FGameplayTag EventTag, c
 
 void UAbilityTask_PlayMontageWaitEvent::OnMontageTimeOut()
 {
-	UE_LOG(LogCombatFramework, Warning, TEXT("UAbilityTask_PlayMontageAndWait task time out at %s"), *FDateTime::Now().ToString());
 	if (ShouldBroadcastAbilityTaskDelegates())
 	{
 		OnTimeOut.Broadcast(FGameplayTag(), FGameplayEventData());

@@ -13,6 +13,19 @@ UGameplayAbility_Anim::UGameplayAbility_Anim(const FObjectInitializer& ObjectIni
 	AppliedEffects.Empty();
 }
 
+bool UGameplayAbility_Anim::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, OUT FGameplayTagContainer* OptionalRelevantTags) const
+{
+	if (Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags))
+	{
+		UAnimInstance* AnimInstance = ActorInfo->GetAnimInstance();
+		if (MontageToPlay != nullptr && AnimInstance != nullptr && AnimInstance->GetActiveMontageInstance() == nullptr)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 void UGameplayAbility_Anim::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
@@ -45,6 +58,7 @@ void UGameplayAbility_Anim::ActivateAbility(const FGameplayAbilitySpecHandle Han
 			}
 		}
 
+
 		MontageTask = UAbilityTask_PlayMontageWaitEvent::CreatePlayMontageWaitEventProxy(this, NAME_None, EventTagFilter, true, MontageToPlay, PlayRate, SectionName, AnimRootMotionTranslationScale, StartTimeSeconds);
 		MontageTask->OnCancelled.AddDynamic(this, &ThisClass::OnCancelled);
 		MontageTask->OnInterrupted.AddDynamic(this, &ThisClass::OnInterrupted);
@@ -53,7 +67,11 @@ void UGameplayAbility_Anim::ActivateAbility(const FGameplayAbilitySpecHandle Han
 		MontageTask->OnReceiveEvent.AddDynamic(this, &ThisClass::OnReceiveEvent);
 		MontageTask->OnTimeOut.AddDynamic(this, &ThisClass::OnPlayMontageTimeOut);
 
-		MontageTask->Activate();
+		MontageTask->ReadyForActivation();
+	}
+	else
+	{
+		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 	}
 }
 
