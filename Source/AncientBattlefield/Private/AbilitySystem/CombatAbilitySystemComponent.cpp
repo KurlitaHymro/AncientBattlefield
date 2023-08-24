@@ -11,11 +11,13 @@
 
 UCombatAbilitySystemComponent::UCombatAbilitySystemComponent()
 {
+	DamageDefault.Reset();
 	DamageDefault.AddTag(FGameplayTag::RequestGameplayTag(FName("AncientBattlefield.Event.Hit.MeleeWeapon")));
 
-	AdvanceInput.AdvanceInputTag = FGameplayTag::RequestGameplayTag(FName("AncientBattlefield.Status.WaitInput"));
+	AdvanceInput.AdvanceInputTag = FGameplayTag::RequestGameplayTag(FName("AncientBattlefield.Status.BodyForm"));
 	AdvanceInput.AbilityID = 0;
 	AdvanceInput.bIsPressed = false;
+	AdvanceInput.BodyFormDeriveAbilities.Empty();
 }
 
 void UCombatAbilitySystemComponent::HandleHitEvent(FGameplayTag EventTag, AActor* Target)
@@ -45,6 +47,7 @@ void UCombatAbilitySystemComponent::SwitchBodyForm(FName NewBodyForm)
 		auto NewAbilities = Registry->GetCachedItem<FBodyFormAbilities>(FDataRegistryId(RegistryTypeName, NewBodyForm));
 		if (NewAbilities)
 		{
+			AdvanceInput.BodyFormDeriveAbilities.Empty();
 			for (auto DeriveAbility : NewAbilities->DeriveAbilities)
 			{
 				auto AbilityID = FindAbilityByType(DeriveAbility.Value.ClassType);
@@ -54,19 +57,10 @@ void UCombatAbilitySystemComponent::SwitchBodyForm(FName NewBodyForm)
 				}
 				AIC->SetupBinding(DeriveAbility.Key.LoadSynchronous(), AbilityID);
 				SwitchBodyFormDelegate.Broadcast(DeriveAbility.Key, DeriveAbility.Value);
+				AdvanceInput.BodyFormDeriveAbilities.AddUnique(DeriveAbility.Value.ClassType);
 			}
 		}
 	}
-}
-
-bool UCombatAbilitySystemComponent::IsWaitingAdvanceInput()
-{
-	return HasMatchingGameplayTag(AdvanceInput.AdvanceInputTag);
-}
-
-bool UCombatAbilitySystemComponent::IsAdvanceInputValid()
-{
-	return AdvanceInput.AbilityID != 0;
 }
 
 void UCombatAbilitySystemComponent::CommitAdvanceInput(int32 AbilityID, bool bPress)
@@ -88,6 +82,16 @@ void UCombatAbilitySystemComponent::CommitAdvanceInput(int32 AbilityID, bool bPr
 	}
 }
 
+void UCombatAbilitySystemComponent::ResetAdvanceInput()
+{
+	FGameplayTagContainer Container;
+	Container.AddTag(AdvanceInput.AdvanceInputTag);
+	RemoveActiveEffectsWithTags(Container);
+	AdvanceInput.AbilityID = 0;
+	AdvanceInput.BodyFormDeriveAbilities.Empty();
+	SwitchBodyForm(DefaultBodyForm);
+}
+
 void UCombatAbilitySystemComponent::TriggerAdvanceInput()
 {
 	FGameplayTagContainer Container;
@@ -95,13 +99,21 @@ void UCombatAbilitySystemComponent::TriggerAdvanceInput()
 	RemoveActiveEffectsWithTags(Container);
 	if (AdvanceInput.AbilityID)
 	{
+		// 体态下的任何技能输入均推迟到当前技能结束后执行。
 		AbilityLocalInputPressed(AdvanceInput.AbilityID);
 		if (!AdvanceInput.bIsPressed)
 		{
 			AbilityLocalInputReleased(AdvanceInput.AbilityID);
 		}
+
+		// 如果不是本体态附加的技能则认为派生失败，返回初始体态。
+		if (!AdvanceInput.BodyFormDeriveAbilities.Contains(GetAbilityType(AdvanceInput.AbilityID)))
+		{
+			SwitchBodyForm(DefaultBodyForm);
+		}
 	}
 	AdvanceInput.AbilityID = 0;
+	AdvanceInput.BodyFormDeriveAbilities.Empty();
 }
 
 void UCombatAbilitySystemComponent::AbilityLocalInputPressed(int32 InputID)

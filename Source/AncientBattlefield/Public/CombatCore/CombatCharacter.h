@@ -65,9 +65,6 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "CombatGameplay")
 	bool bIsActive = false;
 
-	UPROPERTY(BlueprintReadWrite, Category = "CombatGameplay")
-	FName DefaultBodyForm;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = AnimSettings)
 	FCombatCharacterAnimConfig AnimConfig;
 

@@ -36,14 +36,17 @@ struct FAdvanceInput
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY()
 	FGameplayTag AdvanceInputTag;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY()
 	int32 AbilityID;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY()
 	bool bIsPressed;
+
+	UPROPERTY()
+	TArray<TSoftClassPtr<UGameplayAbility>> BodyFormDeriveAbilities;
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FSwitchBodyFormDelegate, TSoftObjectPtr<class UInputAction>, InputAction, FAbilityInfo, AbilityInfo);
@@ -59,11 +62,14 @@ class ANCIENTBATTLEFIELD_API UCombatAbilitySystemComponent : public URegisteredA
 public:
 	UCombatAbilitySystemComponent();
 
-	UPROPERTY(EditDefaultsOnly, Category = "Dagame")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Dagame")
 	FGameplayTagContainer DamageDefault;
 
 	UPROPERTY(BlueprintAssignable)
 	FSwitchBodyFormDelegate SwitchBodyFormDelegate;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "BodyForm")
+	FName DefaultBodyForm;
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -73,13 +79,16 @@ public:
 	void SwitchBodyForm(FName NewBodyForm);
 
 	UFUNCTION(BlueprintCallable)
-	bool IsWaitingAdvanceInput();
+	FORCEINLINE bool IsWaitingAdvanceInput() { return HasMatchingGameplayTag(AdvanceInput.AdvanceInputTag); }
 
 	UFUNCTION(BlueprintCallable)
-	bool IsAdvanceInputValid();
+	FORCEINLINE bool IsAdvanceInputValid() { return AdvanceInput.AbilityID != 0; }
 
 	UFUNCTION(BlueprintCallable)
 	void CommitAdvanceInput(int32 AbilityID, bool bPress);
+
+	UFUNCTION(BlueprintCallable)
+	void ResetAdvanceInput();
 
 	UFUNCTION(BlueprintCallable)
 	void TriggerAdvanceInput();
