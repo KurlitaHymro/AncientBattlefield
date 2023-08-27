@@ -26,6 +26,22 @@ struct FAbilityTaskAnimMontageConfig
 	UPROPERTY(BlueprintReadWrite)
 	float StartTimeSeconds = 0.f;
 };
+
+USTRUCT(BlueprintType)
+struct FAbilityEffectCalculationConfig
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSubclassOf<UGameplayEffect> EffectClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TMap<FGameplayTag, float> MagnitudeSeter;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	int32 Stack;
+};
+
 /**
  * 
  */
@@ -41,36 +57,36 @@ public:
 
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 
-	UPROPERTY(EditDefaultsOnly, Category = AnimAbility)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = AnimAbility)
 	TObjectPtr<UAnimMontage> MontageToPlay;
 
-	UPROPERTY(EditDefaultsOnly, Category = AnimAbility)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = AnimAbility)
 	float PlayRate = 1.f;
 
-	UPROPERTY(EditDefaultsOnly, Category = AnimAbility)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = AnimAbility)
 	FName SectionName;
 
-	UPROPERTY(EditDefaultsOnly, Category = AnimAbility)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = AnimAbility)
 	float AnimRootMotionTranslationScale = 1.f;
 
-	UPROPERTY(EditDefaultsOnly, Category = AnimAbility)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = AnimAbility)
 	float StartTimeSeconds;
 
-	UPROPERTY(EditDefaultsOnly, Category = AnimAbility)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = AnimAbility)
 	FGameplayTagContainer EventTagFilter;
 
-	UPROPERTY(EditDefaultsOnly, Category = AnimAbility)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = AnimAbility)
 	FName IdleBodyForm;
 
-	UPROPERTY(EditDefaultsOnly, Category = AnimAbility)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = AnimAbility)
 	FName NextBodyForm;
 
 	/** GameplayEffects to apply and then remove while the animation is playing */
-	UPROPERTY(EditDefaultsOnly, Category = MontageAbility)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = MontageAbility)
 	TArray<TSubclassOf<UGameplayEffect>> GameplayEffectClassesWhileAnimating;
 
-	UPROPERTY(EditDefaultsOnly, Category = MontageAbility)
-	TMap<FGameplayTag, TSubclassOf<UGameplayEffect>> GameplayEffectClassesOnEvent;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = MontageAbility)
+	TMap<FGameplayTag, FAbilityEffectCalculationConfig> GameplayEffectClassesOnEvent;
 
 protected:
 	UFUNCTION(Category = Ability, BlueprintNativeEvent)

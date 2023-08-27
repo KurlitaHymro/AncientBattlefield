@@ -4,33 +4,30 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotifyState.h"
-#include "GameplayEffect.h"
-#include "AnimNotifyState_SelfEffectBase.generated.h"
+#include "GameplayTagAssetInterface.h"
+#include "Abilities/GameplayAbilityTypes.h"
+#include "AnimNotifyState_SendGameplayEvent.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class COMBATFRAMEWORK_API UAnimNotifyState_SelfEffectBase : public UAnimNotifyState
+class ANCIENTBATTLEFIELD_API UAnimNotifyState_SendGameplayEvent : public UAnimNotifyState
 {
 	GENERATED_BODY()
-	
-public:
-	UPROPERTY(EditAnywhere, Category = "Ability")
-	TSubclassOf<UGameplayEffect> SelfEffect;
 
-	UPROPERTY(EditAnywhere, Category = "Ability")
-	TMap<FGameplayTag, float> MagnitudeSeter;
+public:
+	UAnimNotifyState_SendGameplayEvent();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AnimNotify", meta = (ExposeOnSpawn = true))
+	FGameplayEventData BeginPayload;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AnimNotify", meta = (ExposeOnSpawn = true))
+	FGameplayEventData EndPayload;
 
 protected:
 	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference) override;
 
 	virtual void NotifyEnd(class USkeletalMeshComponent* MeshComp, class UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;
 
-	virtual FGameplayEffectSpecHandle MakeSelfEffectSpec();
-
-protected:
-	UAbilitySystemComponent* AbilitySystemComponent;
-
-	FActiveGameplayEffectHandle Handle;
 };

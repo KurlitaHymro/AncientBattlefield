@@ -125,21 +125,21 @@ void UGameplayAbility_Anim::OnCompleted_Implementation(FGameplayTag EventTag, FG
 void UGameplayAbility_Anim::OnReceiveEvent_Implementation(FGameplayTag EventTag, FGameplayEventData EventData)
 {
 	auto CombatAbilitySystemComponent = Cast<UCombatAbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo_Ensured());
-	TSubclassOf<UGameplayEffect>* EffectClass = GameplayEffectClassesOnEvent.Find(EventTag);
-	if (EffectClass && *EffectClass)
+	auto EffectConfig = GameplayEffectClassesOnEvent.Find(EventTag);
+	if (EffectConfig && EffectConfig->EffectClass)
 	{
-		const UGameplayEffect* Effect = (*EffectClass)->GetDefaultObject<UGameplayEffect>();
-		CombatAbilitySystemComponent;
-		FActiveGameplayEffectHandle EffectHandle = CombatAbilitySystemComponent->ApplyGameplayEffectToSelf(Effect, 1.f, MakeEffectContext(CurrentSpecHandle, CurrentActorInfo));
-		if (EffectHandle.IsValid())
+		FGameplayEffectContextHandle ContextHandle = CombatAbilitySystemComponent->MakeEffectContext();
+		FGameplayEffectSpecHandle SpecHandle = CombatAbilitySystemComponent->MakeOutgoingSpec(EffectConfig->EffectClass, FGameplayEffectConstants::INVALID_LEVEL, ContextHandle);
+		FGameplayEffectSpec* SpecData = SpecHandle.Data.Get();
+		for (auto Seter : EffectConfig->MagnitudeSeter)
 		{
-			AppliedEffects.Add(EffectHandle);
+			SpecData->SetSetByCallerMagnitude(Seter.Key, Seter.Value);
 		}
-	}
-
-	if (EventTag == FGameplayTag::RequestGameplayTag(FName("AncientBattlefield.Event.Anim.SwitchBodyForm")))
-	{
-		CombatAbilitySystemComponent->SwitchBodyForm(NextBodyForm);
+		auto ActiveHandle = CombatAbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecData);
+		if (ActiveHandle.IsValid())
+		{
+			AppliedEffects.Add(ActiveHandle);
+		}
 	}
 }
 
