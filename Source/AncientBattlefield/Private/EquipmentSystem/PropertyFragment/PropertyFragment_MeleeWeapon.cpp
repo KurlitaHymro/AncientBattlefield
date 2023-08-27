@@ -24,6 +24,7 @@ void UPropertyFragment_MeleeWeapon::OnWeaponPutOn(UAbilitySystemComponent* Targe
 	if (AbilitySystemComponent != nullptr && HitTraceComponent != nullptr && Mesh != nullptr)
 	{
 		HitTraceComponent->Setup(Mesh);
+		HitTraceComponent->ActorsToIgnore.AddUnique(AbilitySystemComponent->GetOwner());
 		HitTraceComponent->UniqueHitDelegate.AddDynamic(this, &ThisClass::OnWeaponHit);
 	}
 }
@@ -32,6 +33,7 @@ void UPropertyFragment_MeleeWeapon::OnWeaponTakeOff()
 {
 	if (AbilitySystemComponent && HitTraceComponent)
 	{
+		HitTraceComponent->ActorsToIgnore.Remove(AbilitySystemComponent->GetOwner());
 		HitTraceComponent->Teardown();
 		HitTraceComponent->UniqueHitDelegate.RemoveAll(this);
 		AbilitySystemComponent = nullptr;

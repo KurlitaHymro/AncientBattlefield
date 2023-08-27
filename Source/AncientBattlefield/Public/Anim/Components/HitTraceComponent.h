@@ -50,9 +50,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = TraceSettings, meta = (Tooltip = "How you want to debug the trace if at all."))
 	TEnumAsByte<EDrawDebugTrace::Type> DrawDebugType;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = TraceSettings, meta = (Tooltip = "True means it will ignore self."))
-	uint32 bIgnoreSelf : 1;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = TraceSettings, meta = (Tooltip = "Color when tracing but not hitting."))
 	FLinearColor TraceColor;
 

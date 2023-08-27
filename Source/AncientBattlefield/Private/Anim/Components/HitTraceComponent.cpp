@@ -14,7 +14,6 @@ UHitTraceComponent::UHitTraceComponent()
 	bTraceComplex = false;
 	ActorsToIgnore.Empty();
 	DrawDebugType = EDrawDebugTrace::None;
-	bIgnoreSelf = true;
 	TraceColor = FLinearColor::Yellow;
 	HitColor = FLinearColor::Red;
 	DrawTime = 0.2f;
