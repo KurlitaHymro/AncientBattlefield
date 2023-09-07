@@ -29,6 +29,7 @@ public class AncientBattlefield : ModuleRules
 			"EnhancedInput",
 			"ItemInventorySystem",
 			"AIModule",
+			"Niagara",
 		});
 
 		// Uncomment if you are using Slate UI

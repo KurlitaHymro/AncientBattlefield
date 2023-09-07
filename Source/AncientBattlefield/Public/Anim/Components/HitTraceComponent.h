@@ -30,9 +30,6 @@ public:
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interface)
-	class UPrimitiveComponent* ReferenceMesh;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interface)
 	TArray<FName> Sockets;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interface)
@@ -76,6 +73,9 @@ public:
 	void DisableTrace();
 
 private:
+	UPROPERTY()
+	class UPrimitiveComponent* ReferenceMesh;
+
 	UPROPERTY()
 	AActor* Owner;
 
