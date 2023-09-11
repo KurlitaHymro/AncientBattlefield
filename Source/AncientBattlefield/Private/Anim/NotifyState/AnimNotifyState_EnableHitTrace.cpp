@@ -8,6 +8,7 @@
 #include "EquipmentSystem/PropertyFragment/PropertyFragment_Equipment.h"
 #include "EquipmentSystem/PropertyFragment/PropertyFragment_MeleeWeapon.h"
 #include "Anim/Components/HitTraceComponent.h"
+#include "Anim/Components/TrailingComponent.h"
 
 void UAnimNotifyState_EnableHitTrace::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference)
 {
@@ -26,6 +27,7 @@ void UAnimNotifyState_EnableHitTrace::NotifyBegin(USkeletalMeshComponent* MeshCo
 				if (MeleeWeaponProperty)
 				{
 					HitTraceComponent = MeleeWeaponProperty->GetHitTraceComponent();
+					TrailingComponent = MeleeWeaponProperty->GetTrailingComponent();
 				}
 			}
 		}
@@ -35,6 +37,11 @@ void UAnimNotifyState_EnableHitTrace::NotifyBegin(USkeletalMeshComponent* MeshCo
 	{
 		HitActors.Empty();
 		HitTraceComponent->EnableTrace();
+	}
+
+	if (TrailingComponent)
+	{
+		TrailingComponent->EnableTrailing();
 	}
 } 
 
@@ -46,5 +53,11 @@ void UAnimNotifyState_EnableHitTrace::NotifyEnd(USkeletalMeshComponent* MeshComp
 	{
 		HitTraceComponent->DisableTrace();
 		HitTraceComponent = nullptr;
+	}
+
+	if (TrailingComponent)
+	{
+		TrailingComponent->DisableTrailing();
+		TrailingComponent = nullptr;	
 	}
 }

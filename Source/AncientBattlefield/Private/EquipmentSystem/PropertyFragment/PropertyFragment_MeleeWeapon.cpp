@@ -3,6 +3,7 @@
 
 #include "EquipmentSystem/PropertyFragment/PropertyFragment_MeleeWeapon.h"
 #include "Anim/Components/HitTraceComponent.h"
+#include "Anim/Components/TrailingComponent.h"
 #include "Item/ItemObject.h"
 #include "PropertyFragment/PropertyFragment_EntityLink.h"
 #include "PropertyFragment/PropertyFragment_PhysicsMesh.h"
@@ -18,6 +19,7 @@ void UPropertyFragment_MeleeWeapon::OnWeaponPutOn(UAbilitySystemComponent* Targe
 	if (EntityLink && EntityLink->GetEntity())
 	{
 		HitTraceComponent = EntityLink->GetEntity()->GetComponentByClass<UHitTraceComponent>();
+		TrailingComponent = EntityLink->GetEntity()->GetComponentByClass<UTrailingComponent>();
 		Mesh = EntityLink->GetEntity()->GetComponentByClass<UMeshComponent>();
 	}
 
@@ -26,6 +28,11 @@ void UPropertyFragment_MeleeWeapon::OnWeaponPutOn(UAbilitySystemComponent* Targe
 		HitTraceComponent->Setup(Mesh);
 		HitTraceComponent->ActorsToIgnore.AddUnique(AbilitySystemComponent->GetOwner());
 		HitTraceComponent->UniqueHitDelegate.AddDynamic(this, &ThisClass::OnWeaponHit);
+	}
+
+	if (TrailingComponent != nullptr && Mesh != nullptr)
+	{
+		TrailingComponent->RibbonTrailingSetup(Mesh);
 	}
 }
 
@@ -39,11 +46,12 @@ void UPropertyFragment_MeleeWeapon::OnWeaponTakeOff()
 		AbilitySystemComponent = nullptr;
 		HitTraceComponent = nullptr;
 	}
-}
 
-UHitTraceComponent* UPropertyFragment_MeleeWeapon::GetHitTraceComponent()
-{
-	return HitTraceComponent;
+	if (TrailingComponent)
+	{
+		TrailingComponent->Teardown();
+		TrailingComponent = nullptr;
+	}
 }
 
 void UPropertyFragment_MeleeWeapon::OnWeaponHit(FHitResult HitResult)

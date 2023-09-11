@@ -24,5 +24,7 @@ private:
 
 	class UHitTraceComponent* HitTraceComponent;
 
+	class UTrailingComponent* TrailingComponent;
+
 	TArray<AActor*> HitActors;
 };

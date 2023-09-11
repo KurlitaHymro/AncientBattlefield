@@ -2,6 +2,7 @@
 
 
 #include "Anim/Components/TrailingComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
@@ -53,10 +54,10 @@ void UTrailingComponent::RibbonTrailingSetup(UPrimitiveComponent* Reference, boo
 	if (!Start.IsNone() && !End.IsNone())
 	{
 		SocketName = Start;
-		auto StartLocation = Mesh->GetSocketLocation(Start);
-		auto EndLocation = Mesh->GetSocketLocation(End);
+		auto StartLocation = Mesh->GetSocketTransform(Start, RTS_Actor).GetTranslation();
+		auto EndLocation = Mesh->GetSocketTransform(End, RTS_Actor).GetTranslation();
 		LocationOffset = (EndLocation - StartLocation) / 2;
-		RotationOffset = FRotator(90.f, 0, 0);
+		RotationOffset = UKismetMathLibrary::FindLookAtRotation(StartLocation, EndLocation);
 		Setup(Mesh);
 	}
 }
@@ -71,7 +72,7 @@ void UTrailingComponent::Teardown()
 {
 	ReferenceMesh = nullptr;
 	Owner = nullptr;
-}
+} 
 
 void UTrailingComponent::EnableTrailing()
 {

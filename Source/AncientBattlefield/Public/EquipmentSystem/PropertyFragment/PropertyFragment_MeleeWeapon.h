@@ -23,7 +23,10 @@ public:
 	void OnWeaponTakeOff();
 
 	UFUNCTION(BlueprintCallable)
-	class UHitTraceComponent* GetHitTraceComponent();
+	class UHitTraceComponent* GetHitTraceComponent() { return HitTraceComponent; };
+
+	UFUNCTION(BlueprintCallable)
+	class UTrailingComponent* GetTrailingComponent() { return TrailingComponent; };
 
 protected:
 	UFUNCTION()
@@ -33,4 +36,6 @@ private:
 	class UCombatAbilitySystemComponent* AbilitySystemComponent;
 
 	class UHitTraceComponent* HitTraceComponent;
+
+	class UTrailingComponent* TrailingComponent;
 };
