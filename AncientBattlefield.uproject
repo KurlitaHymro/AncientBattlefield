@@ -55,6 +55,10 @@
 		{
 			"Name": "CombatCore",
 			"Enabled": true
+		},
+		{
+			"Name": "SkeletalMeshModelingTools",
+			"Enabled": true
 		}
 	]
 }
