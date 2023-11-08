@@ -17,6 +17,10 @@
 			"TargetAllowList": [
 				"Editor"
 			]
+		},
+		{
+			"Name": "CombatCore",
+			"Enabled": true
 		}
 	]
 }
