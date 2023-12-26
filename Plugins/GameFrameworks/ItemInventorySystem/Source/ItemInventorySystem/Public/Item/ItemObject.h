@@ -7,6 +7,27 @@
 #include "GameplayTagAssetInterface.h"
 #include "ItemObject.generated.h"
 
+USTRUCT(BlueprintType, meta = (DisplayName = "ItemPropertyFragment"))
+struct FPropertyFragmentConfig
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly)
+	TSoftClassPtr<class UItemPropertyFragment> PropertyClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	FName PropertyPrefab;
+};
+
+USTRUCT(BlueprintType, meta = (DisplayName = "ItemAbstract"))
+struct FItemAbstract : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly)
+	TArray<FPropertyFragmentConfig> PropertyFragments;
+};
+
 /**
  * 
  */
@@ -28,6 +49,9 @@ public:
 	{
 		return Cast<PropertyFragmentType>(FindPropertyFragment(PropertyFragmentType::StaticClass()));
 	};
+
+	UFUNCTION(BlueprintCallable)
+	static class UItemObject* NewItem(UObject* Outer, FName PrefabName);
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = Tags)

@@ -171,7 +171,7 @@ void UGameFeatureAction_AddAbilities::HandleActorExtension(AActor* Actor, FName 
 
 void UGameFeatureAction_AddAbilities::AddActorAbilities(AActor* Actor, const FCombatAbilitiesEntry& Entry)
 {
-	if (URegisteredAbilitySystemComponent* AbilitySystemComponent = FindOrAddComponentForActor<URegisteredAbilitySystemComponent>(Actor, Entry))
+	if (URegisteredAbilitySystemComponent* AbilitySystemComponent = FindOrAddComponentForActor<URegisteredAbilitySystemComponent>(Actor, Entry.ActorClass))
 	{
 		FActorExtensions AddedExtensions;
 		AddedExtensions.Abilities.Reserve(Entry.GrantedAbilities.Num());
@@ -185,7 +185,7 @@ void UGameFeatureAction_AddAbilities::AddActorAbilities(AActor* Actor, const FCo
 
 				if (!Ability.InputAction.IsNull())
 				{
-					UAbilitiesInputComponent* InputComponent = FindOrAddComponentForActor<UAbilitiesInputComponent>(Actor, Entry);
+					UAbilitiesInputComponent* InputComponent = FindOrAddComponentForActor<UAbilitiesInputComponent>(Actor, Entry.ActorClass);
 					if (InputComponent)
 					{
 						InputComponent->SetupBinding(Ability.InputAction.LoadSynchronous(), AbilityID);
@@ -255,45 +255,6 @@ void UGameFeatureAction_AddAbilities::RemoveActorAbilities(AActor* Actor)
 
 		ActiveExtensions.Remove(Actor);
 	}
-}
-
-UActorComponent* UGameFeatureAction_AddAbilities::FindOrAddComponentForActor(UClass* ComponentType, AActor* Actor, const FCombatAbilitiesEntry& Entry)
-{
-	UActorComponent* Component = Actor->FindComponentByClass(ComponentType);
-	
-	bool bMakeComponentRequest = (Component == nullptr);
-	if (Component)
-	{
-		// Check to see if this component was created from a different `UGameFrameworkComponentManager` request.
-		// `Native` is what `CreationMethod` defaults to for dynamically added components.
-		if (Component->CreationMethod == EComponentCreationMethod::Native)
-		{
-			// Attempt to tell the difference between a true native component and one created by the GameFrameworkComponent system.
-			// If it is from the UGameFrameworkComponentManager, then we need to make another request (requests are ref counted).
-			UObject* ComponentArchetype = Component->GetArchetype();
-			bMakeComponentRequest = ComponentArchetype->HasAnyFlags(RF_ClassDefaultObject);
-		}
-	}
-
-	if (bMakeComponentRequest)
-	{
-		UWorld* World = Actor->GetWorld();
-		UGameInstance* GameInstance = World->GetGameInstance();
-
-		if (UGameFrameworkComponentManager* ComponentMan = UGameInstance::GetSubsystem<UGameFrameworkComponentManager>(GameInstance))
-		{
-			TSharedPtr<FComponentRequestHandle> RequestHandle = ComponentMan->AddComponentRequest(Entry.ActorClass, ComponentType);
-			ComponentRequests.Add(RequestHandle);
-		}
-
-		if (!Component)
-		{
-			Component = Actor->FindComponentByClass(ComponentType);
-			ensureAlways(Component);
-		}
-	}
-
-	return Component;
 }
 
 #undef LOCTEXT_NAMESPACE
