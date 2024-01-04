@@ -49,7 +49,7 @@ class ANCIENTBATTLEFIELD_API ACombatCharacter : public AModularCharacter, public
 
 public:
 	// Sets default values for this character's properties
-	ACombatCharacter();
+	ACombatCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
 	// APawn interface Called to bind functionality to input
@@ -79,17 +79,18 @@ public:
 	virtual class UEquipmentComponent* GetEquipmentSystemComponent() const;
 
 	virtual class UAbilitiesInputComponent* GetAbilitiesInputComponent() const;
+
 protected:
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
 	class UCombatAbilitySystemComponent* CombatAbilityComponent;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
 	class UAbilitiesInputComponent* AbilitiesInputComponent;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
 	class UInventoryComponent* InventoryComponent;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
 	class UEquipmentComponent* EquipmentComponent;
 
 public:

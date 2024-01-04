@@ -25,6 +25,9 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	UTexture* GetIcon();
 
+	UFUNCTION(BlueprintCallable, Category = "Drag and Drop")
+	UDragDropOperation* DragItem(TSubclassOf<UItemWidget> DragDropWidgetClass);
+
 private:
 	FName Name;
 

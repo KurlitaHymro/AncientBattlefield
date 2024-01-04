@@ -20,4 +20,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (InstanceEditable = true, ExposeOnSpawn = true))
 	int32 SlotID;
+
+protected:
+	UFUNCTION(BlueprintCallable, Category = "Drag and Drop")
+	bool DropItem(UItemDragDropOperation* ItemDragDropOperation);
 };
