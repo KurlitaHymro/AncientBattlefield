@@ -92,13 +92,6 @@ private:
 	void AddActorAbilities(AActor* Actor, const FCombatAbilitiesEntry& Entry);
 	void RemoveActorAbilities(AActor* Actor);
 
-	template<class ComponentType>
-	ComponentType* FindOrAddComponentForActor(AActor* Actor, const FCombatAbilitiesEntry& Entry)
-	{
-		return Cast<ComponentType>(FindOrAddComponentForActor(ComponentType::StaticClass(), Actor, Entry));
-	}
-	UActorComponent* FindOrAddComponentForActor(UClass* ComponentType, AActor* Actor, const FCombatAbilitiesEntry& Entry);
-
 private:
 	struct FActorExtensions
 	{
@@ -106,6 +99,4 @@ private:
 		TArray<class UAttributeSet*> Attributes;
 	};
 	TMap<AActor*, FActorExtensions> ActiveExtensions;
-
-	TArray<TSharedPtr<struct FComponentRequestHandle>> ComponentRequests;
 };

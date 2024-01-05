@@ -10,7 +10,8 @@
 #include "InventoryComponent.h"
 #include "EquipmentSystem/EquipmentComponent.h"
 
-ACombatCharacter::ACombatCharacter()
+ACombatCharacter::ACombatCharacter(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(50.f, 88.0f);

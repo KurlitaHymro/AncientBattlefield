@@ -2,6 +2,7 @@
 
 
 #include "WidgetBase/ItemWidget.h"
+#include "WidgetBase/ItemDragDropOperation.h"
 #include "Item/ItemObject.h"
 #include "Item/ItemPropertyFragment.h"
 #include "PropertyFragment/PropertyFragment_PropBaseInfo.h"
@@ -28,8 +29,7 @@ FName UItemWidget::GetName()
 
 UTexture* UItemWidget::GetIcon()
 {
-	if (Item)
-	if (!Icon)
+	if (Item && !Icon)
 	{
 		UPropertyFragment_PropBaseInfo* BaseInfo = Item->FindPropertyFragment<UPropertyFragment_PropBaseInfo>();
 		if (BaseInfo != nullptr)
@@ -38,4 +38,17 @@ UTexture* UItemWidget::GetIcon()
 		}
 	}
 	return Icon;
+}
+
+UDragDropOperation* UItemWidget::DragItem(TSubclassOf<UItemWidget> DragDropWidgetClass)
+{
+	UItemWidget* DefaultDragVisual = CreateWidget<UItemWidget>(this, DragDropWidgetClass);
+	DefaultDragVisual->Icon = Icon;
+
+	UItemDragDropOperation* DragDropOperation = NewObject<UItemDragDropOperation>(GetTransientPackage(), UItemDragDropOperation::StaticClass());
+	DragDropOperation->DefaultDragVisual = DefaultDragVisual;
+	DragDropOperation->Pivot = EDragPivot::CenterCenter;
+	DragDropOperation->Item = Item;
+
+	return DragDropOperation;
 }

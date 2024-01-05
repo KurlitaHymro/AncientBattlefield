@@ -20,6 +20,16 @@ public:
 	virtual void OnGameFeatureDeactivating(FGameFeatureDeactivatingContext& Context) override;
 	//~ End UGameFeatureAction interface
 
+protected:
+	template<class ComponentType>
+	ComponentType* FindOrAddComponentForActor(AActor* Actor, const TSoftClassPtr<AActor>& Entry)
+	{
+		return Cast<ComponentType>(FindOrAddComponentForActor(ComponentType::StaticClass(), Actor, Entry));
+	}
+	UActorComponent* FindOrAddComponentForActor(UClass* ComponentType, AActor* Actor, const TSoftClassPtr<AActor>& Entry);
+
+	TArray<TSharedPtr<struct FComponentRequestHandle>> ComponentRequests;
+
 private:
 	void HandleGameInstanceStart(UGameInstance* GameInstance);
 	virtual void AddToWorld(const FWorldContext& WorldContext) PURE_VIRTUAL(UGameFeatureAction_AddToWorld::AddToWorld, );

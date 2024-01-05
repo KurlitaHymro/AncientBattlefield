@@ -5,12 +5,24 @@
 #include "Item/ItemObject.h"
 
 // Sets default values for this component's properties
-UInventoryComponent::UInventoryComponent()
+UInventoryComponent::UInventoryComponent(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 
+	ItemObjectSlot.Empty();
+}
+
+void UInventoryComponent::PostLoad()
+{
+	Super::PostLoad();
+	
+	if (Size > 0)
+	{
+		ItemObjectSlot.Init(nullptr, Size);
+	}
 }
 
 void UInventoryComponent::Setup(int32 SlotsNumber)
@@ -101,13 +113,13 @@ int32 UInventoryComponent::GetSize() const
 
 FString UInventoryComponent::GetStaticDescription() const
 {
-	FString Description = FString::Printf(TEXT("%s"), *this->GetName());
+	FString Description = FString::Printf(TEXT("%s::%s"), *GetOwner()->GetName(), *this->GetName());
 	for (int32 i = 0; i < Size; i++)
 	{
 		if (ItemObjectSlot[i])
 		{
 			auto ItemInfo = ItemObjectSlot[i]->GetFName().ToString();
-			Description += FString::Printf(TEXT("[%02d]{%s}"), i, *ItemInfo);
+			Description += FString::Printf(TEXT("\n[%02d]{%s}"), i, *ItemInfo);
 		}
 	}
 	return Description;

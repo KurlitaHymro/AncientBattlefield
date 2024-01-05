@@ -12,14 +12,16 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInventoryAddItemDelegate, UItemObj
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInventoryRemoveItemDelegate, UItemObject*, Item, int32, LocalID);
 
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+UCLASS(BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class ITEMINVENTORYSYSTEM_API UInventoryComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
-	UInventoryComponent();
+	UInventoryComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
+	virtual void PostLoad() override;
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -56,7 +58,7 @@ protected:
 	UPROPERTY()
 	TArray<UItemObject*> ItemObjectSlot;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0", InstanceEditable = true, ExposeOnSpawn = true))
 	int32 Size;
 
 public:
