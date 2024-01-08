@@ -6,6 +6,30 @@
 #include "Blueprint/UserWidget.h"
 #include "InventoryWidget.generated.h"
 
+USTRUCT(BlueprintType, meta = (DisplayName = "WidgetSubregio"))
+struct FInventoryWidgetSubregioInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Instanced)
+	TObjectPtr<class UPanelWidget> Panel;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class USlotWidget> SlotWidgetType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class UItemWidget> ItemWidgetType;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	int32 SubregioBegin;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	int32 SubregioSize;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	int32 SubregioGridPerRow;
+};
+
 /**
  * 
  */
@@ -18,11 +42,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (InstanceEditable = true, ExposeOnSpawn = true))
 	class UInventoryComponent* InventoryComponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (InstanceEditable = true, ExposeOnSpawn = true))
-	TSubclassOf<class USlotWidget> SlotWidgetType;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (InstanceEditable = true, ExposeOnSpawn = true))
-	TSubclassOf<class UItemWidget> ItemWidgetType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FInventoryWidgetSubregioInfo> SubregioConfig;
 
 protected:
 	virtual void OnWidgetRebuilt() override;
@@ -34,26 +55,13 @@ protected:
 	void OnRemoveItem(class UItemObject* Item, int32 SlotID);
 
 protected:
-	/* 使用统一网格面板自动布局
-	 * 根据PerRow自动生成并排布物品槽。
-	 */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (InstanceEditable = true, ExposeOnSpawn = true, AllowPrivateAccess = "true", ClampMin = "1", UIMin = "1"))
-	int32 PerRow = 1;
-
 	UFUNCTION(BlueprintImplementableEvent)
-	class UUniformGridPanel* GetUniformGridPanel();
-
-	UFUNCTION(BlueprintCallable)
-	void UniformGridArrange(UUserWidget* Widget, int32 SlotsPerRow, int32 SlotID);
-
-protected:
-	/* 使用已有槽位布局
-	 * 对现有布局的若干覆层生成物品槽
-	 */
-	UFUNCTION(BlueprintImplementableEvent)
-	TArray<class UOverlay*> GetOverlayContainer();
+	void GetSubregioConfig();
 
 private:
-	TMap<int32, UItemWidget*> SlotsItemWidget;
+	void LoadSubregio(FInventoryWidgetSubregioInfo& Subregio);
 
+	int32 AccumulativeSize;
+
+	TMap<int32, UItemWidget*> ItemsWidget;
 };

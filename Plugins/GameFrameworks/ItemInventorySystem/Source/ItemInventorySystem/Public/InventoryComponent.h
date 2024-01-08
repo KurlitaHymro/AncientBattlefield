@@ -4,13 +4,27 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "GameplayTagContainer.h"
 #include "InventoryComponent.generated.h"
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventorySetupDelegate, int32, SlotsNumber);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInventoryAddItemDelegate, UItemObject*, Item, int32, LocalID);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInventoryRemoveItemDelegate, UItemObject*, Item, int32, LocalID);
+
+USTRUCT(BlueprintType, meta = (DisplayName = "InventorySlot"))
+struct FInventorySlot
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, Category = Tags)
+	FGameplayTagContainer ItemBlockedTags;
+
+	UPROPERTY(EditDefaultsOnly, Category = Tags)
+	FGameplayTagContainer ItemRequiredTags;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UItemObject> Item;
+};
 
 UCLASS(BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class ITEMINVENTORYSYSTEM_API UInventoryComponent : public UActorComponent
@@ -25,13 +39,10 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	virtual void Setup(int32 SlotsNumber);
-
-	UFUNCTION(BlueprintCallable)
 	virtual int32 FindVacancy() const;
 
 	UFUNCTION(BlueprintCallable)
-	virtual bool CanMoveTo(UItemObject* Item, int32 SlotID) const;
+	virtual bool CanHold(UItemObject* Item, int32 SlotID) const;
 
 	UFUNCTION(BlueprintCallable)
 	virtual void AddItem(UItemObject* Item, int32 SlotID);
@@ -49,22 +60,16 @@ public:
 	virtual UItemObject* GetItem(int32 SlotID);
 
 	UFUNCTION(BlueprintCallable)
-	virtual int32 GetSize() const;
-
-	UFUNCTION(BlueprintCallable)
 	virtual FString GetStaticDescription() const;
 
-protected:
+protected: 
 	UPROPERTY()
-	TArray<UItemObject*> ItemObjectSlot;
+	TArray<FInventorySlot> Slots;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0", InstanceEditable = true, ExposeOnSpawn = true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0", AllowPrivateAccess = "true", InstanceEditable = true, ExposeOnSpawn = true))
 	int32 Size;
 
 public:
-	UPROPERTY(BlueprintAssignable)
-	FInventorySetupDelegate InventorySetupDelegate;
-
 	UPROPERTY(BlueprintAssignable)
 	FInventoryAddItemDelegate InventoryAddItemDelegate;
 

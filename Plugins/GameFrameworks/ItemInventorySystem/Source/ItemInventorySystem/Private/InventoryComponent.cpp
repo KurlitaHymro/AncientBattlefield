@@ -12,7 +12,7 @@ UInventoryComponent::UInventoryComponent(const FObjectInitializer& ObjectInitial
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 
-	ItemObjectSlot.Empty();
+	Slots.Empty();
 }
 
 void UInventoryComponent::PostLoad()
@@ -21,22 +21,15 @@ void UInventoryComponent::PostLoad()
 	
 	if (Size > 0)
 	{
-		ItemObjectSlot.Init(nullptr, Size);
+		Slots.Init(FInventorySlot(), Size);
 	}
-}
-
-void UInventoryComponent::Setup(int32 SlotsNumber)
-{
-	Size = SlotsNumber;
-	ItemObjectSlot.Init(nullptr, Size);
-	InventorySetupDelegate.Broadcast(Size);
 }
 
 int32 UInventoryComponent::FindVacancy() const
 {
 	for (int32 SlotID = 0; SlotID < Size; SlotID++)
 	{
-		if (ItemObjectSlot[SlotID] == nullptr)
+		if (Slots[SlotID].Item == nullptr)
 		{
 			return SlotID;
 		}
@@ -44,42 +37,49 @@ int32 UInventoryComponent::FindVacancy() const
 	return Size;
 }
 
-bool UInventoryComponent::CanMoveTo(UItemObject* Item, int32 SlotID) const
+bool UInventoryComponent::CanHold(UItemObject* Item, int32 SlotID) const
 {
 	if (Item && 0 <= SlotID && SlotID < Size)
 	{
-		return true;
+		FGameplayTagContainer ItemTags;
+		Item->GetOwnedGameplayTags(ItemTags);
+		if (ItemTags.HasAll(Slots[SlotID].ItemRequiredTags) && !ItemTags.HasAny(Slots[SlotID].ItemBlockedTags)) // 后续仍可追加更复杂的功能
+		{
+			return true;
+		}
 	}
 	return false;
 }
 
 void UInventoryComponent::AddItem(UItemObject* Item, int32 SlotID)
 {
-	if (Item && 0 <= SlotID && SlotID < Size)
+	if (CanHold(Item, SlotID))
 	{
 		Item->BelongingInventory = this;
 		Item->BelongingSlotID = SlotID;
 		InventoryAddItemDelegate.Broadcast(Item, SlotID);
-		ItemObjectSlot[SlotID] = Item;
+		Slots[SlotID].Item = Item;
 	}
 }
 
 void UInventoryComponent::RemoveItem(UItemObject* Item)
 {
-	if (Item && Item->BelongingInventory == this && Item->BelongingSlotID < Size)
+	if (Item && Item->BelongingInventory == this)
 	{
 		int32 SlotID = Item->BelongingSlotID;
+		ensure(Item == Slots[SlotID].Item);
+
 		InventoryRemoveItemDelegate.Broadcast(Item, SlotID);
 		Item->BelongingSlotID = Size;
 		Item->BelongingInventory = nullptr;
-		ItemObjectSlot[SlotID] = nullptr;
+		Slots[SlotID].Item = nullptr;
 	}
 }
 
 void UInventoryComponent::RemoveItemFromSlot(int32 SlotID)
 {
-	ItemObjectSlot.RangeCheck(SlotID);
-	RemoveItem(ItemObjectSlot[SlotID]);
+	Slots.RangeCheck(SlotID);
+	RemoveItem(Slots[SlotID].Item);
 }
 
 UItemObject* UInventoryComponent::SwapItem(int32 SlotID, UItemObject* OtherItem)
@@ -89,7 +89,7 @@ UItemObject* UInventoryComponent::SwapItem(int32 SlotID, UItemObject* OtherItem)
 	{
 		UInventoryComponent* OtherInventory = OtherItem->BelongingInventory;
 		int32 OtherSlot = OtherItem->BelongingSlotID;
-		if (CanMoveTo(OtherItem, SlotID) && OtherInventory->CanMoveTo(ThisItem, OtherSlot))
+		if (CanHold(OtherItem, SlotID) && OtherInventory->CanHold(ThisItem, OtherSlot))
 		{
 			this->RemoveItem(ThisItem);
 			OtherInventory->RemoveItem(OtherItem);
@@ -102,13 +102,8 @@ UItemObject* UInventoryComponent::SwapItem(int32 SlotID, UItemObject* OtherItem)
 
 UItemObject* UInventoryComponent::GetItem(int32 SlotID)
 {
-	ItemObjectSlot.RangeCheck(SlotID);
-	return ItemObjectSlot[SlotID];
-}
-
-int32 UInventoryComponent::GetSize() const
-{
-	return Size;
+	Slots.RangeCheck(SlotID);
+	return Slots[SlotID].Item;
 }
 
 FString UInventoryComponent::GetStaticDescription() const
@@ -116,9 +111,9 @@ FString UInventoryComponent::GetStaticDescription() const
 	FString Description = FString::Printf(TEXT("%s::%s"), *GetOwner()->GetName(), *this->GetName());
 	for (int32 i = 0; i < Size; i++)
 	{
-		if (ItemObjectSlot[i])
+		if (Slots[i].Item)
 		{
-			auto ItemInfo = ItemObjectSlot[i]->GetFName().ToString();
+			auto ItemInfo = Slots[i].Item->GetFName().ToString();
 			Description += FString::Printf(TEXT("\n[%02d]{%s}"), i, *ItemInfo);
 		}
 	}

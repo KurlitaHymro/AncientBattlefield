@@ -15,33 +15,11 @@ void UInventoryWidget::OnWidgetRebuilt()
 
 	if (InventoryComponent)
 	{
-		if (GetUniformGridPanel() && PerRow > 0)
+		GetSubregioConfig();
+		AccumulativeSize = 0;
+		for (auto& Subregio : SubregioConfig)
 		{
-			for (int32 i = 0; i < InventoryComponent->GetSize(); i++)
-			{
-				auto SlotWidget = NewObject<USlotWidget>(this, SlotWidgetType);
-				SlotWidget->InventoryComponent = InventoryComponent;
-				SlotWidget->SlotID = i;
-				UniformGridArrange(SlotWidget, PerRow, i);
-				if (auto Item = InventoryComponent->GetItem(i))
-				{
-					OnAddItem(Item, i);
-				}
-			}
-		}
-		else if (!GetOverlayContainer().IsEmpty() && GetOverlayContainer().Num() == InventoryComponent->GetSize())
-		{
-			for (int32 i = 0; i < InventoryComponent->GetSize(); i++)
-			{ 
-				auto SlotWidget = NewObject<USlotWidget>(this, SlotWidgetType);
-				SlotWidget->InventoryComponent = InventoryComponent;
-				SlotWidget->SlotID = i;
-				GetOverlayContainer()[i]->AddChildToOverlay(SlotWidget);
-				if (auto Item = InventoryComponent->GetItem(i))
-				{
-					OnAddItem(Item, i);
-				}
-			}
+			LoadSubregio(Subregio);
 		}
 		InventoryComponent->InventoryAddItemDelegate.AddDynamic(this, &ThisClass::OnAddItem);
 		InventoryComponent->InventoryRemoveItemDelegate.AddDynamic(this, &ThisClass::OnRemoveItem);
@@ -50,35 +28,98 @@ void UInventoryWidget::OnWidgetRebuilt()
 
 void UInventoryWidget::OnAddItem(UItemObject* Item, int32 SlotID)
 {
-	auto ItemWidget = NewObject<UItemWidget>(this, ItemWidgetType);
-	ItemWidget->Item = Item;
-	SlotsItemWidget.Add(SlotID, ItemWidget);
-	if (GetUniformGridPanel() && PerRow > 0)
+	auto Subregio = SubregioConfig.CreateIterator();
+	while (Subregio)
 	{
-		UniformGridArrange(ItemWidget, PerRow, SlotID);
+		if (Subregio->SubregioBegin > SlotID)
+		{
+			--Subregio;
+			break;
+		}
+		++Subregio;
 	}
-	else if (!GetOverlayContainer().IsEmpty())
+	if (Subregio)
 	{
-		GetOverlayContainer()[SlotID]->AddChildToOverlay(ItemWidget);
+		auto ItemWidget = NewObject<UItemWidget>(this, Subregio->ItemWidgetType);
+		ItemWidget->Item = Item;
+		ItemsWidget.Add(SlotID, ItemWidget);
+
+		if (Subregio->Panel->IsA(UUniformGridPanel::StaticClass()))
+		{
+			UUniformGridPanel* UniformGridPanel = Cast<UUniformGridPanel>(Subregio->Panel);
+			int32 LocolID = SlotID - Subregio->SubregioBegin;
+			int32 Row = LocolID / Subregio->SubregioGridPerRow;
+			int32 Column = LocolID - Row * Subregio->SubregioGridPerRow;
+			UniformGridPanel->AddChildToUniformGrid(ItemWidget, Row, Column);
+		}
+		else if (0) // 垂直表
+		{
+
+		}
+		else if (Subregio->Panel->IsA(UOverlay::StaticClass()) && Subregio->SubregioSize == 1)
+		{
+			UOverlay* Overlay = Cast<UOverlay>(Subregio->Panel);
+			Overlay->AddChildToOverlay(ItemWidget);
+		}
 	}
 }
 
 void UInventoryWidget::OnRemoveItem(UItemObject* Item, int32 SlotID)
 {
-	auto ItemWidget = SlotsItemWidget.FindAndRemoveChecked(SlotID);
-	if (GetUniformGridPanel() && ItemWidget)
+	auto ItemWidget = ItemsWidget.FindAndRemoveChecked(SlotID);
+	auto Subregio = SubregioConfig.CreateIterator();
+	while (Subregio)
 	{
-		GetUniformGridPanel()->RemoveChild(ItemWidget);
+		if (Subregio->SubregioBegin > SlotID)
+		{
+			--Subregio;
+			break;
+		}
+		++Subregio;
 	}
-	else if (!GetOverlayContainer().IsEmpty())
+	if (Subregio)
 	{
-		GetOverlayContainer()[SlotID]->RemoveChild(ItemWidget);
+		Subregio->Panel->RemoveChild(ItemWidget);
 	}
 }
 
-void UInventoryWidget::UniformGridArrange(UUserWidget* Widget, int32 SlotsPerRow, int32 SlotID)
+
+
+void UInventoryWidget::LoadSubregio(FInventoryWidgetSubregioInfo& Subregio)
 {
-	int32 Row = SlotID / SlotsPerRow;
-	int32 Column = SlotID - Row * SlotsPerRow;
-	GetUniformGridPanel()->AddChildToUniformGrid(Widget, Row, Column);
+	Subregio.SubregioBegin = AccumulativeSize;
+	if (Subregio.Panel->IsA(UUniformGridPanel::StaticClass()))
+	{
+		UUniformGridPanel* UniformGridPanel = Cast<UUniformGridPanel>(Subregio.Panel);
+		for (int32 LocolID = 0; LocolID < Subregio.SubregioSize; LocolID++)
+		{
+			auto SlotWidget = NewObject<USlotWidget>(this, Subregio.SlotWidgetType);
+			SlotWidget->InventoryComponent = InventoryComponent;
+			SlotWidget->SlotID = LocolID + AccumulativeSize;
+			int32 Row = LocolID / Subregio.SubregioGridPerRow;
+			int32 Column = LocolID - Row * Subregio.SubregioGridPerRow;
+			UniformGridPanel->AddChildToUniformGrid(SlotWidget, Row, Column);
+			if (auto Item = InventoryComponent->GetItem(SlotWidget->SlotID))
+			{
+				OnAddItem(Item, SlotWidget->SlotID);
+			}
+		}
+	}
+	else if (0) // 垂直表
+	{
+
+	}
+	else if (Subregio.Panel->IsA(UOverlay::StaticClass()) && Subregio.SubregioSize == 1)
+	{
+		UOverlay* Overlay = Cast<UOverlay>(Subregio.Panel);
+		auto SlotWidget = NewObject<USlotWidget>(this, Subregio.SlotWidgetType);
+		SlotWidget->InventoryComponent = InventoryComponent;
+		SlotWidget->SlotID = AccumulativeSize;
+		Overlay->AddChildToOverlay(SlotWidget);
+		if (auto Item = InventoryComponent->GetItem(SlotWidget->SlotID))
+		{
+			OnAddItem(Item, SlotWidget->SlotID);
+		}
+	}
+	AccumulativeSize += Subregio.SubregioSize;
 }
