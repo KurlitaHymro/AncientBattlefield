@@ -76,22 +76,17 @@ public:
 
 	virtual class UInventoryComponent* GetInventorySystemComponent() const override;
 
-	virtual class UEquipmentComponent* GetEquipmentSystemComponent() const;
-
 	virtual class UAbilitiesInputComponent* GetAbilitiesInputComponent() const;
 
 protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
-	class UCombatAbilitySystemComponent* CombatAbilityComponent;
+	TObjectPtr<class UCombatAbilitySystemComponent> CombatAbilitySystem;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
-	class UAbilitiesInputComponent* AbilitiesInputComponent;
+	TObjectPtr<class UAbilitiesInputComponent> AbilitiesInput;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
-	class UInventoryComponent* InventoryComponent;
-
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
-	class UEquipmentComponent* EquipmentComponent;
+	TObjectPtr<class UInventoryComponent> Inventory;
 
 public:
 	UFUNCTION(BlueprintNativeEvent)

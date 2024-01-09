@@ -4,8 +4,23 @@
 
 #include "CoreMinimal.h"
 #include "Item/ItemPropertyFragment.h"
-#include "EquipmentSystem/EquipmentComponent.h"
 #include "PropertyFragment_Equipment.generated.h"
+
+UENUM(BlueprintType)
+enum class EEquipmentSlots : uint8
+{
+	Helmet,
+	Breastplate,
+	Glove,
+	Belt,
+	Shoes,
+	Cloak,
+
+	MainHand,
+	OffHand,
+
+	EquipmentSlotsNum
+};
 
 USTRUCT(BlueprintType, meta = (DisplayName = "Equipment"))
 struct FPropertyFragmentEquipment : public FTableRowBase

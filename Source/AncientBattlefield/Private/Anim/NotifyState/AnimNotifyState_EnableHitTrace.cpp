@@ -4,7 +4,7 @@
 #include "Anim/NotifyState/AnimNotifyState_EnableHitTrace.h"
 #include "CombatCore/CombatCharacter.h"
 #include "Item/ItemObject.h"
-#include "EquipmentSystem/EquipmentComponent.h"
+#include "InventoryComponent.h"
 #include "EquipmentSystem/PropertyFragment/PropertyFragment_Equipment.h"
 #include "EquipmentSystem/PropertyFragment/PropertyFragment_MeleeWeapon.h"
 #include "Anim/Components/HitTraceComponent.h"
@@ -17,10 +17,10 @@ void UAnimNotifyState_EnableHitTrace::NotifyBegin(USkeletalMeshComponent* MeshCo
 	OwnerCharacter = Cast<ACombatCharacter>(MeshComp->GetOwner());
 	if (OwnerCharacter && OwnerCharacter->bIsActive)
 	{
-		auto EquipmentSystemComponent = OwnerCharacter->GetEquipmentSystemComponent();
-		if (EquipmentSystemComponent)
+		auto InventorySystemComponent = OwnerCharacter->GetInventorySystemComponent();
+		if (InventorySystemComponent)
 		{
-			auto Weapon = EquipmentSystemComponent->GetItem((int32)EEquipmentSlots::MainHand);
+			auto Weapon = InventorySystemComponent->GetItem((int32)EEquipmentSlots::MainHand);
 			if (Weapon)
 			{
 				auto MeleeWeaponProperty = Weapon->FindPropertyFragment<UPropertyFragment_MeleeWeapon>();

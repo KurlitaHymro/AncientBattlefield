@@ -39,22 +39,21 @@ void UPropertyFragment_Equipment::PutOn()
 	if (CharacterInventory)
 	{
 		// 查找与物品容器共属的装备容器，然后移动物品到最优先的可用位置。
-		UEquipmentComponent* CharacterEquipment = CharacterInventory->GetOwner()->FindComponentByClass<UEquipmentComponent>();
-		if (CharacterEquipment)
+		if (0)
 		{
 			EEquipmentSlots EquipmentSlot = EEquipmentSlots::EquipmentSlotsNum;
-			for (auto IdleSlot : PropertyFragment.EquipmentSlots)
-			{
-				if (CharacterEquipment->GetItem((int32)IdleSlot.Key) == nullptr)
-				{
-					EquipmentSlot = IdleSlot.Key;
-				}
-			}
-			if (EquipmentSlot < EEquipmentSlots::EquipmentSlotsNum)
-			{
-				CharacterInventory->RemoveItem(Owner);
-				CharacterEquipment->AddItem(Owner, (int32)EquipmentSlot);
-			}
+			//for (auto IdleSlot : PropertyFragment.EquipmentSlots)
+			//{
+			//	if (CharacterEquipment->GetItem((int32)IdleSlot.Key) == nullptr)
+			//	{
+			//		EquipmentSlot = IdleSlot.Key;
+			//	}
+			//}
+			//if (EquipmentSlot < EEquipmentSlots::EquipmentSlotsNum)
+			//{
+			//	CharacterInventory->RemoveItem(Owner);
+			//	CharacterEquipment->AddItem(Owner, (int32)EquipmentSlot);
+			//}
 		}
 	}
 }
@@ -65,21 +64,21 @@ void UPropertyFragment_Equipment::TakeOff()
 	{
 		return;
 	}
-	UEquipmentComponent* CharacterEquipment = Cast<UEquipmentComponent>(Owner->BelongingInventory);
-	if (CharacterEquipment)
-	{
-		// 查找与装备容器共属的物品容器，然后移动物品到空槽。
-		UInventoryComponent* CharacterInventory = CharacterEquipment->GetOwner()->FindComponentByClass<UInventoryComponent>();
-		if (CharacterInventory)
-		{
-			int32 SlotID = CharacterInventory->FindVacancy();
-			if (SlotID < CharacterInventory->GetSize())
-			{
-				CharacterEquipment->RemoveItem(Owner);
-				CharacterInventory->AddItem(Owner, SlotID);
-			}
-		}
-	}
+	//UEquipmentComponent* CharacterEquipment = Cast<UEquipmentComponent>(Owner->BelongingInventory);
+	//if (CharacterEquipment)
+	//{
+	//	// 查找与装备容器共属的物品容器，然后移动物品到空槽。
+	//	UInventoryComponent* CharacterInventory = CharacterEquipment->GetOwner()->FindComponentByClass<UInventoryComponent>();
+	//	if (CharacterInventory)
+	//	{
+	//		int32 SlotID = CharacterInventory->FindVacancy();
+	//		if (SlotID < CharacterInventory->GetSize())
+	//		{
+	//			CharacterEquipment->RemoveItem(Owner);
+	//			CharacterInventory->AddItem(Owner, SlotID);
+	//		}
+	//	}
+	//}
 }
 
 void UPropertyFragment_Equipment::OnEquipmentPutOn(AActor* Target, EEquipmentSlots TargetSlot)

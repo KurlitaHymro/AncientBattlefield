@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Item/ItemPropertyFragment.h"
-#include "EquipmentSystem/EquipmentComponent.h"
 #include "PropertyFragment_MeleeWeapon.generated.h"
 
 /**

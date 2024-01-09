@@ -8,7 +8,6 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "AbilitySystem/CombatAbilitySystemComponent.h"
 #include "InventoryComponent.h"
-#include "EquipmentSystem/EquipmentComponent.h"
 
 ACombatCharacter::ACombatCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -34,14 +33,12 @@ ACombatCharacter::ACombatCharacter(const FObjectInitializer& ObjectInitializer)
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 
-	CombatAbilityComponent = CreateDefaultSubobject<UCombatAbilitySystemComponent>(TEXT("CombatAbilitySystemComponent"));
-	CombatAbilityComponent->SetIsReplicated(true);
+	CombatAbilitySystem = CreateDefaultSubobject<UCombatAbilitySystemComponent>(TEXT("CombatAbilitySystemComponent"));
+	CombatAbilitySystem->SetIsReplicated(true);
 
-	AbilitiesInputComponent = CreateDefaultSubobject<UAbilitiesInputComponent>(TEXT("AbilitiesInputComponent"));
+	AbilitiesInput = CreateDefaultSubobject<UAbilitiesInputComponent>(TEXT("AbilitiesInputComponent"));
 
-	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory"));
-
-	EquipmentComponent = CreateDefaultSubobject<UEquipmentComponent>(TEXT("Equipment"));
+	Inventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
 }
 
 void ACombatCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -58,45 +55,40 @@ void ACombatCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (CombatAbilityComponent && InventoryComponent && EquipmentComponent)
+	if (CombatAbilitySystem && Inventory)
 	{
 		bIsActive = true;
-		CombatAbilityComponent->SwitchBodyForm(CombatAbilityComponent->DefaultBodyForm);
+		CombatAbilitySystem->SwitchBodyForm(CombatAbilitySystem->DefaultBodyForm);
 	}
 }
 
 UAbilitySystemComponent* ACombatCharacter::GetAbilitySystemComponent() const
 {
-	return CombatAbilityComponent;
+	return CombatAbilitySystem;
 }
 
 UInventoryComponent* ACombatCharacter::GetInventorySystemComponent() const
 {
-	return InventoryComponent;
-}
-
-UEquipmentComponent* ACombatCharacter::GetEquipmentSystemComponent() const
-{
-	return EquipmentComponent;
+	return Inventory;
 }
 
 UAbilitiesInputComponent* ACombatCharacter::GetAbilitiesInputComponent() const
 {
-	return AbilitiesInputComponent;
+	return AbilitiesInput;
 }
 
 void ACombatCharacter::Die_Implementation()
 {
 	CombatCharacterDieDelegate.Broadcast();
 
-	for (auto i = 0; i < EquipmentComponent->GetSize(); i++)
-	{
-		auto Equipment = EquipmentComponent->GetEquipment((EEquipmentSlots)i);
-		if (Equipment)
-		{
-			EquipmentComponent->RemoveItem(Equipment);
-		}
-	}
+	//for (auto i = 0; i < EquipmentComponent->GetSize(); i++)
+	//{
+	//	auto Equipment = EquipmentComponent->GetEquipment((EEquipmentSlots)i);
+	//	if (Equipment)
+	//	{
+	//		EquipmentComponent->RemoveItem(Equipment);
+	//	}
+	//}
 
 	if (!AnimConfig.DieAnim.IsEmpty())
 	{
