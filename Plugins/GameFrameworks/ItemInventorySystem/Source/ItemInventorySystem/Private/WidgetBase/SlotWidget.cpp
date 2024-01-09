@@ -13,8 +13,11 @@ bool USlotWidget::DropItem(UItemDragDropOperation* ItemDragDropOperation)
     auto Item = ItemDragDropOperation->Item;
     if (Item->BelongingInventory && InventoryComponent)
     {
-        Item->BelongingInventory->RemoveItem(Item);
-        InventoryComponent->AddItem(Item, SlotID);
+        if (InventoryComponent->CanHold(Item, SlotID))
+        {
+            Item->BelongingInventory->RemoveItem(Item);
+            InventoryComponent->AddItem(Item, SlotID);
+        }
         return true;
     }
     return false;

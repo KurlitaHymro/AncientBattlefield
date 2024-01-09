@@ -54,6 +54,9 @@ public:
 	virtual void RemoveItemFromSlot(int32 SlotID);
 
 	UFUNCTION(BlueprintCallable)
+	virtual void AppendSlotTags(int32 SlotID, FGameplayTagContainer BlockedTags, FGameplayTagContainer RequiredTags);
+
+	UFUNCTION(BlueprintCallable)
 	virtual UItemObject* SwapItem(int32 SlotID, UItemObject* OtherItem);
 
 	UFUNCTION(BlueprintCallable)
@@ -62,8 +65,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual FString GetStaticDescription() const;
 
-protected: 
-	UPROPERTY()
+protected:
+	UPROPERTY(meta = (AllowPrivateAccess = "true"))
 	TArray<FInventorySlot> Slots;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0", AllowPrivateAccess = "true", InstanceEditable = true, ExposeOnSpawn = true))

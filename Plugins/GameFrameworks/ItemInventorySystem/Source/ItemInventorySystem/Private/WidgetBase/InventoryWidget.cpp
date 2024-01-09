@@ -36,7 +36,14 @@ void UInventoryWidget::OnAddItem(UItemObject* Item, int32 SlotID)
 			--Subregio;
 			break;
 		}
-		++Subregio;
+		else if (!(Subregio + 1) && Subregio->SubregioBegin + Subregio->SubregioSize > SlotID)
+		{
+			break;
+		}
+		else
+		{
+			++Subregio;
+		}
 	}
 	if (Subregio)
 	{
@@ -75,7 +82,14 @@ void UInventoryWidget::OnRemoveItem(UItemObject* Item, int32 SlotID)
 			--Subregio;
 			break;
 		}
-		++Subregio;
+		else if (!(Subregio + 1) && Subregio->SubregioBegin + Subregio->SubregioSize > SlotID)
+		{
+			break;
+		}
+		else
+		{
+			++Subregio;
+		}
 	}
 	if (Subregio)
 	{
@@ -99,6 +113,7 @@ void UInventoryWidget::LoadSubregio(FInventoryWidgetSubregioInfo& Subregio)
 			int32 Row = LocolID / Subregio.SubregioGridPerRow;
 			int32 Column = LocolID - Row * Subregio.SubregioGridPerRow;
 			UniformGridPanel->AddChildToUniformGrid(SlotWidget, Row, Column);
+			InventoryComponent->AppendSlotTags(SlotWidget->SlotID, Subregio.AppendBlockedTags, Subregio.AppendRequiredTags);
 			if (auto Item = InventoryComponent->GetItem(SlotWidget->SlotID))
 			{
 				OnAddItem(Item, SlotWidget->SlotID);
@@ -116,6 +131,7 @@ void UInventoryWidget::LoadSubregio(FInventoryWidgetSubregioInfo& Subregio)
 		SlotWidget->InventoryComponent = InventoryComponent;
 		SlotWidget->SlotID = AccumulativeSize;
 		Overlay->AddChildToOverlay(SlotWidget);
+		InventoryComponent->AppendSlotTags(SlotWidget->SlotID, Subregio.AppendBlockedTags, Subregio.AppendRequiredTags);
 		if (auto Item = InventoryComponent->GetItem(SlotWidget->SlotID))
 		{
 			OnAddItem(Item, SlotWidget->SlotID);

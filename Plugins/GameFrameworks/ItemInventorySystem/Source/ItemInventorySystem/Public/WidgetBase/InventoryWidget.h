@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "GameplayTagContainer.h"
 #include "InventoryWidget.generated.h"
 
 USTRUCT(BlueprintType, meta = (DisplayName = "WidgetSubregio"))
@@ -14,11 +15,17 @@ struct FInventoryWidgetSubregioInfo
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Instanced)
 	TObjectPtr<class UPanelWidget> Panel;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<class USlotWidget> SlotWidgetType;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<class UItemWidget> ItemWidgetType;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Tags)
+	FGameplayTagContainer AppendBlockedTags;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Tags)
+	FGameplayTagContainer AppendRequiredTags;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	int32 SubregioBegin;

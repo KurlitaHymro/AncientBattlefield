@@ -82,6 +82,13 @@ void UInventoryComponent::RemoveItemFromSlot(int32 SlotID)
 	RemoveItem(Slots[SlotID].Item);
 }
 
+void UInventoryComponent::AppendSlotTags(int32 SlotID, FGameplayTagContainer BlockedTags, FGameplayTagContainer RequiredTags)
+{
+	Slots.RangeCheck(SlotID);
+	Slots[SlotID].ItemBlockedTags.AppendTags(BlockedTags);
+	Slots[SlotID].ItemRequiredTags.AppendTags(RequiredTags);
+}
+
 UItemObject* UInventoryComponent::SwapItem(int32 SlotID, UItemObject* OtherItem)
 {
 	UItemObject* ThisItem = GetItem(SlotID);
