@@ -28,6 +28,11 @@ void UPropertyFragment_Equipment::InitFromRegistry(const FName RegistryType, FNa
 	}
 }
 
+FName UPropertyFragment_Equipment::GetPropertyTagName()
+{
+	return FName("InventorySystem.Property.Equipment");
+}
+
 FName UPropertyFragment_Equipment::GetRegistryTypeName()
 {
 	return FName("EquipmentRegistry");

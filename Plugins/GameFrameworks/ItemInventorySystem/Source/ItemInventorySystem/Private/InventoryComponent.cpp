@@ -25,11 +25,11 @@ void UInventoryComponent::PostLoad()
 	}
 }
 
-int32 UInventoryComponent::FindVacancy() const
+int32 UInventoryComponent::FindVacancy(UItemObject* Item) const
 {
 	for (int32 SlotID = 0; SlotID < Size; SlotID++)
 	{
-		if (Slots[SlotID].Item == nullptr)
+		if (Slots[SlotID].Item == nullptr && CanHold(Item, SlotID))
 		{
 			return SlotID;
 		}
@@ -111,6 +111,39 @@ UItemObject* UInventoryComponent::GetItem(int32 SlotID)
 {
 	Slots.RangeCheck(SlotID);
 	return Slots[SlotID].Item;
+}
+
+bool UInventoryComponent::CollectToUniversalSlots()
+{
+	/* 将移除所有物品，再按次序添加回万能槽位中。
+	 * 万能槽位UI不足的部分不会显示，Size不足则会被销毁。
+	**/
+	TArray<TObjectPtr<UItemObject>> Items;
+	for (auto Slot : Slots)
+	{
+		if (Slot.Item)
+		{
+			Items.Add(Slot.Item);
+			RemoveItem(Slot.Item);
+		}
+	}
+	auto Iterator = Items.CreateIterator();
+	for (int32 i = 0; i < Size; i++)
+	{
+		if (Iterator && Slots[i].ItemBlockedTags.IsEmpty() && Slots[i].ItemRequiredTags.IsEmpty())
+		{
+			AddItem(*Iterator, i);
+			Iterator++;
+		}
+	}
+	if (Iterator)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
 }
 
 FString UInventoryComponent::GetStaticDescription() const

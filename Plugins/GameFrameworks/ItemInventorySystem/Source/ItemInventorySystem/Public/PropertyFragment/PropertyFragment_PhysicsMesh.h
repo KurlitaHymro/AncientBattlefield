@@ -24,6 +24,9 @@ class ITEMINVENTORYSYSTEM_API UPropertyFragment_PhysicsMesh : public UItemProper
 	GENERATED_BODY()
 
 public:
+	virtual FName GetPropertyTagName() override;
+
+public:
 	UFUNCTION(BlueprintCallable)
 	void SetEntityState(UMeshComponent* Mesh, EEntityState State);
 

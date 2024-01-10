@@ -7,6 +7,11 @@
 #include "InventoryComponent.h"
 #include "Kismet/GameplayStatics.h"
 
+FName UPropertyFragment_PhysicsMesh::GetPropertyTagName()
+{
+	return FName("InventorySystem.Property.PhysicsMesh");
+}
+
 void UPropertyFragment_PhysicsMesh::SetEntityState(UMeshComponent* Mesh, EEntityState State)
 {
 	if (Mesh != nullptr)
@@ -61,7 +66,7 @@ void UPropertyFragment_PhysicsMesh::Pickup(UInventoryComponent* TargetInventory)
 		if (EntityLink && EntityLink->GetEntity() != nullptr)
 		{
 			EntityLink->DestroyEntity();
-			TargetInventory->AddItem(Owner, TargetInventory->FindVacancy());
+			TargetInventory->AddItem(Owner, TargetInventory->FindVacancy(Owner));
 		}
 	}
 }

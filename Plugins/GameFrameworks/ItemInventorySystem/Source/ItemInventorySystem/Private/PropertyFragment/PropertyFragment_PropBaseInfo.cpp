@@ -23,6 +23,11 @@ void UPropertyFragment_PropBaseInfo::InitFromRegistry(const FName RegistryType, 
 	}
 }
 
+FName UPropertyFragment_PropBaseInfo::GetPropertyTagName()
+{
+	return FName("InventorySystem.Property.PropBaseInfo");
+}
+
 FName UPropertyFragment_PropBaseInfo::GetRegistryTypeName()
 {
 	return FName("PropBaseInfoRegistry");

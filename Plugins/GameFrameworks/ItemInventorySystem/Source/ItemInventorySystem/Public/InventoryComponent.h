@@ -39,7 +39,7 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	virtual int32 FindVacancy() const;
+	virtual int32 FindVacancy(UItemObject* Item) const;
 
 	UFUNCTION(BlueprintCallable)
 	virtual bool CanHold(UItemObject* Item, int32 SlotID) const;
@@ -63,10 +63,13 @@ public:
 	virtual UItemObject* GetItem(int32 SlotID);
 
 	UFUNCTION(BlueprintCallable)
+	virtual bool CollectToUniversalSlots();
+
+	UFUNCTION(BlueprintCallable)
 	virtual FString GetStaticDescription() const;
 
-protected:
-	UPROPERTY(meta = (AllowPrivateAccess = "true"))
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	TArray<FInventorySlot> Slots;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0", AllowPrivateAccess = "true", InstanceEditable = true, ExposeOnSpawn = true))

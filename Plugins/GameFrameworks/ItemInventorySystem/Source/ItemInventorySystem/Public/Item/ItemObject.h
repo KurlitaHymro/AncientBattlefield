@@ -51,13 +51,13 @@ public:
 	};
 
 	UFUNCTION(BlueprintCallable)
-	static class UItemObject* NewItem(UObject* Outer, FName PrefabName);
+	static class UItemObject* NewItemByRegistry(UObject* Outer, FName PrefabName);
 
-private:
-	UPROPERTY(EditDefaultsOnly, Category = Tags)
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Tags, meta = (AllowPrivateAccess = "true"))
 	FGameplayTagContainer ItemTagContainer;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Property, meta = (AllowPrivateAccess = "true"))
 	TArray<class UItemPropertyFragment*> PropertyFragments;
 
 public:

@@ -10,6 +10,11 @@
 #include "EquipmentSystem/PropertyFragment/PropertyFragment_Equipment.h"
 #include "AbilitySystem/CombatAbilitySystemComponent.h"
 
+FName UPropertyFragment_MeleeWeapon::GetPropertyTagName()
+{
+	return FName("InventorySystem.Property.MeleeWeapon");
+}
+
 void UPropertyFragment_MeleeWeapon::OnWeaponPutOn(UAbilitySystemComponent* TargetASC)
 {
 	AbilitySystemComponent = Cast<UCombatAbilitySystemComponent>(TargetASC);

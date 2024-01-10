@@ -24,6 +24,11 @@ void UPropertyFragment_EntityLink::InitFromRegistry(const FName RegistryType, FN
 	}
 }
 
+FName UPropertyFragment_EntityLink::GetPropertyTagName()
+{
+	return FName("InventorySystem.Property.EntityLink");
+}
+
 FName UPropertyFragment_EntityLink::GetRegistryTypeName()
 {
 	return FName("EntityLinkRegistry");

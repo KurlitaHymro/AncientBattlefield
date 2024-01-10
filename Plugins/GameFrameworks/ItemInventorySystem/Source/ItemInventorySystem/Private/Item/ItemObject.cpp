@@ -31,7 +31,7 @@ UItemPropertyFragment* UItemObject::FindPropertyFragment(TSubclassOf<UItemProper
 	return nullptr;
 }
 
-UItemObject* UItemObject::NewItem(UObject* Outer, FName PrefabName)
+UItemObject* UItemObject::NewItemByRegistry(UObject* Outer, FName PrefabName)
 {
 	UItemObject* Item = NewObject<UItemObject>(Outer);
 	auto ItemPrefabRegistry = UDataRegistrySubsystem::Get()->GetRegistryForType(FName("ItemPrefabRegistry"));
@@ -44,11 +44,7 @@ UItemObject* UItemObject::NewItem(UObject* Outer, FName PrefabName)
 			{
 				UClass* PropertyClass = PropertyFragment.PropertyClass.LoadSynchronous();
 				UItemPropertyFragment* PropertyInstance = NewObject<UItemPropertyFragment>(Item, PropertyClass);
-				if (PropertyFragment.PropertyPrefab.IsValid() && !PropertyFragment.PropertyPrefab.IsNone())
-				{
-					PropertyInstance->InitFromRegistry(PropertyInstance->GetRegistryTypeName(), PropertyFragment.PropertyPrefab);
-				}
-				Item->AddPropertyFragment(PropertyInstance);
+				PropertyInstance->Init(Item, PropertyFragment.PropertyPrefab, PropertyInstance->GetRegistryTypeName(), nullptr);
 			}
 		}
 	}

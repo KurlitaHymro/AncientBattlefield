@@ -64,7 +64,6 @@ void UGameFeatureAction_AddItem::AddActorItems(AActor* Actor, const FInventoryIt
 {
 	if (UInventoryComponent* InventoryComponent = FindOrAddComponentForActor<UInventoryComponent>(Actor, Entry.ActorClass))
 	{
-		// 如果一个Actor具有多个库存（比如Character同时有物品栏和装备栏），这里只往首个库存中添加物品，需保证兼容性最高的库存在首个。
 		TArray<class UItemObject*> AddedExtensions;
 		AddedExtensions.Reserve(Entry.GivedItems.Num());
 
@@ -72,8 +71,8 @@ void UGameFeatureAction_AddItem::AddActorItems(AActor* Actor, const FInventoryIt
 		{
 			if (ItemName.IsValid() && !ItemName.IsNone())
 			{
-				UItemObject* ItemObject = UItemObject::NewItem(Actor, ItemName);
-				InventoryComponent->AddItem(ItemObject, InventoryComponent->FindVacancy());
+				UItemObject* ItemObject = UItemObject::NewItemByRegistry(Actor, ItemName);
+				InventoryComponent->AddItem(ItemObject, InventoryComponent->FindVacancy(ItemObject));
 				AddedExtensions.Add(ItemObject);
 			}
 		}

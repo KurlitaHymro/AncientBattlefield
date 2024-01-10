@@ -15,6 +15,9 @@ class ANCIENTBATTLEFIELD_API UPropertyFragment_MeleeWeapon : public UItemPropert
 	GENERATED_BODY()
 
 public:
+	virtual FName GetPropertyTagName() override;
+
+public:
 	UFUNCTION()
 	void OnWeaponPutOn(class UAbilitySystemComponent* TargetASC);
 

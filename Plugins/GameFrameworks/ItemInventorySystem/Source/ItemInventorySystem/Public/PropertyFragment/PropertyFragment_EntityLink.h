@@ -29,6 +29,8 @@ public:
 
 	virtual void InitFromRegistry(const FName RegistryType, FName PrefabName) override;
 
+	virtual FName GetPropertyTagName() override;
+
 	virtual FName GetRegistryTypeName() override;
 
 public:

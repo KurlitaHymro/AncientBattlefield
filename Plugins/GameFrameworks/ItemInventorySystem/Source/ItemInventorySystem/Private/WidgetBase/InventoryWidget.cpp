@@ -21,7 +21,12 @@ void UInventoryWidget::OnWidgetRebuilt()
 		{
 			LoadSubregio(Subregio);
 		}
+		
+		/* UI的部署会对槽位施加规则，所以需要对之前存在的物品重排；重排的过程实质是移除和添加。
+		 * 移除时，之前存在的物品本就没有UI，也就不须关联代理；添加时，其UI会被创建。
+		**/
 		InventoryComponent->InventoryAddItemDelegate.AddDynamic(this, &ThisClass::OnAddItem);
+		InventoryComponent->CollectToUniversalSlots();
 		InventoryComponent->InventoryRemoveItemDelegate.AddDynamic(this, &ThisClass::OnRemoveItem);
 	}
 }
@@ -114,10 +119,6 @@ void UInventoryWidget::LoadSubregio(FInventoryWidgetSubregioInfo& Subregio)
 			int32 Column = LocolID - Row * Subregio.SubregioGridPerRow;
 			UniformGridPanel->AddChildToUniformGrid(SlotWidget, Row, Column);
 			InventoryComponent->AppendSlotTags(SlotWidget->SlotID, Subregio.AppendBlockedTags, Subregio.AppendRequiredTags);
-			if (auto Item = InventoryComponent->GetItem(SlotWidget->SlotID))
-			{
-				OnAddItem(Item, SlotWidget->SlotID);
-			}
 		}
 	}
 	else if (0) // 垂直表
@@ -132,10 +133,6 @@ void UInventoryWidget::LoadSubregio(FInventoryWidgetSubregioInfo& Subregio)
 		SlotWidget->SlotID = AccumulativeSize;
 		Overlay->AddChildToOverlay(SlotWidget);
 		InventoryComponent->AppendSlotTags(SlotWidget->SlotID, Subregio.AppendBlockedTags, Subregio.AppendRequiredTags);
-		if (auto Item = InventoryComponent->GetItem(SlotWidget->SlotID))
-		{
-			OnAddItem(Item, SlotWidget->SlotID);
-		}
 	}
 	AccumulativeSize += Subregio.SubregioSize;
 }
