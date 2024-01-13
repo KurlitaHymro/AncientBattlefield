@@ -15,7 +15,7 @@ struct FPropertyFragmentPropBaseInfo : public FTableRowBase
 	FName Name;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	UTexture* Icon;
+	UTexture2D* Icon;
 };
 
 /**

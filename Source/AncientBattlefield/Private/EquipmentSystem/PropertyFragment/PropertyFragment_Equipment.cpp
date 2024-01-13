@@ -114,7 +114,7 @@ void UPropertyFragment_Equipment::OnEquipmentPutOn(AActor* Target, EEquipmentSlo
 				UPropertyFragment_MeleeWeapon* MeleeWeapon = Owner->FindPropertyFragment<UPropertyFragment_MeleeWeapon>();
 				if (MeleeWeapon)
 				{
-					MeleeWeapon->OnWeaponPutOn(Character->GetAbilitySystemComponent());
+					MeleeWeapon->OnWeaponPutOn();
 				}
 			}
 		}

@@ -19,7 +19,7 @@ struct FAbilityInfo
 	FName Name;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	UTexture* Icon;
+	UTexture2D* Icon;
 };
 
 USTRUCT(BlueprintType, meta = (DisplayName = "DeriveAbilities"))

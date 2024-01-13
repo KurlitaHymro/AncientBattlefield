@@ -6,6 +6,16 @@
 #include "Item/ItemPropertyFragment.h"
 #include "PropertyFragment_MeleeWeapon.generated.h"
 
+USTRUCT(BlueprintType, meta = (DisplayName = "MeleeWeapon"))
+struct FPropertyFragmentMeleeWeapon : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UTexture2D* DisplayIcon;
+};
+
+
 /**
  * 
  */
@@ -15,11 +25,17 @@ class ANCIENTBATTLEFIELD_API UPropertyFragment_MeleeWeapon : public UItemPropert
 	GENERATED_BODY()
 
 public:
+	virtual void InitFromDataTable(const class UDataTable* DataTable, FName PrefabName) override;
+
+	virtual void InitFromRegistry(const FName RegistryType, FName PrefabName) override;
+
 	virtual FName GetPropertyTagName() override;
+
+	virtual FName GetRegistryTypeName() override;
 
 public:
 	UFUNCTION()
-	void OnWeaponPutOn(class UAbilitySystemComponent* TargetASC);
+	void OnWeaponPutOn();
 
 	UFUNCTION()
 	void OnWeaponTakeOff();
@@ -33,6 +49,10 @@ public:
 protected:
 	UFUNCTION()
 	void OnWeaponHit(FHitResult HitResult);
+
+public:
+	UPROPERTY(BlueprintReadOnly)
+	FPropertyFragmentMeleeWeapon PropertyFragment;
 
 private:
 	class UCombatAbilitySystemComponent* AbilitySystemComponent;

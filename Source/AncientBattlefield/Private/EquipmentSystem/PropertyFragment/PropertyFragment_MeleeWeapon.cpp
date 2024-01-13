@@ -2,23 +2,47 @@
 
 
 #include "EquipmentSystem/PropertyFragment/PropertyFragment_MeleeWeapon.h"
+#include "DataRegistrySubsystem.h"
 #include "Anim/Components/HitTraceComponent.h"
 #include "Anim/Components/TrailingComponent.h"
+#include "InventoryComponent.h"
 #include "Item/ItemObject.h"
 #include "PropertyFragment/PropertyFragment_EntityLink.h"
 #include "PropertyFragment/PropertyFragment_PhysicsMesh.h"
 #include "EquipmentSystem/PropertyFragment/PropertyFragment_Equipment.h"
 #include "AbilitySystem/CombatAbilitySystemComponent.h"
 
+void UPropertyFragment_MeleeWeapon::InitFromDataTable(const UDataTable* DataTable, FName PrefabName)
+{
+	FPropertyFragmentMeleeWeapon* Prefab = DataTable->FindRow<FPropertyFragmentMeleeWeapon>(PrefabName, DataTable->GetName(), true);
+	if (Prefab)
+	{
+		PropertyFragment = *Prefab;
+	}
+}
+
+void UPropertyFragment_MeleeWeapon::InitFromRegistry(const FName RegistryType, FName PrefabName)
+{
+	auto Registry = UDataRegistrySubsystem::Get()->GetRegistryForType(RegistryType);
+	if (Registry)
+	{
+		auto Prefab = Registry->GetCachedItem<FPropertyFragmentMeleeWeapon>(FDataRegistryId(RegistryType, PrefabName));
+		PropertyFragment = *Prefab;
+	}
+}
+
 FName UPropertyFragment_MeleeWeapon::GetPropertyTagName()
 {
 	return FName("InventorySystem.Property.MeleeWeapon");
 }
 
-void UPropertyFragment_MeleeWeapon::OnWeaponPutOn(UAbilitySystemComponent* TargetASC)
+FName UPropertyFragment_MeleeWeapon::GetRegistryTypeName()
 {
-	AbilitySystemComponent = Cast<UCombatAbilitySystemComponent>(TargetASC);
+	return FName("MeleeWeaponRegistry");
+}
 
+void UPropertyFragment_MeleeWeapon::OnWeaponPutOn()
+{
 	UPropertyFragment_EntityLink* EntityLink = Owner->FindPropertyFragment<UPropertyFragment_EntityLink>();
 	UMeshComponent* Mesh = nullptr;
 	if (EntityLink && EntityLink->GetEntity())
@@ -28,10 +52,11 @@ void UPropertyFragment_MeleeWeapon::OnWeaponPutOn(UAbilitySystemComponent* Targe
 		Mesh = EntityLink->GetEntity()->GetComponentByClass<UMeshComponent>();
 	}
 
-	if (AbilitySystemComponent != nullptr && HitTraceComponent != nullptr && Mesh != nullptr)
+	if (HitTraceComponent != nullptr && Mesh != nullptr)
 	{
+		auto OwnerActor = Owner->BelongingInventory->GetOwner();
 		HitTraceComponent->Setup(Mesh);
-		HitTraceComponent->ActorsToIgnore.AddUnique(AbilitySystemComponent->GetOwner());
+		HitTraceComponent->ActorsToIgnore.AddUnique(OwnerActor);
 		HitTraceComponent->UniqueHitDelegate.AddDynamic(this, &ThisClass::OnWeaponHit);
 	}
 
