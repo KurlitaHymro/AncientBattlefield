@@ -7,6 +7,8 @@
 #include "GameplayTagAssetInterface.h"
 #include "ItemObject.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInventoryUpdateDelegate, UInventoryComponent*, Inventory, int32, LocalID);
+
 USTRUCT(BlueprintType, meta = (DisplayName = "ItemPropertyFragment"))
 struct FPropertyFragmentConfig
 {
@@ -16,7 +18,7 @@ struct FPropertyFragmentConfig
 	TSoftClassPtr<class UItemPropertyFragment> PropertyClass;
 
 	UPROPERTY(EditDefaultsOnly)
-	FName PropertyPrefab;
+	FName PropertyTemplate;
 };
 
 USTRUCT(BlueprintType, meta = (DisplayName = "ItemAbstract"))
@@ -37,10 +39,12 @@ class ITEMINVENTORYSYSTEM_API UItemObject : public UObject, public IGameplayTagA
 	GENERATED_BODY()
 
 public:
+	UItemObject();
+
 	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;
 
 	UFUNCTION(BlueprintCallable)
-	virtual void AddPropertyFragment(UItemPropertyFragment* PropertyFragmentObject);
+	virtual void AddPropertyFragment(UItemPropertyFragment* PropertyFragmentObject, FName TemplateName = TEXT(""));
 
 	UFUNCTION(BlueprintCallable)
 	class UItemPropertyFragment* FindPropertyFragment(TSubclassOf<UItemPropertyFragment> PropertyFragmentType);
@@ -51,19 +55,28 @@ public:
 	};
 
 	UFUNCTION(BlueprintCallable)
-	static class UItemObject* NewItemByRegistry(UObject* Outer, FName PrefabName);
+	static class UItemObject* NewItemByRegistry(UObject* Outer, FName TemplateName);
+
+protected:
+	UFUNCTION()
+	void OnInventoryUpdate(UInventoryComponent* Inventory, int32 LocalID);
 
 public:
+	UPROPERTY(BlueprintAssignable)
+	FInventoryUpdateDelegate InventoryUpdateDelegate;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Tags, meta = (AllowPrivateAccess = "true"))
 	FGameplayTagContainer ItemTagContainer;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Property, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Property,  meta = (AllowPrivateAccess = "true"))
 	TArray<class UItemPropertyFragment*> PropertyFragments;
 
-public:
 	UPROPERTY(BlueprintReadOnly)
 	class UInventoryComponent* BelongingInventory;
 
 	UPROPERTY(BlueprintReadOnly)
 	int32 BelongingSlotID;
+
+public:
+	static FName RegistryType;
 };

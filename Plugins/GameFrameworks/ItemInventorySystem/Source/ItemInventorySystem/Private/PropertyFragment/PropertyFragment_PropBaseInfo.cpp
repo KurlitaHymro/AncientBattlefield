@@ -4,31 +4,25 @@
 #include "PropertyFragment/PropertyFragment_PropBaseInfo.h"
 #include "DataRegistrySubsystem.h"
 
-void UPropertyFragment_PropBaseInfo::InitFromDataTable(const UDataTable* DataTable, FName PrefabName)
-{
-	FPropertyFragmentPropBaseInfo* Prefab = DataTable->FindRow<FPropertyFragmentPropBaseInfo>(PrefabName, DataTable->GetName(), true);
-	if (Prefab)
-	{
-		PropertyFragment = *Prefab;
-	}
-}
+FGameplayTag UPropertyFragment_PropBaseInfo::PropertyTag(FGameplayTag::RequestGameplayTag(TEXT("InventorySystem.Property.PropBaseInfo")));
+FName UPropertyFragment_PropBaseInfo::RegistryType(TEXT("PropBaseInfoRegistry"));
 
-void UPropertyFragment_PropBaseInfo::InitFromRegistry(const FName RegistryType, FName PrefabName)
+void UPropertyFragment_PropBaseInfo::InitFromRegistry(FName Template)
 {
-	auto Registry = UDataRegistrySubsystem::Get()->GetRegistryForType(RegistryType);
+	auto Registry = UDataRegistrySubsystem::Get()->GetRegistryForType(GetRegistryTypeName());
 	if (Registry)
 	{
-		auto Prefab = Registry->GetCachedItem<FPropertyFragmentPropBaseInfo>(FDataRegistryId(RegistryType, PrefabName));
+		auto Prefab = Registry->GetCachedItem<FPropertyFragmentPropBaseInfo>(FDataRegistryId(GetRegistryTypeName(), Template));
 		PropertyFragment = *Prefab;
 	}
 }
 
-FName UPropertyFragment_PropBaseInfo::GetPropertyTagName()
+FGameplayTag UPropertyFragment_PropBaseInfo::GetPropertyTag()
 {
-	return FName("InventorySystem.Property.PropBaseInfo");
+	return PropertyTag;
 }
 
 FName UPropertyFragment_PropBaseInfo::GetRegistryTypeName()
 {
-	return FName("PropBaseInfoRegistry");
+	return RegistryType;
 }

@@ -27,16 +27,19 @@ class ITEMINVENTORYSYSTEM_API UPropertyFragment_PropBaseInfo : public UItemPrope
 	GENERATED_BODY()
 
 public:
-	virtual void InitFromDataTable(const class UDataTable* DataTable, FName PrefabName) override;
+	virtual void InitFromRegistry(FName Template) override;
 
-	virtual void InitFromRegistry(const FName RegistryType, FName PrefabName) override;
-
-	virtual FName GetPropertyTagName() override;
+	virtual FGameplayTag GetPropertyTag() override;
 
 	virtual FName GetRegistryTypeName() override;
 
 public:
 	UPROPERTY(BlueprintReadOnly)
 	FPropertyFragmentPropBaseInfo PropertyFragment;
+
+public:
+	static FGameplayTag PropertyTag;
+
+	static FName RegistryType;
 
 };

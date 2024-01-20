@@ -3,35 +3,30 @@
 
 #include "PropertyFragment/PropertyFragment_EntityLink.h"
 #include "DataRegistrySubsystem.h"
+#include "Item/ItemObject.h"
 #include "Components/GameFrameworkComponentManager.h"
 
-void UPropertyFragment_EntityLink::InitFromDataTable(const UDataTable* DataTable, FName PrefabName)
-{
-	FPropertyFragmentEntityLink* Prefab = DataTable->FindRow<FPropertyFragmentEntityLink>(PrefabName, DataTable->GetName(), true);
-	if (Prefab)
-	{
-		PropertyFragment = *Prefab;
-	}
-}
+FGameplayTag UPropertyFragment_EntityLink::PropertyTag(FGameplayTag::RequestGameplayTag(TEXT("InventorySystem.Property.EntityLink")));
+FName UPropertyFragment_EntityLink::RegistryType(TEXT("EntityLinkRegistry"));
 
-void UPropertyFragment_EntityLink::InitFromRegistry(const FName RegistryType, FName PrefabName)
+void UPropertyFragment_EntityLink::InitFromRegistry(FName Template)
 {
-	auto Registry = UDataRegistrySubsystem::Get()->GetRegistryForType(RegistryType);
+	auto Registry = UDataRegistrySubsystem::Get()->GetRegistryForType(GetRegistryTypeName());
 	if (Registry)
 	{
-		auto Prefab = Registry->GetCachedItem<FPropertyFragmentEntityLink>(FDataRegistryId(RegistryType, PrefabName));
+		auto Prefab = Registry->GetCachedItem<FPropertyFragmentEntityLink>(FDataRegistryId(GetRegistryTypeName(), Template));
 		PropertyFragment = *Prefab;
 	}
 }
 
-FName UPropertyFragment_EntityLink::GetPropertyTagName()
+FGameplayTag UPropertyFragment_EntityLink::GetPropertyTag()
 {
-	return FName("InventorySystem.Property.EntityLink");
+	return PropertyTag;
 }
 
 FName UPropertyFragment_EntityLink::GetRegistryTypeName()
 {
-	return FName("EntityLinkRegistry");
+	return RegistryType;
 }
 
 void UPropertyFragment_EntityLink::SpawnEntity()
@@ -41,12 +36,12 @@ void UPropertyFragment_EntityLink::SpawnEntity()
 		FActorSpawnParameters SpawnConfig;
 		SpawnConfig.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-		auto World = GetWorld();
 		TSubclassOf<AActor> EntityType = PropertyFragment.EntityType.LoadSynchronous();
 		if (EntityType)
 		{
-			Entity = Cast<AEntityActor>(World->SpawnActor(EntityType));
+			Entity = Cast<AEntityActor>(GetWorld()->SpawnActor(EntityType));
 			Entity->ItemObject = Owner;
+			ItemSpawnEntityDelegate.Broadcast(Entity);
 		}
 	}
 }
@@ -65,18 +60,4 @@ AEntityActor::AEntityActor()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
-}
-
-// Called when the game starts or when spawned
-void AEntityActor::BeginPlay()
-{
-	Super::BeginPlay();
-
-}
-
-// Called every frame
-void AEntityActor::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }

@@ -25,21 +25,17 @@ class ANCIENTBATTLEFIELD_API UPropertyFragment_MeleeWeapon : public UItemPropert
 	GENERATED_BODY()
 
 public:
-	virtual void InitFromDataTable(const class UDataTable* DataTable, FName PrefabName) override;
+	virtual void Init(const FName Template) override;
 
-	virtual void InitFromRegistry(const FName RegistryType, FName PrefabName) override;
+	virtual void InitFromRegistry(FName Template) override;
 
-	virtual FName GetPropertyTagName() override;
+	virtual FGameplayTag GetPropertyTag() override;
 
 	virtual FName GetRegistryTypeName() override;
 
+	virtual FGameplayTagContainer GetRequiredTags() override;
+
 public:
-	UFUNCTION()
-	void OnWeaponPutOn();
-
-	UFUNCTION()
-	void OnWeaponTakeOff();
-
 	UFUNCTION(BlueprintCallable)
 	class UHitTraceComponent* GetHitTraceComponent() { return HitTraceComponent; };
 
@@ -48,7 +44,16 @@ public:
 
 protected:
 	UFUNCTION()
+	void OnSpawnEntity(AActor* Entity);
+
+	UFUNCTION()
 	void OnWeaponHit(FHitResult HitResult);
+
+	UFUNCTION()
+	void OnWeaponPutOn();
+
+	UFUNCTION()
+	void OnWeaponTakeOff();
 
 public:
 	UPROPERTY(BlueprintReadOnly)
@@ -60,4 +65,9 @@ private:
 	class UHitTraceComponent* HitTraceComponent;
 
 	class UTrailingComponent* TrailingComponent;
+
+public:
+	static FGameplayTag PropertyTag;
+
+	static FName RegistryType;
 };

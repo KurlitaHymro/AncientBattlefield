@@ -24,7 +24,9 @@ class ITEMINVENTORYSYSTEM_API UPropertyFragment_PhysicsMesh : public UItemProper
 	GENERATED_BODY()
 
 public:
-	virtual FName GetPropertyTagName() override;
+	virtual FGameplayTag GetPropertyTag() override;
+
+	virtual FGameplayTagContainer GetRequiredTags() override;
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -35,4 +37,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void Pickup(UInventoryComponent* TargetInventory);
+
+public:
+	static FGameplayTag PropertyTag;
+
+	static FName RegistryType;
 };

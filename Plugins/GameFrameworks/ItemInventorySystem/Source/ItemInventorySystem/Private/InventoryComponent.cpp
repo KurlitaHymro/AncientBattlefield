@@ -55,10 +55,9 @@ void UInventoryComponent::AddItem(UItemObject* Item, int32 SlotID)
 {
 	if (CanHold(Item, SlotID))
 	{
-		Item->BelongingInventory = this;
-		Item->BelongingSlotID = SlotID;
-		InventoryAddItemDelegate.Broadcast(Item, SlotID);
 		Slots[SlotID].Item = Item;
+		InventoryAddItemDelegate.Broadcast(Item, SlotID);
+		Item->InventoryUpdateDelegate.Broadcast(this, SlotID);
 	}
 }
 
@@ -68,11 +67,9 @@ void UInventoryComponent::RemoveItem(UItemObject* Item)
 	{
 		int32 SlotID = Item->BelongingSlotID;
 		ensure(Item == Slots[SlotID].Item);
-
-		InventoryRemoveItemDelegate.Broadcast(Item, SlotID);
-		Item->BelongingSlotID = Size;
-		Item->BelongingInventory = nullptr;
 		Slots[SlotID].Item = nullptr;
+		InventoryRemoveItemDelegate.Broadcast(Item, SlotID);
+		Item->InventoryUpdateDelegate.Broadcast(nullptr, Size);
 	}
 }
 

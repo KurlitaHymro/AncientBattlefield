@@ -12,33 +12,52 @@
 #include "EquipmentSystem/PropertyFragment/PropertyFragment_Equipment.h"
 #include "AbilitySystem/CombatAbilitySystemComponent.h"
 
-void UPropertyFragment_MeleeWeapon::InitFromDataTable(const UDataTable* DataTable, FName PrefabName)
+FGameplayTag UPropertyFragment_MeleeWeapon::PropertyTag(FGameplayTag::RequestGameplayTag(TEXT("InventorySystem.Property.MeleeWeapon")));
+FName UPropertyFragment_MeleeWeapon::RegistryType(TEXT("MeleeWeaponRegistry"));
+
+void UPropertyFragment_MeleeWeapon::Init(const FName Template)
 {
-	FPropertyFragmentMeleeWeapon* Prefab = DataTable->FindRow<FPropertyFragmentMeleeWeapon>(PrefabName, DataTable->GetName(), true);
-	if (Prefab)
-	{
-		PropertyFragment = *Prefab;
-	}
+	Super::Init(Template);
+
+	auto EntityLink = Owner->FindPropertyFragment<UPropertyFragment_EntityLink>();
+	EntityLink->ItemSpawnEntityDelegate.AddDynamic(this, &ThisClass::OnSpawnEntity);
 }
 
-void UPropertyFragment_MeleeWeapon::InitFromRegistry(const FName RegistryType, FName PrefabName)
+void UPropertyFragment_MeleeWeapon::InitFromRegistry(FName Template)
 {
-	auto Registry = UDataRegistrySubsystem::Get()->GetRegistryForType(RegistryType);
+	auto Registry = UDataRegistrySubsystem::Get()->GetRegistryForType(GetRegistryTypeName());
 	if (Registry)
 	{
-		auto Prefab = Registry->GetCachedItem<FPropertyFragmentMeleeWeapon>(FDataRegistryId(RegistryType, PrefabName));
+		auto Prefab = Registry->GetCachedItem<FPropertyFragmentMeleeWeapon>(FDataRegistryId(GetRegistryTypeName(), Template));
 		PropertyFragment = *Prefab;
 	}
 }
 
-FName UPropertyFragment_MeleeWeapon::GetPropertyTagName()
+FGameplayTag UPropertyFragment_MeleeWeapon::GetPropertyTag()
 {
-	return FName("InventorySystem.Property.MeleeWeapon");
+	return PropertyTag;
 }
 
 FName UPropertyFragment_MeleeWeapon::GetRegistryTypeName()
 {
-	return FName("MeleeWeaponRegistry");
+	return RegistryType;
+}
+
+FGameplayTagContainer UPropertyFragment_MeleeWeapon::GetRequiredTags()
+{
+	auto Tags = Super::GetRequiredTags();
+	Tags.AddTag(UPropertyFragment_Equipment::PropertyTag);
+	return Tags;
+}
+
+void UPropertyFragment_MeleeWeapon::OnSpawnEntity(AActor* Entity)
+{
+	OnWeaponPutOn();
+}
+
+void UPropertyFragment_MeleeWeapon::OnWeaponHit(FHitResult HitResult)
+{
+	AbilitySystemComponent->HandleHitEvent(FGameplayTag::RequestGameplayTag(FName("AncientBattlefield.Event.Hit.MeleeWeapon")), HitResult.GetActor());
 }
 
 void UPropertyFragment_MeleeWeapon::OnWeaponPutOn()
@@ -82,9 +101,4 @@ void UPropertyFragment_MeleeWeapon::OnWeaponTakeOff()
 		TrailingComponent->Teardown();
 		TrailingComponent = nullptr;
 	}
-}
-
-void UPropertyFragment_MeleeWeapon::OnWeaponHit(FHitResult HitResult)
-{
-	AbilitySystemComponent->HandleHitEvent(FGameplayTag::RequestGameplayTag(FName("AncientBattlefield.Event.Hit.MeleeWeapon")), HitResult.GetActor());
 }

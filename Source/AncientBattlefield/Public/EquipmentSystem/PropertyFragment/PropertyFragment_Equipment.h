@@ -22,13 +22,25 @@ enum class EEquipmentSlots : uint8
 	EquipmentSlotsNum
 };
 
+USTRUCT(BlueprintType)
+struct FEquipMode
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FGameplayTag ModeTag;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FName AttachSocketName;
+};
+
 USTRUCT(BlueprintType, meta = (DisplayName = "Equipment"))
 struct FPropertyFragmentEquipment : public FTableRowBase
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TMap<EEquipmentSlots, FName> EquipmentSlots;
+	TArray<FEquipMode> EquipModes;
 };
 
 /**
@@ -40,13 +52,15 @@ class ANCIENTBATTLEFIELD_API UPropertyFragment_Equipment : public UItemPropertyF
 	GENERATED_BODY()
 
 public:
-	virtual void InitFromDataTable(const class UDataTable* DataTable, FName PrefabName) override;
+	virtual void Init(const FName Template) override;
 
-	virtual void InitFromRegistry(const FName RegistryType, FName PrefabName) override;
+	virtual void InitFromRegistry(FName Template) override;
 
-	virtual FName GetPropertyTagName() override;
+	virtual FGameplayTag GetPropertyTag() override;
 
 	virtual FName GetRegistryTypeName() override;
+
+	virtual FGameplayTagContainer GetRequiredTags() override;
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -55,11 +69,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void TakeOff();
 
+protected:
 	UFUNCTION()
-	void OnEquipmentPutOn(AActor* Target, EEquipmentSlots TargetSlot);
+	void OnInventoryUpdate(UInventoryComponent* Inventory, int32 LocalID);
 
 	UFUNCTION()
-	void OnEquipmentTakeOff();
+	void OnSpawnEntity(AActor* Entity);
 
 public:
 	UPROPERTY(BlueprintReadOnly)
@@ -67,4 +82,9 @@ public:
 
 private:
 	UMeshComponent* ParentMesh;
+
+public:
+	static FGameplayTag PropertyTag;
+
+	static FName RegistryType;
 };

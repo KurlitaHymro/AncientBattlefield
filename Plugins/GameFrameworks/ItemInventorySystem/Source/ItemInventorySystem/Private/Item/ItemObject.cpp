@@ -5,15 +5,29 @@
 #include "Item/ItemPropertyFragment.h"
 #include "DataRegistrySubsystem.h"
 
+UItemObject::UItemObject()
+{
+	InventoryUpdateDelegate.AddDynamic(this, &ThisClass::OnInventoryUpdate);
+}
+
 void UItemObject::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const
 {
 	TagContainer.AppendTags(ItemTagContainer);
 }
 
-void UItemObject::AddPropertyFragment(UItemPropertyFragment* PropertyFragmentObject)
+void UItemObject::AddPropertyFragment(UItemPropertyFragment* PropertyFragmentObject, FName TemplateName)
 {
-	PropertyFragmentObject->Owner = this;
-	PropertyFragments.Add(PropertyFragmentObject);
+	if (PropertyFragmentObject->IsDependencyReady(this))
+	{
+		PropertyFragmentObject->Owner = this;
+		PropertyFragmentObject->Init(TemplateName);
+		PropertyFragments.Add(PropertyFragmentObject);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AddPropertyFragment Lack of Dependency."));
+		PropertyFragmentObject->BeginDestroy();
+	}
 }
 
 UItemPropertyFragment* UItemObject::FindPropertyFragment(TSubclassOf<UItemPropertyFragment> PropertyFragmentType)
@@ -31,22 +45,29 @@ UItemPropertyFragment* UItemObject::FindPropertyFragment(TSubclassOf<UItemProper
 	return nullptr;
 }
 
-UItemObject* UItemObject::NewItemByRegistry(UObject* Outer, FName PrefabName)
+FName UItemObject::RegistryType(TEXT("ItemPrefabRegistry"));
+UItemObject* UItemObject::NewItemByRegistry(UObject* Outer, FName TemplateName)
 {
 	UItemObject* Item = NewObject<UItemObject>(Outer);
-	auto ItemPrefabRegistry = UDataRegistrySubsystem::Get()->GetRegistryForType(FName("ItemPrefabRegistry"));
+	auto ItemPrefabRegistry = UDataRegistrySubsystem::Get()->GetRegistryForType(RegistryType);
 	if (ItemPrefabRegistry)
 	{
-		auto ItemPrefab = ItemPrefabRegistry->GetCachedItem<FItemAbstract>(FDataRegistryId(FName("ItemPrefabRegistry"), PrefabName));
-		if (ItemPrefab != nullptr)
+		auto Template = ItemPrefabRegistry->GetCachedItem<FItemAbstract>(FDataRegistryId(RegistryType, TemplateName));
+		if (Template != nullptr)
 		{
-			for (auto PropertyFragment : ItemPrefab->PropertyFragments)
+			for (auto PropertyFragment : Template->PropertyFragments)
 			{
 				UClass* PropertyClass = PropertyFragment.PropertyClass.LoadSynchronous();
 				UItemPropertyFragment* PropertyInstance = NewObject<UItemPropertyFragment>(Item, PropertyClass);
-				PropertyInstance->Init(Item, PropertyFragment.PropertyPrefab, PropertyInstance->GetRegistryTypeName(), nullptr);
+				Item->AddPropertyFragment(PropertyInstance, PropertyFragment.PropertyTemplate);
 			}
 		}
 	}
 	return Item;
+}
+
+void UItemObject::OnInventoryUpdate(UInventoryComponent* Inventory, int32 LocalID)
+{
+	BelongingInventory = Inventory;
+	BelongingSlotID = LocalID;
 }

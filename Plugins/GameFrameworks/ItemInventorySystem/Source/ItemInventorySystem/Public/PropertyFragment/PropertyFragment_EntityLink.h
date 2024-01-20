@@ -7,6 +7,8 @@
 #include "GameFramework/Actor.h"
 #include "PropertyFragment_EntityLink.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemSpawnEntityDelegate, AActor*, Entity);
+
 USTRUCT(BlueprintType, meta = (DisplayName = "EntityLink"))
 struct FPropertyFragmentEntityLink : public FTableRowBase
 {
@@ -25,11 +27,9 @@ class ITEMINVENTORYSYSTEM_API UPropertyFragment_EntityLink : public UItemPropert
 	GENERATED_BODY()
 
 public:
-	virtual void InitFromDataTable(const class UDataTable* DataTable, FName PrefabName) override;
+	virtual void InitFromRegistry(FName Template) override;
 
-	virtual void InitFromRegistry(const FName RegistryType, FName PrefabName) override;
-
-	virtual FName GetPropertyTagName() override;
+	virtual FGameplayTag GetPropertyTag() override;
 
 	virtual FName GetRegistryTypeName() override;
 
@@ -47,8 +47,16 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	FPropertyFragmentEntityLink PropertyFragment;
 
+	UPROPERTY(BlueprintAssignable)
+	FItemSpawnEntityDelegate ItemSpawnEntityDelegate;
+
 private:
 	AEntityActor* Entity;
+
+public:
+	static FGameplayTag PropertyTag;
+
+	static FName RegistryType;
 };
 
 UCLASS()
@@ -60,13 +68,7 @@ public:
 	// Sets default values for this actor's properties
 	AEntityActor();
 
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (InstanceEditable = true, ExposeOnSpawn = true))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = ())
 	class UItemObject* ItemObject;
 };

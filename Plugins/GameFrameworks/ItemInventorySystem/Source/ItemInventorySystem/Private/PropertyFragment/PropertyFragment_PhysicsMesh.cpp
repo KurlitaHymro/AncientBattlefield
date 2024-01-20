@@ -7,9 +7,19 @@
 #include "InventoryComponent.h"
 #include "Kismet/GameplayStatics.h"
 
-FName UPropertyFragment_PhysicsMesh::GetPropertyTagName()
+FGameplayTag UPropertyFragment_PhysicsMesh::PropertyTag(FGameplayTag::RequestGameplayTag(TEXT("InventorySystem.Property.PhysicsMesh")));
+FName UPropertyFragment_PhysicsMesh::RegistryType(TEXT("PhysicsMeshRegistry"));
+
+FGameplayTag UPropertyFragment_PhysicsMesh::GetPropertyTag()
 {
-	return FName("InventorySystem.Property.PhysicsMesh");
+	return PropertyTag;
+}
+
+FGameplayTagContainer UPropertyFragment_PhysicsMesh::GetRequiredTags()
+{
+	auto Tags = Super::GetRequiredTags();
+	Tags.AddTag(UPropertyFragment_EntityLink::PropertyTag);
+	return Tags;
 }
 
 void UPropertyFragment_PhysicsMesh::SetEntityState(UMeshComponent* Mesh, EEntityState State)

@@ -17,19 +17,26 @@ class ITEMINVENTORYSYSTEM_API UItemPropertyFragment : public UObject
 
 public:
 	UFUNCTION(BlueprintCallable)
-	virtual void Init(UItemObject* Item, const FName PrefabName = "", const FName RegistryType = "", const UDataTable* DataTable = nullptr);
+	virtual void Init(const FName Template = "");
 
 	UFUNCTION(BlueprintCallable)
-	virtual void InitFromDataTable(const class UDataTable* DataTable, FName PrefabName);
+	virtual void InitFromRegistry(FName Template);
 
 	UFUNCTION(BlueprintCallable)
-	virtual void InitFromRegistry(const FName RegistryType, FName PrefabName);
+	virtual bool IsDependencyReady(UItemObject* Item);
 
+protected:
 	UFUNCTION(BlueprintCallable)
-	virtual FName GetPropertyTagName();
+	virtual FGameplayTag GetPropertyTag();
 
 	UFUNCTION(BlueprintCallable)
 	virtual FName GetRegistryTypeName();
+
+	UFUNCTION(BlueprintCallable)
+	virtual FGameplayTagContainer GetRequiredTags();
+
+	UFUNCTION(BlueprintCallable)
+	virtual FGameplayTagContainer GetBlockedTags();
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (InstanceEditable = true, ExposeOnSpawn = true))

@@ -4,39 +4,42 @@
 #include "Item/ItemPropertyFragment.h"
 #include "Item/ItemObject.h"
 
-void UItemPropertyFragment::Init(UItemObject* Item, const FName PrefabName, const FName RegistryType, const UDataTable* DataTable)
+void UItemPropertyFragment::Init(const FName Template)
 {
-	Item->ItemTagContainer.AddTag(FGameplayTag::RequestGameplayTag(GetPropertyTagName()));
-	if (PrefabName.IsValid() && !PrefabName.IsNone())
+	ensure(Owner);
+	Owner->ItemTagContainer.AddTag(GetPropertyTag());
+	if (!Template.IsNone())
 	{
-		if (DataTable)
-		{
-			InitFromDataTable(DataTable, PrefabName);
-		}
-		if (!RegistryType.IsNone())
-		{
-			InitFromRegistry(RegistryType, PrefabName);
-		}
+		InitFromRegistry(Template);
 	}
-	Item->AddPropertyFragment(this);
 }
 
-void UItemPropertyFragment::InitFromDataTable(const UDataTable* DataTable, FName PrefabName)
+void UItemPropertyFragment::InitFromRegistry(FName Template)
 {
 
 }
 
-void UItemPropertyFragment::InitFromRegistry(const FName RegistryType, FName PrefabName)
+bool UItemPropertyFragment::IsDependencyReady(UItemObject* Item)
 {
-
+	return Item->ItemTagContainer.HasAll(GetRequiredTags()) && !Item->ItemTagContainer.HasAny(GetBlockedTags());
 }
 
-FName UItemPropertyFragment::GetPropertyTagName()
+FGameplayTag UItemPropertyFragment::GetPropertyTag()
 {
-	return FName();
+	return FGameplayTag();
 }
 
 FName UItemPropertyFragment::GetRegistryTypeName()
 {
 	return FName();
+}
+
+FGameplayTagContainer UItemPropertyFragment::GetRequiredTags()
+{
+	return FGameplayTagContainer();
+}
+
+FGameplayTagContainer UItemPropertyFragment::GetBlockedTags()
+{
+	return FGameplayTagContainer();
 }
