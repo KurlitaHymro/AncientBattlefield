@@ -69,6 +69,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void TakeOff();
 
+	UFUNCTION(BlueprintCallable)
+	void SwitchMode();
+
 protected:
 	UFUNCTION()
 	void OnInventoryUpdate(UInventoryComponent* Inventory, int32 LocalID);
@@ -82,6 +85,8 @@ public:
 
 private:
 	UMeshComponent* ParentMesh;
+
+	TArray<FEquipMode>::TIterator EquipMode = PropertyFragment.EquipModes.CreateIterator();
 
 public:
 	static FGameplayTag PropertyTag;

@@ -26,7 +26,7 @@ void UInventoryWidget::OnWidgetRebuilt()
 		 * 移除时，之前存在的物品本就没有UI，也就不须关联代理；添加时，其UI会被创建。
 		**/
 		InventoryComponent->InventoryAddItemDelegate.AddDynamic(this, &ThisClass::OnAddItem);
-		InventoryComponent->CollectToUniversalSlots();
+		InventoryComponent->CollectItems();
 		InventoryComponent->InventoryRemoveItemDelegate.AddDynamic(this, &ThisClass::OnRemoveItem);
 	}
 }
@@ -118,7 +118,8 @@ void UInventoryWidget::LoadSubregio(FInventoryWidgetSubregioInfo& Subregio)
 			int32 Row = LocolID / Subregio.SubregioGridPerRow;
 			int32 Column = LocolID - Row * Subregio.SubregioGridPerRow;
 			UniformGridPanel->AddChildToUniformGrid(SlotWidget, Row, Column);
-			InventoryComponent->AppendSlotTags(SlotWidget->SlotID, Subregio.AppendBlockedTags, Subregio.AppendRequiredTags);
+			InventoryComponent->Slots[SlotWidget->SlotID].ItemRequiredTags.AppendTags(Subregio.AppendRequiredTags);
+			InventoryComponent->Slots[SlotWidget->SlotID].ItemBlockedTags.AppendTags(Subregio.AppendBlockedTags);
 		}
 	}
 	else if (0) // 垂直表
@@ -132,7 +133,8 @@ void UInventoryWidget::LoadSubregio(FInventoryWidgetSubregioInfo& Subregio)
 		SlotWidget->InventoryComponent = InventoryComponent;
 		SlotWidget->SlotID = AccumulativeSize;
 		Overlay->AddChildToOverlay(SlotWidget);
-		InventoryComponent->AppendSlotTags(SlotWidget->SlotID, Subregio.AppendBlockedTags, Subregio.AppendRequiredTags);
+		InventoryComponent->Slots[SlotWidget->SlotID].ItemRequiredTags.AppendTags(Subregio.AppendRequiredTags);
+		InventoryComponent->Slots[SlotWidget->SlotID].ItemBlockedTags.AppendTags(Subregio.AppendBlockedTags);
 	}
 	AccumulativeSize += Subregio.SubregioSize;
 }

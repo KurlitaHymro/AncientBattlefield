@@ -18,6 +18,13 @@ void UPropertyFragment_Equipment::Init(const FName Template)
 	Super::Init(Template);
 
 	Owner->InventoryUpdateDelegate.AddDynamic(this, &ThisClass::OnInventoryUpdate);
+	auto EntityLink = Owner->FindPropertyFragment<UPropertyFragment_EntityLink>();
+	EntityLink->ItemSpawnEntityDelegate.AddDynamic(this, &ThisClass::OnSpawnEntity);
+
+	if (EquipMode)
+	{
+		Owner->ItemTagContainer.AddTag(EquipMode->ModeTag);
+	}
 }
 
 void UPropertyFragment_Equipment::InitFromRegistry(FName Template)
@@ -49,82 +56,75 @@ FGameplayTagContainer UPropertyFragment_Equipment::GetRequiredTags()
 
 void UPropertyFragment_Equipment::PutOn()
 {
-	UInventoryComponent* CharacterInventory = Owner->BelongingInventory;
-	if (CharacterInventory)
+	if (UInventoryComponent* Inventory = Owner->BelongingInventory)
 	{
-		// 查找与物品容器共属的装备容器，然后移动物品到最优先的可用位置。
-		if (0)
+		for (int32 SlotID = 0; SlotID < Inventory->Slots.Num(); SlotID++)
 		{
-			EEquipmentSlots EquipmentSlot = EEquipmentSlots::EquipmentSlotsNum;
-			//for (auto IdleSlot : PropertyFragment.EquipmentSlots)
-			//{
-			//	if (CharacterEquipment->GetItem((int32)IdleSlot.Key) == nullptr)
-			//	{
-			//		EquipmentSlot = IdleSlot.Key;
-			//	}
-			//}
-			//if (EquipmentSlot < EEquipmentSlots::EquipmentSlotsNum)
-			//{
-			//	CharacterInventory->RemoveItem(Owner);
-			//	CharacterEquipment->AddItem(Owner, (int32)EquipmentSlot);
-			//}
+			if (Inventory->Slots[SlotID].Item == nullptr && Inventory->CanHold(Owner, SlotID) &&
+				Inventory->Slots[SlotID].ItemRequiredTags.HasTag(PropertyTag))
+			{
+				Inventory->RemoveItem(Owner);
+				Inventory->AddItemToSlot(Owner, SlotID);
+			}
 		}
 	}
 }
 
 void UPropertyFragment_Equipment::TakeOff()
 {
-	if (!Owner)
+	if (UInventoryComponent* Inventory = Owner->BelongingInventory)
+	{
+		for (int32 SlotID = 0; SlotID < Inventory->Slots.Num(); SlotID++)
+		{
+			if (Inventory->Slots[SlotID].Item == nullptr && Inventory->CanHold(Owner, SlotID) &&
+				!Inventory->Slots[SlotID].ItemRequiredTags.HasTag(PropertyTag))
+			{
+				Inventory->RemoveItem(Owner);
+				Inventory->AddItemToSlot(Owner, SlotID);
+			}
+		}
+	}
+}
+
+void UPropertyFragment_Equipment::SwitchMode()
+{
+	if (PropertyFragment.EquipModes.Num() <= 1)
 	{
 		return;
 	}
-	//UEquipmentComponent* CharacterEquipment = Cast<UEquipmentComponent>(Owner->BelongingInventory);
-	//if (CharacterEquipment)
-	//{
-	//	// 查找与装备容器共属的物品容器，然后移动物品到空槽。
-	//	UInventoryComponent* CharacterInventory = CharacterEquipment->GetOwner()->FindComponentByClass<UInventoryComponent>();
-	//	if (CharacterInventory)
-	//	{
-	//		int32 SlotID = CharacterInventory->FindVacancy();
-	//		if (SlotID < CharacterInventory->GetSize())
-	//		{
-	//			CharacterEquipment->RemoveItem(Owner);
-	//			CharacterInventory->AddItem(Owner, SlotID);
-	//		}
-	//	}
-	//}
+
+	TakeOff();
+	Owner->ItemTagContainer.RemoveTag(EquipMode->ModeTag);
+	if (!++EquipMode)
+	{
+		EquipMode.Reset();
+	}
+	Owner->ItemTagContainer.AddTag(EquipMode->ModeTag);
+	PutOn();
 }
 
 void UPropertyFragment_Equipment::OnInventoryUpdate(UInventoryComponent* Inventory, int32 LocalID)
 {
 	UPropertyFragment_EntityLink* EntityLink = Owner->FindPropertyFragment<UPropertyFragment_EntityLink>();
-	if (Inventory && Inventory->Slots[LocalID].ItemRequiredTags.HasTag(GetPropertyTag()))
+	if (Inventory && Inventory->Slots[LocalID].ItemRequiredTags.HasTag(PropertyTag))
 	{
-		if (EntityLink)
-		{
-			EntityLink->ItemSpawnEntityDelegate.AddDynamic(this, &ThisClass::OnSpawnEntity);
-			EntityLink->SpawnEntity();
-		}
+		EntityLink->SpawnEntity();
 	}
-	else
+	else if (ParentMesh)
 	{
-		if (EntityLink)
-		{
-			EntityLink->DestroyEntity();
-			EntityLink->ItemSpawnEntityDelegate.RemoveAll(this);
-			ParentMesh = nullptr;
-		}
+		EntityLink->DestroyEntity();
+		ParentMesh = nullptr;
 	}
 }
 
 void UPropertyFragment_Equipment::OnSpawnEntity(AActor* Entity)
 {
-	ensure(Entity && Owner && Owner->BelongingInventory);
-	ACharacter* Char = Cast<ACharacter>(Owner->BelongingInventory->GetOwner());
-	ParentMesh = Char->GetMesh();
-	auto InitialMode = *PropertyFragment.EquipModes.begin();
+	ensure(Entity && Owner && Owner->BelongingInventory && EquipMode);
+	ParentMesh = Cast<ACharacter>(Owner->BelongingInventory->GetOwner())->GetMesh();
+
 	FAttachmentTransformRules Rules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true);
-	Entity->AttachToComponent(ParentMesh, Rules, InitialMode.AttachSocketName);
+	Entity->AttachToComponent(ParentMesh, Rules, EquipMode->AttachSocketName);
+
 	UPropertyFragment_PhysicsMesh* PhysicsMesh = Owner->FindPropertyFragment<UPropertyFragment_PhysicsMesh>();
 	if (PhysicsMesh)
 	{

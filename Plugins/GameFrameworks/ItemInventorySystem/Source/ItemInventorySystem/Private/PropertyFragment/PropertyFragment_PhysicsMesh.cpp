@@ -76,7 +76,7 @@ void UPropertyFragment_PhysicsMesh::Pickup(UInventoryComponent* TargetInventory)
 		if (EntityLink && EntityLink->GetEntity() != nullptr)
 		{
 			EntityLink->DestroyEntity();
-			TargetInventory->AddItem(Owner, TargetInventory->FindVacancy(Owner));
+			TargetInventory->AddItem(Owner);
 		}
 	}
 }

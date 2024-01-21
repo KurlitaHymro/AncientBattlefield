@@ -4,6 +4,15 @@
 #include "InventoryComponent.h"
 #include "Item/ItemObject.h"
 
+const int32 UInventoryComponent::InvalidIndex(-1);
+
+bool FInventorySlot::CanHold(UItemObject* ExternItem) const
+{
+	FGameplayTagContainer ItemTags;
+	ExternItem->GetOwnedGameplayTags(ItemTags);
+	return ItemTags.HasAll(ItemRequiredTags) && !ItemTags.HasAny(ItemBlockedTags);
+}
+
 // Sets default values for this component's properties
 UInventoryComponent::UInventoryComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -15,106 +24,91 @@ UInventoryComponent::UInventoryComponent(const FObjectInitializer& ObjectInitial
 	Slots.Empty();
 }
 
-void UInventoryComponent::PostLoad()
-{
-	Super::PostLoad();
-	
-	if (Size > 0)
-	{
-		Slots.Init(FInventorySlot(), Size);
-	}
-}
-
-int32 UInventoryComponent::FindVacancy(UItemObject* Item) const
-{
-	for (int32 SlotID = 0; SlotID < Size; SlotID++)
-	{
-		if (Slots[SlotID].Item == nullptr && CanHold(Item, SlotID))
-		{
-			return SlotID;
-		}
-	}
-	return Size;
-}
-
-bool UInventoryComponent::CanHold(UItemObject* Item, int32 SlotID) const
-{
-	if (Item && 0 <= SlotID && SlotID < Size)
-	{
-		FGameplayTagContainer ItemTags;
-		Item->GetOwnedGameplayTags(ItemTags);
-		if (ItemTags.HasAll(Slots[SlotID].ItemRequiredTags) && !ItemTags.HasAny(Slots[SlotID].ItemBlockedTags)) // 后续仍可追加更复杂的功能
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
-void UInventoryComponent::AddItem(UItemObject* Item, int32 SlotID)
-{
-	if (CanHold(Item, SlotID))
-	{
-		Slots[SlotID].Item = Item;
-		InventoryAddItemDelegate.Broadcast(Item, SlotID);
-		Item->InventoryUpdateDelegate.Broadcast(this, SlotID);
-	}
-}
-
-void UInventoryComponent::RemoveItem(UItemObject* Item)
-{
-	if (Item && Item->BelongingInventory == this)
-	{
-		int32 SlotID = Item->BelongingSlotID;
-		ensure(Item == Slots[SlotID].Item);
-		Slots[SlotID].Item = nullptr;
-		InventoryRemoveItemDelegate.Broadcast(Item, SlotID);
-		Item->InventoryUpdateDelegate.Broadcast(nullptr, Size);
-	}
-}
-
-void UInventoryComponent::RemoveItemFromSlot(int32 SlotID)
-{
-	Slots.RangeCheck(SlotID);
-	RemoveItem(Slots[SlotID].Item);
-}
-
-void UInventoryComponent::AppendSlotTags(int32 SlotID, FGameplayTagContainer BlockedTags, FGameplayTagContainer RequiredTags)
-{
-	Slots.RangeCheck(SlotID);
-	Slots[SlotID].ItemBlockedTags.AppendTags(BlockedTags);
-	Slots[SlotID].ItemRequiredTags.AppendTags(RequiredTags);
-}
-
-UItemObject* UInventoryComponent::SwapItem(int32 SlotID, UItemObject* OtherItem)
-{
-	UItemObject* ThisItem = GetItem(SlotID);
-	if (ThisItem && OtherItem && OtherItem->BelongingInventory)
-	{
-		UInventoryComponent* OtherInventory = OtherItem->BelongingInventory;
-		int32 OtherSlot = OtherItem->BelongingSlotID;
-		if (CanHold(OtherItem, SlotID) && OtherInventory->CanHold(ThisItem, OtherSlot))
-		{
-			this->RemoveItem(ThisItem);
-			OtherInventory->RemoveItem(OtherItem);
-			this->AddItem(OtherItem, SlotID);
-			OtherInventory->AddItem(ThisItem, OtherSlot);
-		}
-	}
-	return ThisItem;
-}
-
 UItemObject* UInventoryComponent::GetItem(int32 SlotID)
 {
 	Slots.RangeCheck(SlotID);
 	return Slots[SlotID].Item;
 }
 
-bool UInventoryComponent::CollectToUniversalSlots()
+bool UInventoryComponent::CanHold(UItemObject* Item, int32 SlotID) const
 {
-	/* 将移除所有物品，再按次序添加回万能槽位中。
-	 * 万能槽位UI不足的部分不会显示，Size不足则会被销毁。
-	**/
+	if (Slots.IsValidIndex(SlotID))
+	{
+		return Slots[SlotID].CanHold(Item);
+	}
+	return false;
+}
+
+bool UInventoryComponent::AddItem(UItemObject* Item)
+{
+	for (int32 SlotID = 0; SlotID < Slots.Num(); SlotID++)
+	{
+		if (Slots[SlotID].Item == nullptr && CanHold(Item, SlotID))
+		{
+			return AddItemToSlot(Item, SlotID);
+		}
+	}
+	return false;
+}
+
+bool UInventoryComponent::AddItemToSlot(UItemObject* Item, int32 SlotID)
+{
+	if (Slots.IsValidIndex(SlotID) && Slots[SlotID].Item == nullptr && CanHold(Item, SlotID))
+	{
+		Slots[SlotID].Item = Item;
+		InventoryAddItemDelegate.Broadcast(Item, SlotID);
+		Item->InventoryUpdateDelegate.Broadcast(this, SlotID);
+		return true;
+	}
+	return false;
+}
+
+bool UInventoryComponent::RemoveItem(UItemObject* Item)
+{
+	if (Item && Item->BelongingInventory == this && Slots.IsValidIndex(Item->BelongingSlotID) && Slots[Item->BelongingSlotID].Item == Item)
+	{
+		Slots[Item->BelongingSlotID].Item = nullptr;
+		InventoryRemoveItemDelegate.Broadcast(Item, Item->BelongingSlotID);
+		Item->InventoryUpdateDelegate.Broadcast(nullptr, InvalidIndex);
+		return true;
+	}
+	return false;
+}
+
+bool UInventoryComponent::RemoveItemFromSlot(int32 SlotID)
+{
+	return Slots.IsValidIndex(SlotID) ? RemoveItem(Slots[SlotID].Item) : false;
+}
+
+// 交换
+bool UInventoryComponent::SwapItems(UItemObject* Item1, UItemObject* Item2)
+{
+	if (Item1 && Item1->BelongingInventory && Item1->BelongingInventory->Slots.IsValidIndex(Item1->BelongingSlotID) &&
+		Item2 && Item2->BelongingInventory && Item2->BelongingInventory->Slots.IsValidIndex(Item2->BelongingSlotID))
+	{
+		UInventoryComponent* Inventory1 = Item1->BelongingInventory;
+		UInventoryComponent* Inventory2 = Item2->BelongingInventory;
+		int32 SlotID1 = Item1->BelongingSlotID;
+		int32 SlotID2 = Item2->BelongingSlotID;
+		if (Inventory1->CanHold(Item2, SlotID1) && Inventory2->CanHold(Item1, SlotID2))
+		{
+			Inventory1->Slots[SlotID1].Item = Item2;
+			Inventory2->Slots[SlotID2].Item = Item1;
+			Inventory1->InventoryRemoveItemDelegate.Broadcast(Item1, SlotID1);
+			Inventory2->InventoryRemoveItemDelegate.Broadcast(Item2, SlotID2);
+			Inventory1->InventoryAddItemDelegate.Broadcast(Item2, SlotID1);
+			Inventory2->InventoryAddItemDelegate.Broadcast(Item1, SlotID2);
+			Item1->InventoryUpdateDelegate.Broadcast(Inventory2, SlotID2);
+			Item2->InventoryUpdateDelegate.Broadcast(Inventory1, SlotID1);
+			return true;
+		}
+	}
+	return false;
+}
+
+// 简单整理 O(n^2)
+bool UInventoryComponent::CollectItems()
+{
 	TArray<TObjectPtr<UItemObject>> Items;
 	for (auto Slot : Slots)
 	{
@@ -125,33 +119,36 @@ bool UInventoryComponent::CollectToUniversalSlots()
 		}
 	}
 	auto Iterator = Items.CreateIterator();
-	for (int32 i = 0; i < Size; i++)
+	while (Iterator)
 	{
-		if (Iterator && Slots[i].ItemBlockedTags.IsEmpty() && Slots[i].ItemRequiredTags.IsEmpty())
+		if (AddItem(*Iterator))
 		{
-			AddItem(*Iterator, i);
 			Iterator++;
 		}
+		else
+		{
+			return false;
+		}
 	}
-	if (Iterator)
-	{
-		return false;
-	}
-	else
-	{
-		return true;
-	}
+	return true;
 }
 
 FString UInventoryComponent::GetStaticDescription() const
 {
 	FString Description = FString::Printf(TEXT("%s::%s"), *GetOwner()->GetName(), *this->GetName());
-	for (int32 i = 0; i < Size; i++)
+	for (int32 i = 0; i < Slots.Num(); i++)
 	{
+		if (i % 10)
+		{
+			Description += FString::Printf(TEXT("\n"));
+		}
 		if (Slots[i].Item)
 		{
-			auto ItemInfo = Slots[i].Item->GetFName().ToString();
-			Description += FString::Printf(TEXT("\n[%02d]{%s}"), i, *ItemInfo);
+			Description += FString::Printf(TEXT("[%02d]{% 10s} "), i, *Slots[i].Item->GetFName().ToString());
+		}
+		else
+		{
+			Description += FString::Printf(TEXT("[%02d]{      NULL} "), i);
 		}
 	}
 	return Description;

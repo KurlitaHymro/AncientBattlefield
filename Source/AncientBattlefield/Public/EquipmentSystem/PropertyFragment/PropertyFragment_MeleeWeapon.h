@@ -70,4 +70,6 @@ public:
 	static FGameplayTag PropertyTag;
 
 	static FName RegistryType;
+
+	static FGameplayTag HitEventTag;
 };

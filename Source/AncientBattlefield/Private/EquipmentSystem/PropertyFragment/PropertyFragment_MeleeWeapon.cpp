@@ -14,6 +14,7 @@
 
 FGameplayTag UPropertyFragment_MeleeWeapon::PropertyTag(FGameplayTag::RequestGameplayTag(TEXT("InventorySystem.Property.MeleeWeapon")));
 FName UPropertyFragment_MeleeWeapon::RegistryType(TEXT("MeleeWeaponRegistry"));
+FGameplayTag UPropertyFragment_MeleeWeapon::HitEventTag(FGameplayTag::RequestGameplayTag(TEXT("AncientBattlefield.Event.Hit.MeleeWeapon")));
 
 void UPropertyFragment_MeleeWeapon::Init(const FName Template)
 {
@@ -57,7 +58,7 @@ void UPropertyFragment_MeleeWeapon::OnSpawnEntity(AActor* Entity)
 
 void UPropertyFragment_MeleeWeapon::OnWeaponHit(FHitResult HitResult)
 {
-	AbilitySystemComponent->HandleHitEvent(FGameplayTag::RequestGameplayTag(FName("AncientBattlefield.Event.Hit.MeleeWeapon")), HitResult.GetActor());
+	AbilitySystemComponent->HandleHitEvent(HitEventTag, HitResult.GetActor());
 }
 
 void UPropertyFragment_MeleeWeapon::OnWeaponPutOn()

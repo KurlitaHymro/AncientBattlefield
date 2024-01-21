@@ -72,7 +72,7 @@ void UGameFeatureAction_AddItem::AddActorItems(AActor* Actor, const FInventoryIt
 			if (ItemName.IsValid() && !ItemName.IsNone())
 			{
 				UItemObject* ItemObject = UItemObject::NewItemByRegistry(Actor, ItemName);
-				InventoryComponent->AddItem(ItemObject, InventoryComponent->FindVacancy(ItemObject));
+				InventoryComponent->AddItem(ItemObject);
 				AddedExtensions.Add(ItemObject);
 			}
 		}

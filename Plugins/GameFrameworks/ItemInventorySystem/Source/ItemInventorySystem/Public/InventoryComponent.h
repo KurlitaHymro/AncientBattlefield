@@ -8,7 +8,6 @@
 #include "InventoryComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInventoryAddItemDelegate, UItemObject*, Item, int32, LocalID);
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInventoryRemoveItemDelegate, UItemObject*, Item, int32, LocalID);
 
 USTRUCT(BlueprintType, meta = (DisplayName = "InventorySlot"))
@@ -22,8 +21,10 @@ struct FInventorySlot
 	UPROPERTY(EditDefaultsOnly, Category = Tags)
 	FGameplayTagContainer ItemRequiredTags;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY()
 	TObjectPtr<UItemObject> Item;
+
+	bool CanHold(UItemObject* ExternItem) const;
 };
 
 UCLASS(BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -35,51 +36,45 @@ public:
 	// Sets default values for this component's properties
 	UInventoryComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-	virtual void PostLoad() override;
-
 public:
 	UFUNCTION(BlueprintCallable)
-	virtual int32 FindVacancy(UItemObject* Item) const;
+	virtual UItemObject* GetItem(int32 SlotID);
 
 	UFUNCTION(BlueprintCallable)
 	virtual bool CanHold(UItemObject* Item, int32 SlotID) const;
 
 	UFUNCTION(BlueprintCallable)
-	virtual void AddItem(UItemObject* Item, int32 SlotID);
+	virtual bool AddItem(UItemObject* Item);
 
 	UFUNCTION(BlueprintCallable)
-	virtual void RemoveItem(UItemObject* Item);
+	virtual bool AddItemToSlot(UItemObject* Item, int32 SlotID);
 
 	UFUNCTION(BlueprintCallable)
-	virtual void RemoveItemFromSlot(int32 SlotID);
+	virtual bool RemoveItem(UItemObject* Item);
 
 	UFUNCTION(BlueprintCallable)
-	virtual void AppendSlotTags(int32 SlotID, FGameplayTagContainer BlockedTags, FGameplayTagContainer RequiredTags);
+	virtual bool RemoveItemFromSlot(int32 SlotID);
 
 	UFUNCTION(BlueprintCallable)
-	virtual UItemObject* SwapItem(int32 SlotID, UItemObject* OtherItem);
+	virtual bool SwapItems(UItemObject* Item1, UItemObject* Item2);
 
 	UFUNCTION(BlueprintCallable)
-	virtual UItemObject* GetItem(int32 SlotID);
-
-	UFUNCTION(BlueprintCallable)
-	virtual bool CollectToUniversalSlots();
+	virtual bool CollectItems();
 
 	UFUNCTION(BlueprintCallable)
 	virtual FString GetStaticDescription() const;
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", InstanceEditable = true))
 	TArray<FInventorySlot> Slots;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0", AllowPrivateAccess = "true", InstanceEditable = true, ExposeOnSpawn = true))
-	int32 Size;
-
 public:
-	UPROPERTY(BlueprintAssignable)
+	UPROPERTY(BlueprintAssignable, meta = (DisplayName = OnInventoryAddItem))
 	FInventoryAddItemDelegate InventoryAddItemDelegate;
 
-	UPROPERTY(BlueprintAssignable)
+	UPROPERTY(BlueprintAssignable, meta = (DisplayName = OnInventoryRemoveItem))
 	FInventoryRemoveItemDelegate InventoryRemoveItemDelegate;
 
+private:
+	static const int32 InvalidIndex;
 };

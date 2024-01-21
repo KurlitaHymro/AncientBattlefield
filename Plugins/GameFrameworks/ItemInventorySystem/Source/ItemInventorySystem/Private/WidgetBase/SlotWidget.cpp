@@ -16,7 +16,7 @@ bool USlotWidget::DropItem(UItemDragDropOperation* ItemDragDropOperation)
         if (InventoryComponent->CanHold(Item, SlotID))
         {
             Item->BelongingInventory->RemoveItem(Item);
-            InventoryComponent->AddItem(Item, SlotID);
+            InventoryComponent->AddItemToSlot(Item, SlotID);
         }
         return true;
     }
