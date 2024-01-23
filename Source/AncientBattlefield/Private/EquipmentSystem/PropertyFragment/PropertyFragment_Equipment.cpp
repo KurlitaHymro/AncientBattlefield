@@ -47,6 +47,11 @@ FName UPropertyFragment_Equipment::GetRegistryTypeName()
 	return RegistryType;
 }
 
+FString UPropertyFragment_Equipment::GetPropertyDescription()
+{
+	return FString(TEXT("装备"));
+}
+
 FGameplayTagContainer UPropertyFragment_Equipment::GetRequiredTags()
 {
 	auto Tags = Super::GetRequiredTags();

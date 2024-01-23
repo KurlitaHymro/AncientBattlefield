@@ -34,6 +34,11 @@ FName UItemPropertyFragment::GetRegistryTypeName()
 	return FName();
 }
 
+FString UItemPropertyFragment::GetPropertyDescription()
+{
+	return FString();
+}
+
 FGameplayTagContainer UItemPropertyFragment::GetRequiredTags()
 {
 	return FGameplayTagContainer();

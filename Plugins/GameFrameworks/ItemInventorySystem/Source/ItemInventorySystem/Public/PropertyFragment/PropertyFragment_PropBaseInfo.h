@@ -34,6 +34,13 @@ public:
 	virtual FName GetRegistryTypeName() override;
 
 public:
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE FName& GetName() { return PropertyFragment.Name; };
+
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE UTexture2D* GetIcon() { return PropertyFragment.Icon; };
+
+public:
 	UPROPERTY(BlueprintReadOnly)
 	FPropertyFragmentPropBaseInfo PropertyFragment;
 

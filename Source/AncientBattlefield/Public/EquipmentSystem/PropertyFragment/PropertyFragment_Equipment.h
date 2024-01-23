@@ -60,6 +60,8 @@ public:
 
 	virtual FName GetRegistryTypeName() override;
 
+	virtual FString GetPropertyDescription() override;
+
 	virtual FGameplayTagContainer GetRequiredTags() override;
 
 public:

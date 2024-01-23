@@ -21,12 +21,6 @@ struct FInventoryWidgetSubregioInfo
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<class UItemWidget> ItemWidgetType;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Tags)
-	FGameplayTagContainer AppendBlockedTags;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Tags)
-	FGameplayTagContainer AppendRequiredTags;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	int32 SubregioBegin;
 

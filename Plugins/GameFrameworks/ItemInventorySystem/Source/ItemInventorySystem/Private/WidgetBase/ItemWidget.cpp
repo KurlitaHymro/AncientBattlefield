@@ -8,52 +8,6 @@
 #include "Item/ItemPropertyFragment.h"
 #include "PropertyFragment/PropertyFragment_PropBaseInfo.h"
 
-void UItemWidget::OnWidgetRebuilt()
-{
-	Super::OnWidgetRebuilt(); // 蓝图预构造、构造方法的调用时机。
-
-	if (Item)
-	{
-		SetImageWidgetByIcon();
-	}
-}
-
-FName UItemWidget::GetPropName()
-{
-	ensure(Item);
-	FName PropName;
-	UPropertyFragment_PropBaseInfo* BaseInfo = Item->FindPropertyFragment<UPropertyFragment_PropBaseInfo>();
-	if (BaseInfo != nullptr)
-	{
-		PropName = BaseInfo->PropertyFragment.Name;
-	}
-	else
-	{
-		PropName = "Miss_Prop_Name";
-	}
-	return PropName;
-}
-
-UTexture2D* UItemWidget::GetPropIcon()
-{
-	ensure(Item);
-	UTexture2D* PropIcon = nullptr;
-	UPropertyFragment_PropBaseInfo* BaseInfo = Item->FindPropertyFragment<UPropertyFragment_PropBaseInfo>();
-	if (BaseInfo != nullptr)
-	{
-		PropIcon = BaseInfo->PropertyFragment.Icon;
-	}
-	return PropIcon;
-}
-
-void UItemWidget::SetImageWidgetByIcon_Implementation()
-{
-	if (auto Image = GetImageWidget())
-	{
-		Image->SetBrushFromTexture(GetPropIcon());
-	}
-}
-
 UDragDropOperation* UItemWidget::DragItem(TSubclassOf<UItemWidget> DragDropWidgetClass)
 {
 	UItemWidget* DefaultDragVisual = CreateWidget<UItemWidget>(this, DragDropWidgetClass);

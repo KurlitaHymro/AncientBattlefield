@@ -37,6 +37,9 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable)
+	FORCEINLINE UTexture2D* GetIcon() { return PropertyFragment.DisplayIcon; };
+
+	UFUNCTION(BlueprintCallable)
 	class UHitTraceComponent* GetHitTraceComponent() { return HitTraceComponent; };
 
 	UFUNCTION(BlueprintCallable)

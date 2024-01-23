@@ -19,20 +19,6 @@ public:
 	class UItemObject* Item;
 
 protected:
-	virtual void OnWidgetRebuilt() override;
-
-	UFUNCTION(BlueprintCallable)
-	FName GetPropName();
-
-	UFUNCTION(BlueprintCallable)
-	UTexture2D* GetPropIcon();
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	class UImage* GetImageWidget();
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void SetImageWidgetByIcon();
-
 	UFUNCTION(BlueprintCallable, Category = "Drag and Drop")
 	UDragDropOperation* DragItem(TSubclassOf<UItemWidget> DragDropWidgetClass);
 

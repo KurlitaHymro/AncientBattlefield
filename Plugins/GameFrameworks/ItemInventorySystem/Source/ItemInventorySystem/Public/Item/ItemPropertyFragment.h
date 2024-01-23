@@ -25,12 +25,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual bool IsDependencyReady(UItemObject* Item);
 
-protected:
 	UFUNCTION(BlueprintCallable)
 	virtual FGameplayTag GetPropertyTag();
 
 	UFUNCTION(BlueprintCallable)
 	virtual FName GetRegistryTypeName();
+
+	UFUNCTION(BlueprintCallable)
+	virtual FString GetPropertyDescription();
 
 	UFUNCTION(BlueprintCallable)
 	virtual FGameplayTagContainer GetRequiredTags();
