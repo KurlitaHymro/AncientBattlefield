@@ -9,7 +9,7 @@ public class AncientBattlefieldEditorTarget : TargetRules
 	{
 		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V6;
-
-		ExtraModuleNames.AddRange( new string[] { "AncientBattlefield" } );
+		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_7;
+		ExtraModuleNames.Add("AncientBattlefield");
 	}
 }
