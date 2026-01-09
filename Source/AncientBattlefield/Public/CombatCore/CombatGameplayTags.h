@@ -1,0 +1,38 @@
+﻿// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "NativeGameplayTags.h"
+
+/**
+ * 
+ */
+namespace CombatGameplayTags
+{
+	ANCIENTBATTLEFIELD_API FGameplayTag FindTagByString(const FString& TagString, bool bMatchPartialString = false);
+
+	ANCIENTBATTLEFIELD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Combat_AbilitySystem_Event_SwitchStance);
+	ANCIENTBATTLEFIELD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Combat_AbilitySystem_Status_AheadInput);
+
+	ANCIENTBATTLEFIELD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Combat_AbilitySystem_AbilityType_Behavior);
+	ANCIENTBATTLEFIELD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Combat_AbilitySystem_AbilityType_Move);
+	ANCIENTBATTLEFIELD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Combat_AbilitySystem_AbilityType_Theurgys);
+	ANCIENTBATTLEFIELD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Combat_AbilitySystem_AbilityType_Stratagem);
+
+	ANCIENTBATTLEFIELD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Combat_AbilitySystem_Event_HitTraceBegin);
+	ANCIENTBATTLEFIELD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Combat_AbilitySystem_Event_HitTraceEnd);
+	ANCIENTBATTLEFIELD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Combat_AbilitySystem_Event_MeleeWeapon);
+
+	ANCIENTBATTLEFIELD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Combat_AbilitySystem_Status_Running);
+	ANCIENTBATTLEFIELD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Combat_AbilitySystem_Status_Falling);
+	ANCIENTBATTLEFIELD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Combat_AbilitySystem_Status_Defensive);
+
+	ANCIENTBATTLEFIELD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Combat_ItemSystem_Property_Equipment_Helmet);
+	ANCIENTBATTLEFIELD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Combat_ItemSystem_Property_Equipment_Armor);
+	ANCIENTBATTLEFIELD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Combat_ItemSystem_Property_Equipment_Belt);
+	ANCIENTBATTLEFIELD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Combat_ItemSystem_Property_Equipment_Pants);
+	ANCIENTBATTLEFIELD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Combat_ItemSystem_Property_Equipment_Boots);
+	ANCIENTBATTLEFIELD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Combat_ItemSystem_Property_Equipment_Cape);
+	ANCIENTBATTLEFIELD_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Combat_ItemSystem_Property_Equipment_Weapon);
+};
