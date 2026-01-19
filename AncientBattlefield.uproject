@@ -25,6 +25,10 @@
 		{
 			"Name": "CombatCore",
 			"Enabled": true
+		},
+		{
+			"Name": "HuanShouDaoPack",
+			"Enabled": true
 		}
 	]
 }
