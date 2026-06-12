@@ -23,6 +23,26 @@
 			]
 		},
 		{
+			"Name": "GaeaUnrealTools",
+			"Enabled": true
+		},
+		{
+			"Name": "Water",
+			"Enabled": true
+		},
+		{
+			"Name": "WaterAdvanced",
+			"Enabled": true
+		},
+		{
+			"Name": "WaterExtras",
+			"Enabled": true
+		},
+		{
+			"Name": "PCG",
+      "Enabled": true
+    },
+		{
 			"Name": "CombatCore",
 			"Enabled": true
 		},
