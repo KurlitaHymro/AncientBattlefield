@@ -40,6 +40,14 @@
 		},
 		{
 			"Name": "PCG",
+      "Enabled": true
+    },
+		{
+			"Name": "CombatCore",
+			"Enabled": true
+		},
+		{
+			"Name": "HuanShouDaoPack",
 			"Enabled": true
 		}
 	]
