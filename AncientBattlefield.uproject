@@ -40,8 +40,8 @@
 		},
 		{
 			"Name": "PCG",
-      "Enabled": true
-    },
+			"Enabled": true
+		},
 		{
 			"Name": "CombatCore",
 			"Enabled": true
