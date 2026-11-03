@@ -38,16 +38,17 @@ struct FSpawningWorldActorsEntry
 };
 
 /**
- * 
+ * GameFeature action which will spawn actors into particular levels at runtime.
  */
-UCLASS(meta = (DisplayName = "Add Spawned Actors"))
-class GAMEFEATURESEXPANSIONS_API UGameFeatureAction_AddSpawnedActors final : public UGameFeatureAction_AddToWorld
+UCLASS(MinimalAPI, meta = (DisplayName = "Add Spawned Actors"))
+class UGameFeatureAction_AddSpawnedActors final : public UGameFeatureAction_AddToWorld
 {
 	GENERATED_BODY()
 
 public:
 	//~ Begin UGameFeatureAction interface
 	virtual void OnGameFeatureActivating() override;
+	virtual void OnGameFeatureDeactivating(FGameFeatureDeactivatingContext& Context) override;
 
 #if WITH_EDITORONLY_DATA
 	virtual void AddAdditionalAssetBundleData(FAssetBundleData& AssetBundleData) override;
@@ -56,7 +57,7 @@ public:
 
 	//~ Begin UObject interface
 #if WITH_EDITOR
-	virtual EDataValidationResult IsDataValid(TArray<FText>& ValidationErrors) override;
+	virtual EDataValidationResult IsDataValid(class FDataValidationContext& Context) const override;
 #endif
 	//~ End UObject interface
 
@@ -65,7 +66,7 @@ public:
 	TArray<FSpawningWorldActorsEntry> ActorsList;
 
 private:
-	void AddToWorld(const FWorldContext& WorldContext) override;
+	virtual void AddToWorld(const FWorldContext& WorldContext) override;
 
 	void Reset();
 

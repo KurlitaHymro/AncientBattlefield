@@ -124,7 +124,7 @@ void UCombatStanceComponent::ReportInput(UInputAction* InputAction, FGameplayTag
 			}
 		}
 
-		if (!InputAbilitySpec.Ability->AbilityTags.HasTagExact(CombatGameplayTags::Combat_AbilitySystem_AbilityType_Move))
+		if (!InputAbilitySpec.Ability->GetAssetTags().HasTagExact(CombatGameplayTags::Combat_AbilitySystem_AbilityType_Move))
 		{
 			// 仅招式类技能受体态控制。
 		}

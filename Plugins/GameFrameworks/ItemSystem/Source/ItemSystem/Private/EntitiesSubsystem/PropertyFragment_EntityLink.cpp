@@ -77,7 +77,7 @@ void UPropertyFragment_EntityLink::Drop()
 		InventoryComponent->Remove(OwnerItem);
 		if (Entity)
 		{
-			Entity->DetachRootComponentFromParent(false);
+			Entity->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		}
 		else
 		{

@@ -5,6 +5,10 @@
 #include "Engine/AssetManager.h"
 #include "GameFeaturesSubsystemSettings.h"
 
+#if WITH_EDITOR
+#include "Misc/DataValidation.h"
+#endif
+
 #define LOCTEXT_NAMESPACE "GameFeaturesExpansions"
 
 void UGameFeatureAction_AddSpawnedActors::OnGameFeatureActivating()
@@ -14,17 +18,24 @@ void UGameFeatureAction_AddSpawnedActors::OnGameFeatureActivating()
 	Reset();
 }
 
+void UGameFeatureAction_AddSpawnedActors::OnGameFeatureDeactivating(FGameFeatureDeactivatingContext& Context)
+{
+	Super::OnGameFeatureDeactivating(Context);
+
+	Reset();
+}
+
 #if WITH_EDITORONLY_DATA
 void UGameFeatureAction_AddSpawnedActors::AddAdditionalAssetBundleData(FAssetBundleData& AssetBundleData)
 {
-	if (UAssetManager::IsValid())
+	if (UAssetManager::IsInitialized())
 	{
 		for (const FSpawningWorldActorsEntry& Entry : ActorsList)
 		{
 			for (const FSpawningActorEntry& ActorEntry : Entry.Actors)
 			{
-				AssetBundleData.AddBundleAsset(UGameFeaturesSubsystemSettings::LoadStateClient, ActorEntry.ActorType->GetPathName());
-				AssetBundleData.AddBundleAsset(UGameFeaturesSubsystemSettings::LoadStateServer, ActorEntry.ActorType->GetPathName());
+				AssetBundleData.AddBundleAssetTruncated(UGameFeaturesSubsystemSettings::LoadStateClient, ActorEntry.ActorType->GetPathName());
+				AssetBundleData.AddBundleAssetTruncated(UGameFeaturesSubsystemSettings::LoadStateServer, ActorEntry.ActorType->GetPathName());
 			}
 		}
 	}
@@ -32,9 +43,9 @@ void UGameFeatureAction_AddSpawnedActors::AddAdditionalAssetBundleData(FAssetBun
 #endif
 
 #if WITH_EDITOR
-EDataValidationResult UGameFeatureAction_AddSpawnedActors::IsDataValid(TArray<FText>& ValidationErrors)
+EDataValidationResult UGameFeatureAction_AddSpawnedActors::IsDataValid(FDataValidationContext& Context) const
 {
-	EDataValidationResult Result = CombineDataValidationResults(Super::IsDataValid(ValidationErrors), EDataValidationResult::Valid);
+	EDataValidationResult Result = CombineDataValidationResults(Super::IsDataValid(Context), EDataValidationResult::Valid);
 
 	int32 EntryIndex = 0;
 	for (const FSpawningWorldActorsEntry& Entry : ActorsList)
@@ -44,7 +55,7 @@ EDataValidationResult UGameFeatureAction_AddSpawnedActors::IsDataValid(TArray<FT
 		{
 			if (ActorEntry.ActorType == nullptr)
 			{
-				ValidationErrors.Add(FText::Format(LOCTEXT("NullSpawnedActorType", "Null ActorType for actor #{0} at index {1} in ActorsList."), FText::AsNumber(ActorIndex), FText::AsNumber(EntryIndex)));
+				Context.AddError(FText::Format(LOCTEXT("NullSpawnedActorType", "Null ActorType for actor #{0} at index {1} in ActorsList."), FText::AsNumber(ActorIndex), FText::AsNumber(EntryIndex)));
 			}
 			++ActorIndex;
 		}
