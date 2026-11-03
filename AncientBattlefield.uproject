@@ -33,6 +33,22 @@
 		{
 			"Name": "ModularGameplay",
 			"Enabled": true
+		},
+		{
+			"Name": "WaterAdvanced",
+			"Enabled": true
+		},
+		{
+			"Name": "WaterExtras",
+			"Enabled": true
+		},
+		{
+			"Name": "CombatCore",
+			"Enabled": true
+		},
+		{
+			"Name": "HuanShouDaoPack",
+			"Enabled": true
 		}
 	]
 }
